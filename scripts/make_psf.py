@@ -33,6 +33,7 @@ import glob
 import json
 import os
 import sys
+import warnings
 
 import numpy as np
 import matplotlib
@@ -318,7 +319,7 @@ def select_stars(data, mask, params, overrides, star_size):
 
         rows = []
         for s in sources:
-            x, y = float(s['xcentroid']), float(s['ycentroid'])
+            x, y = float(s['x_centroid']), float(s['y_centroid'])
             ix, iy = int(round(x)), int(round(y))
             # bounds: full stamp must be inside the frame
             if not (hsize < x < nx - 1 - hsize and hsize < y < ny - 1 - hsize):
