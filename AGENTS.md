@@ -29,6 +29,25 @@ were 1–44 mas on every band (fit RMSE 0.10–0.19", i.e. the finder's centroid
 galaxies, not a WCS problem). Weight uniformity over every 12" stamp 0.08–0.13 (< 0.2).
 0 bad pixels in any stamp.
 
+**PSFs, all 10 bands empirical (`run_psf_all.sh spt`, 2026-10-02):**
+
+| band | SPT0418-47 stars / FWHM / err frac | SPT2147-50 stars / FWHM / err frac |
+|---|---|---|
+| F115W | **3** / 0.055" / **0.25** | – |
+| F150W | 6 / 0.067" / 0.017 | – |
+| F200W | 5 / 0.073" / 0.012 | 10 / 0.075" / 0.013 |
+| F277W | 6 / 0.120" / 0.018 | **3** / 0.132" / 0.021 |
+| F356W | 6 / 0.148" / 0.012 | 8 / 0.150" / 0.019 |
+| F444W | 7 / 0.169" / 0.008 | 10 / 0.170" / 0.024 |
+
+FWHMs sit 10–35% above the JDox in-flight values (0.040/0.050/0.066/0.092/0.116/0.145"),
+as a 2-dither resampled ePSF should. **SPT0418-47 F115W is not a usable PSF**: 3 stars at
+`min_stars=3`, a bootstrap error fraction of 25%, a visibly noisy kernel. Options, in
+order: add include stars via `info/psf_stars.json` after looking at the F115W mosaic;
+`--method model` once stpsf-data is installed (and then compare the model's FWHM to the
+0.055" measured here); raise `min_stars` to 4 so the auto tier falls back by itself. The
+SPT2147-50 F277W 3-star build is borderline (err 2%) — check `psf.png` before modelling.
+
 **Residual diagonal striping is visible in the SW stamps' background (F115W, F150W, F200W;
 not in LW).** Stripes run diagonally because the detector rows are rotated against the
 North-up grid, so this is a detector-row effect — 1/f that `clean_flicker_noise` did not
