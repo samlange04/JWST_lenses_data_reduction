@@ -1,0 +1,312 @@
+#!/usr/bin/env python
+"""
+Render PyAutoLens `subplot_dataset` QC images from the cutout products.
+
+For each (lens, filt) cutout, assembles a PyAutoLens `al.Imaging` dataset from the four
+FITS products that a lens model actually consumes -- signal, noise, PSF, mask -- applies
+the mask, and writes a 3x3 `aplt.subplot_imaging_dataset` PNG (data, data-log10, noise,
+PSF, PSF-log10, S/N, and the two over-sample-size panels the mask induces). This is the
+same dataset object and the same subplot a modelling run would build, so the image is a
+direct QC of what will be fed to the fit -- crucially it shows the *mask* laid over the
+data/noise/S/N, which none of the pipeline's other QC PNGs do.
+
+All four inputs must exist for a (lens, filt) or it is skipped with a note listing what is
+missing -- a subplot cannot be built from a partial dataset. In particular the MASK is
+hand-drawn by scripts/make_masks.py and is not regenerable, so a lens that has not been
+masked yet is simply reported and skipped, not an error.
+
+All four come from the ONE cutout dir for the band (cutout_paths.py: bcfill supersedes
+standard in place, so there is no priority-tree search to do and no way for the mask to
+describe a different reduction than the sci beside it). The PSF is the one exception, and
+only along the size axis: it is resolved through cutout_paths.psf_cutout_dir, which always
+points at the default-size tree because the kernel is trimmed by amplitude and is not
+size-keyed -- so a --size 20 run pairs its stamps with that same kernel rather than
+reporting it missing.
+
+Output: `{prefix}_dataset.png` written into that cutout dir, where `{prefix}` is
+`cutout_cr` or `cutout` exactly as make_cutouts.py named the products. Provenance (which
+reduction the stamp came from, pixel scale, masked-pixel fraction) is recorded per
+(sample, lens, filt) in info/lens_dataset_subplots.json.
+
+Usage:
+    uv run python scripts/make_dataset_subplots.py --lens J0008-0004 --filt f814W
+    uv run python scripts/make_dataset_subplots.py --sample slacs_gold
+    uv run python scripts/make_dataset_subplots.py --sample slacs_gold --filt f814W
+    uv run python scripts/make_dataset_subplots.py --sample slacs_gold --force
+"""
+
+import argparse
+import contextlib
+import glob
+import os
+import sys
+import warnings
+
+import numpy as np
+from astropy.io import fits
+from astropy.visualization import AsinhStretch, ImageNormalize, PercentileInterval
+from astropy.wcs import WCS
+from astropy.wcs.utils import proj_plane_pixel_scales
+from matplotlib.colors import LogNorm
+
+# autonerves prints a workspace-version-mismatch UserWarning on import in this repo (it's
+# not an autolens_workspace checkout) -- harmless, silence it so it doesn't repeat per lens.
+warnings.filterwarnings('ignore', category=UserWarning, module='autonerves')
+
+import autolens as al
+import autolens.plot as aplt
+
+ws_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import lens_samples as mast_target_names
+import info_json
+import cutout_paths
+
+SUBPLOTS_JSON = os.path.join(ws_path, 'info', 'lens_dataset_subplots.json')
+
+# The four FITS products a lens model consumes; all required to build the dataset.
+COMPONENTS = ('sci', 'noise', 'psf', 'mask')
+
+# Default appearance: match the pipeline's own QC plots (make_cutouts.py / make_mosaics.py),
+# which use inferno + PercentileInterval(99.0) + AsinhStretch(0.1). PyAutoLens's vendored
+# plot_array only knows linear / LogNorm norms, so the asinh stretch is injected via a
+# context-managed Axes.imshow patch (asinh_norm_patch) rather than a public argument.
+DEFAULT_CMAP = 'inferno'
+ASINH_PCT = 99.0
+
+
+@contextlib.contextmanager
+def asinh_norm_patch(pct=ASINH_PCT):
+    """Temporarily make matplotlib's ``Axes.imshow`` apply the same asinh stretch the
+    pipeline's own plots use (``PercentileInterval(pct)`` limits + ``AsinhStretch(0.1)``),
+    computed per panel from the array being shown.
+
+    Only the linear panels are affected -- ``aplt.subplot_imaging_dataset``'s Data / Noise /
+    S/N / over-sample panels, which autolens draws with matplotlib's default linear norm.
+    The dedicated log10 panels (drawn with a ``LogNorm``) are left untouched, and so are RGB
+    images and the translucent ``array_overlay`` imshow, so those keep their intended look.
+    """
+    from matplotlib.axes import Axes
+    orig_imshow = Axes.imshow
+
+    def patched(self, X, *args, **kwargs):
+        norm = kwargs.get('norm', None)
+        arr = np.asarray(X)
+        skip = (
+            isinstance(norm, LogNorm)             # log10 panels: keep the log stretch
+            or arr.ndim != 2                      # RGB image
+            or kwargs.get('alpha') is not None    # translucent array_overlay
+            or kwargs.get('cmap') == 'Greys'      # array_overlay
+        )
+        if not skip:
+            finite = arr[np.isfinite(arr)]
+            if finite.size:
+                vmin, vmax = PercentileInterval(pct).get_limits(finite)
+                kwargs['norm'] = ImageNormalize(vmin=vmin, vmax=vmax,
+                                                stretch=AsinhStretch(0.1))
+                kwargs.pop('vmin', None)
+                kwargs.pop('vmax', None)
+        return orig_imshow(self, X, *args, **kwargs)
+
+    Axes.imshow = patched
+    try:
+        yield
+    finally:
+        Axes.imshow = orig_imshow
+
+
+def pixel_scale_from_header(hdr):
+    """arcsec/pixel from a cutout FITS header's WCS (a plain float, as Array2D wants)."""
+    return float(proj_plane_pixel_scales(WCS(hdr).celestial)[0] * 3600.0)
+
+
+def find_prefix(cutout_dir, drizzle_pass='auto'):
+    """Delegates to cutout_paths.find_prefix: 'cutout_cr' or 'cutout' for this band, whichever
+    reduction (standard / bcfill / ...) its stamp is from -- the stamp names are variant-
+    tagged, so this is the one place that knows how to find them."""
+    return cutout_paths.find_prefix(cutout_dir, drizzle_pass)
+
+
+def discover_targets(root, sample, lens=None, filt=None, include_ignored=False):
+    """Yield (lens, filt, cutout_dir) for every band with a cutout under `root`, sorted for
+    a reproducible run order.
+    """
+    pattern = os.path.join(root, sample, lens or '*', filt or '*')
+    found = {}
+    # Gitignored cutout dirs are not science products -- see make_masks.discover_targets.
+    # This tool only writes a QC PNG, so the cost of touching one is small, but a subplot of
+    # a diagnostic band in a tracked-looking place is still a lie; skip them the same way.
+    candidates = [d for d in sorted(glob.glob(pattern)) if os.path.isdir(d)]
+    ignored = set() if include_ignored else cutout_paths.gitignored(candidates)
+    for cutout_dir in candidates:
+        if os.path.abspath(cutout_dir) in ignored:
+            continue
+        if find_prefix(cutout_dir, 'auto') is None:
+            continue
+        this_filt = os.path.basename(cutout_dir)
+        this_lens = os.path.basename(os.path.dirname(cutout_dir))
+        found[(this_lens, this_filt)] = cutout_dir
+    for key in sorted(found):
+        yield key[0], key[1], found[key]
+
+
+def resolve_components(cutout_dir, drizzle_pass, psf_dir=None):
+    """Locate the four components for one band. The drizzle prefix (cr/nocrrej) is fixed
+    once from the sci file, so all four come from the same pass. Returns
+    (prefix, {component: path}, missing_list).
+
+    `psf_dir` (cutout_paths.psf_cutout_dir) overrides `cutout_dir` for the psf component
+    only, and matters only for a non-default --size: the kernel is trimmed by amplitude and
+    is not size-keyed, so it lives in the default-size tree and a size-variant run must
+    read it from there rather than report it missing.
+    """
+    prefix = find_prefix(cutout_dir, drizzle_pass)
+    if prefix is None:
+        return None, {}, list(COMPONENTS)
+
+    resolved, missing = {}, []
+    for comp in COMPONENTS:
+        src_dir = psf_dir if (comp == 'psf' and psf_dir is not None) else cutout_dir
+        if comp in cutout_paths.STAMP_KINDS:
+            # sci/noise carry the reduction tag in their name; psf/mask do not (same grid).
+            path = cutout_paths.find_stamp(src_dir, prefix, comp)
+        else:
+            path = os.path.join(src_dir, f'{prefix}_{comp}.fits')
+        if path is not None and os.path.exists(path):
+            resolved[comp] = path
+        else:
+            missing.append(comp)
+    return prefix, resolved, missing
+
+
+def build_and_plot(lens, filt, sample, prefix, resolved, output_dir, check_noise_map,
+                   asinh=True, cmap=DEFAULT_CMAP):
+    """Assemble the al.Imaging dataset, apply the mask, and write the subplot PNG. Returns
+    a provenance dict (also recorded in the tracking JSON by the caller)."""
+    sci_path = resolved['sci']
+    sci_hdr = fits.getheader(sci_path)
+    pixel_scales = pixel_scale_from_header(sci_hdr)
+
+    dataset = al.Imaging.from_fits(
+        pixel_scales=pixel_scales,
+        data_path=sci_path,
+        noise_map_path=resolved['noise'],
+        psf_path=resolved['psf'],
+        check_noise_map=check_noise_map,
+    )
+    mask = al.Mask2D.from_fits(file_path=resolved['mask'], pixel_scales=pixel_scales)
+    frac_masked = float(np.asarray(mask).astype(bool).mean())
+    dataset = dataset.apply_mask(mask=mask)
+
+    os.makedirs(output_dir, exist_ok=True)
+    # asinh + inferno (the pipeline's own plot look) via the imshow patch; a no-op
+    # nullcontext restores stock autolens linear/default when --stretch default is chosen.
+    with (asinh_norm_patch() if asinh else contextlib.nullcontext()):
+        aplt.subplot_imaging_dataset(
+            dataset=dataset,
+            output_path=output_dir,
+            output_filename=f'{prefix}_dataset',
+            output_format='png',
+            colormap=cmap,
+        )
+    out_png = os.path.join(output_dir, f'{prefix}_dataset.png')
+    print(f"  wrote {out_png}")
+    return {
+        'prefix': prefix,
+        'drizzle_pass': 'single',
+        'stretch': 'asinh' if asinh else 'default',
+        'cmap': cmap,
+        'pixel_scale_arcsec': round(pixel_scales, 6),
+        'frac_masked': round(frac_masked, 6),
+        # Which reduction the stamp came from, read from its own header rather than its
+        # path -- the one tree holds both (cutout_paths.py).
+        'variant': str(sci_hdr.get('REDUCVAR', 'standard')),
+        'output': os.path.relpath(out_png, ws_path),
+    }
+
+
+def process(lens, filt, sample, cutout_dir, drizzle_pass, force,
+            check_noise_map, asinh=True, cmap=DEFAULT_CMAP):
+    """Resolve components, build the dataset, and write the subplot. Returns True on write,
+    False on skip (missing component or already present without --force)."""
+    prefix, resolved, missing = resolve_components(
+        cutout_dir, drizzle_pass,
+        psf_dir=cutout_paths.psf_cutout_dir(ws_path, sample, lens, filt))
+    if prefix is None:
+        print(f"{lens} {filt}: no cutout sci for --pass {drizzle_pass}, skipping")
+        return False
+    if missing:
+        print(f"{lens} {filt} [{prefix}]: missing {missing} "
+              f"(have {sorted(resolved) or 'nothing'}) -- cannot build dataset, skipping")
+        return False
+
+    output_dir = cutout_dir
+    out_png = os.path.join(output_dir, f'{prefix}_dataset.png')
+    if os.path.exists(out_png) and not force:
+        print(f"{lens} {filt} [{prefix}]: {os.path.basename(out_png)} exists, "
+              f"skipping (--force to redraw)")
+        return False
+
+    print(f"\n{lens} {filt} [{prefix}]")
+    provenance = build_and_plot(lens, filt, sample, prefix, resolved, output_dir,
+                                check_noise_map, asinh=asinh, cmap=cmap)
+    info_json.update(SUBPLOTS_JSON, sample, lens, filt, provenance)
+    return True
+
+
+def main():
+    p = argparse.ArgumentParser(description=__doc__,
+                                formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument('--sample', default=mast_target_names.DEFAULT_SAMPLE,
+                   help=f'sample subdirectory of the cutout trees (default '
+                        f'{mast_target_names.DEFAULT_SAMPLE})')
+    p.add_argument('--lens', default=None,
+                   help='restrict to one lens; default every lens with cutouts in --sample')
+    p.add_argument('--filt', default=None,
+                   help='restrict to one filter; default every filter the lens has')
+    p.add_argument('--pass', dest='drizzle_pass', choices=['auto', 'cr', 'nocrrej'],
+                   default='auto',
+                   help="which cutout pass to use, matching make_cutouts.py's --pass: "
+                        "'auto' (default) prefers cutout_cr_*, falling back to cutout_* "
+                        "where no CR pass exists (F160W)")
+    p.add_argument('--size', type=float, default=cutout_paths.DEFAULT_SIZE,
+                   help=f'cutout tree to read (default {cutout_paths.DEFAULT_SIZE:g}", i.e. '
+                        'data/cutouts/ -- the tracked, default-size tree carrying the '
+                        'hand-drawn masks; pass --size 20 for the 20" tree)')
+    p.add_argument('--stretch', choices=['asinh', 'default'], default='asinh',
+                   help="colour stretch for the linear panels (Data/Noise/S-N/over-sample): "
+                        "'asinh' (default) matches the pipeline's own plots "
+                        "(make_cutouts.py / make_mosaics.py: PercentileInterval(99) + "
+                        "AsinhStretch(0.1)); 'default' restores stock autolens linear scaling. "
+                        "The dedicated log10 panels stay log10 either way")
+    p.add_argument('--cmap', default=DEFAULT_CMAP,
+                   help=f'matplotlib colormap for every panel (default {DEFAULT_CMAP}, matching '
+                        f'the pipeline plots)')
+    p.add_argument('--force', action='store_true', default=False,
+                   help='redraw a subplot PNG that already exists (default: skip it)')
+    p.add_argument('--check-noise-map', action='store_true', default=False,
+                   help="run al.Imaging's noise-map sanity check (off by default: this "
+                        "pipeline's ERR/IVM noise maps are legitimate and can trip the "
+                        "heuristic at low-coverage edges)")
+    a = p.parse_args()
+
+    root = cutout_paths.cutouts_root(ws_path, a.size)
+    targets = list(discover_targets(root, a.sample, a.lens, a.filt))
+    if not targets:
+        raise SystemExit(f"no cutouts found under {root} for sample {a.sample} matching "
+                         f"lens={a.lens!r} filt={a.filt!r}")
+
+    print(f"{len(targets)} lens/filter cutout(s) to process")
+    made = skipped = 0
+    for lens, filt, cutout_dir in targets:
+        if process(lens, filt, a.sample, cutout_dir, a.drizzle_pass,
+                   a.force, a.check_noise_map, asinh=(a.stretch == 'asinh'), cmap=a.cmap):
+            made += 1
+        else:
+            skipped += 1
+
+    print(f"\nDone: {made} subplot(s) written, {skipped} skipped")
+
+
+if __name__ == '__main__':
+    main()

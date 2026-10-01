@@ -1,0 +1,24 @@
+# ── Derived data ───────────────────────────────────────────────────────────────
+# Everything under data/ is reproducible: calibrated/ (uncal/rate pools) re-downloads from
+# MAST, stage1/ stage2/ mosaics/ regenerate from scripts/reduce_nircam.py. Provenance lives
+# in info/*.json. B1938+666 alone is ~80 GB of uncal, so none of it enters git history.
+#
+# data/cutouts is the deliberate exception (as in the HST repo): the final science stamps
+# are small and carry the hand-drawn, non-regenerable masks and positions.
+data/*
+!data/cutouts/
+!data/qc/
+data/cutouts/**/*_positions.png
+
+# ── Generated / local ───────────────────────────────────────────────────────────
+output/
+diagnostics/
+/local/
+.claude/*
+!.claude/settings.json
+.idea/
+__pycache__/
+*.py[cod]
+.DS_Store
+.venv/
+# CRDS cache and STPSF data live under data/ (ignored above) -- see AGENTS.md, Environment.

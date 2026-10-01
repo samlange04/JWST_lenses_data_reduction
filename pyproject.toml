@@ -1,0 +1,24 @@
+[project]
+name = "jwst-lenses-data-reduction"
+version = "0.1.0"
+description = "JWST NIRCam image reduction pipeline for gravitational lenses (B1938+666, SPT0418-47, SPT2147-50)"
+requires-python = "==3.13.*"
+dependencies = [
+    "jwst==3.0.0",
+    "stpsf==2.2.0",
+    "astropy>=8.0",
+    "astroquery>=0.4.11",
+    "photutils>=3.0",
+    "matplotlib>=3.10",
+    "numpy>=2.3",
+    "scipy>=1.17",
+    "requests",
+    "crds>=14.0",
+    "tqdm>=4.70",
+    "autolens>=2026.9.27",
+]
+
+[tool.uv]
+# Fully uv-managed interpreter (not a system/Homebrew/conda python): `uv sync` on any
+# machine downloads this exact CPython build itself. See AGENTS.md.
+python-preference = "only-managed"

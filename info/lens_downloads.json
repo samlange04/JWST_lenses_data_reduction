@@ -1,0 +1,22 @@
+{
+    "spt": {
+        "SPT2147-50": {
+            "uncal": {
+                "obs_ids": [
+                    "jw01355-o024_t004_nircam_clear-f200w",
+                    "jw01355-o024_t004_nircam_clear-f277w",
+                    "jw01355-o024_t004_nircam_clear-f356w",
+                    "jw01355-o024_t004_nircam_clear-f444w"
+                ],
+                "n_files": 30,
+                "size_gb": 2.35,
+                "per_filter": {
+                    "F200W": 24,
+                    "F356W": 2,
+                    "F444W": 2,
+                    "F277W": 2
+                }
+            }
+        }
+    }
+}

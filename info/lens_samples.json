@@ -1,0 +1,35 @@
+{
+    "b1938": {
+        "description": "JVAS B1938+666 (z_l = 0.881, z_s = 2.059): JWST GO 8281 (PI Vegetti), NIRCam F115W + F277W, one visit, modules A and B, 21 exposures per detector (~24.4 h total per filter). Exclusive access ended 2026-10-01.",
+        "proposal_id": "8281",
+        "lenses": {
+            "B1938+666": {
+                "mast_target": "B1938+666",
+                "ra": 294.6053333,
+                "dec": 66.8147,
+                "redshift_lens": 0.881,
+                "redshift_source": 2.059
+            }
+        }
+    },
+    "spt": {
+        "description": "The two SPT lenses of Lange et al. 2025 (SPT_rerun): JWST GO 1355 TEMPLATES (PI Rigby), NIRCam module B only. SPT0418-47 has F115W F150W F200W + F277W F356W F444W; SPT2147-50 has F200W + F277W F356W F444W. Both also have MIRI imaging (F560W..F2100W) and NIRSpec/MIRI IFU in the same program, deliberately not reduced here (NIRCam only).",
+        "proposal_id": "1355",
+        "lenses": {
+            "SPT0418-47": {
+                "mast_target": "SPT0418-47",
+                "ra": 64.6653292,
+                "dec": -47.8646333,
+                "redshift_lens": 0.263,
+                "redshift_source": 4.22
+            },
+            "SPT2147-50": {
+                "mast_target": "SPT2147-50",
+                "ra": 326.8292167,
+                "dec": -50.5984722,
+                "redshift_lens": 0.845,
+                "redshift_source": 3.76
+            }
+        }
+    }
+}
