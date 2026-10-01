@@ -73,16 +73,49 @@ def product_table(obs, level):
     return prods[np.sort(idx)]
 
 
-def download(prods, pool_dir):
-    """Fetch `prods` into `pool_dir` (flat, no mastDownload/ nesting). Returns local paths."""
+def download(prods, pool_dir, attempts=8, wait=60):
+    """Fetch `prods` into `pool_dir` (flat, no mastDownload/ nesting), one file at a time
+    with retries, and verify every file's size against MAST's `size` column.
+
+    Why not one `download_products` call: a dropped connection mid-file (seen on the 8th
+    380 MB B1938 uncal, 2026-10-01: ChunkedEncodingError, IncompleteRead) raises out of the
+    whole batch and leaves a truncated file at the final path, which astroquery's cache
+    then treats as done. Sizes are checked before and after, bad files are deleted and
+    re-fetched, and a file that will not come after `attempts` tries fails the run loudly.
+    Returns the local paths."""
+    import time
     from astroquery.mast import Observations
     os.makedirs(pool_dir, exist_ok=True)
-    manifest = Observations.download_products(prods, download_dir=pool_dir, flat=True,
-                                              cache=True)
-    bad = [str(r['Local Path']) for r in manifest if str(r['Status']) != 'COMPLETE']
-    if bad:
-        raise RuntimeError(f'{len(bad)} products did not download, e.g. {bad[:3]}')
-    return [str(r['Local Path']) for r in manifest]
+    paths = []
+    n = len(prods)
+    for i, row in enumerate(prods, 1):
+        name = str(row['productFilename'])
+        expected = int(row['size'])
+        local = os.path.join(pool_dir, name)
+        if os.path.exists(local) and os.path.getsize(local) == expected:
+            paths.append(local)
+            continue
+        for attempt in range(attempts):
+            if os.path.exists(local):
+                os.remove(local)                     # partial or wrong size: start over
+            try:
+                m = Observations.download_products(prods[[i - 1]], download_dir=pool_dir,
+                                                   flat=True, cache=False)
+                ok = len(m) == 1 and str(m['Status'][0]) == 'COMPLETE' \
+                    and os.path.exists(local) and os.path.getsize(local) == expected
+            except Exception as exc:                 # network drop, MAST 5xx, ...
+                ok = False
+                print(f'    {name}: {exc.__class__.__name__} ({str(exc)[:80]})', flush=True)
+            if ok:
+                break
+            got = os.path.getsize(local) if os.path.exists(local) else 0
+            print(f'    [{i}/{n}] {name}: {got}/{expected} bytes; retry {attempt + 1}/{attempts} in {wait}s', flush=True)
+            time.sleep(wait)
+        else:
+            raise RuntimeError(f'{name} did not download after {attempts} attempts')
+        paths.append(local)
+        print(f'    [{i}/{n}] {name} ok', flush=True)
+    return paths
 
 
 def effective_filter(hdr):
