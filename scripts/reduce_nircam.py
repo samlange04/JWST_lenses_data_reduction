@@ -94,6 +94,49 @@ def crds_context():
         return f'unknown ({e.__class__.__name__})'
 
 
+def sync_references(files, attempts=12, wait=120):
+    """Download (and verify) every CRDS reference the given exposures need, BEFORE a
+    pipeline stage touches them, retrying through server outages.
+
+    Why a pre-sync: stpipe fetches references lazily inside the step and a single 502 from
+    jwst-crds.stsci.edu (seen 2026-10-01, with a 4.4 GB dark left truncated on disk) kills a
+    multi-hour run at a random point, and a truncated file in the cache is reused as-is.
+    `crds sync --check-files --repair-files` verifies sizes against the server and re-fetches
+    bad files, so a retry loop around it both waits out the outage and heals the cache.
+    """
+    import subprocess
+    import crds
+    from astropy.io import fits
+    names = set()
+    for f in files:
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            hdr = dict(fits.getheader(f, 0))
+        for attempt in range(attempts):
+            try:
+                refs = crds.getreferences(hdr, observatory='jwst', ignore_cache=False)
+                break
+            except Exception as exc:
+                print(f'  CRDS bestrefs failed ({exc.__class__.__name__}: {str(exc)[:120]}); '
+                      f'retry {attempt + 1}/{attempts} in {wait}s', flush=True)
+                time.sleep(wait)
+        else:
+            raise RuntimeError('CRDS bestrefs kept failing; is jwst-crds.stsci.edu up?')
+        names.update(os.path.basename(v) for v in refs.values() if isinstance(v, str) and v.endswith(('.fits', '.asdf', '.json')))
+    names = sorted(names)
+    print(f'  CRDS: {len(names)} reference files for {len(files)} exposures', flush=True)
+    for attempt in range(attempts):
+        proc = subprocess.run(['crds', 'sync', '--files', *names, '--check-files', '--repair-files'],
+                              capture_output=True, text=True)
+        bad = [l for l in (proc.stdout + proc.stderr).splitlines() if 'ERROR' in l]
+        if proc.returncode == 0 and not bad:
+            return names
+        print(f'  CRDS sync: {len(bad)} error(s) (e.g. {bad[0][:140] if bad else proc.returncode}); '
+              f'retry {attempt + 1}/{attempts} in {wait}s', flush=True)
+        time.sleep(wait)
+    raise RuntimeError('CRDS sync kept failing; is jwst-crds.stsci.edu up?')
+
+
 def _stage_dir(kind, sample, lens, filt, variant=''):
     root = {'stage1': 'stage1', 'stage2': 'stage2',
             'mosaics': os.path.basename(cutout_paths.mosaics_root(ws_path, variant))}[kind]
@@ -280,6 +323,7 @@ def main():
         print(f'=== exists, skipping: {i2d}  (--force to rebuild)')
         return 0
 
+    sync_references(kept)
     if a.start == 'uncal':
         rates = run_detector1(kept, _stage_dir('stage1', sample, a.lens, filt), a.flicker_by_channel)
         cals = run_image2(rates, _stage_dir('stage2', sample, a.lens, filt))
