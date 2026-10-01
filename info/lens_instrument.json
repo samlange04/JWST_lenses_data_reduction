@@ -1,0 +1,18 @@
+{
+    "spt": {
+        "SPT0418-47": {
+            "F115W": "NIRCAM/SW",
+            "F150W": "NIRCAM/SW",
+            "F200W": "NIRCAM/SW",
+            "F277W": "NIRCAM/LW",
+            "F356W": "NIRCAM/LW",
+            "F444W": "NIRCAM/LW"
+        },
+        "SPT2147-50": {
+            "F200W": "NIRCAM/SW",
+            "F277W": "NIRCAM/LW",
+            "F356W": "NIRCAM/LW",
+            "F444W": "NIRCAM/LW"
+        }
+    }
+}

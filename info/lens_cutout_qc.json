@@ -1,0 +1,188 @@
+{
+    "spt": {
+        "SPT0418-47": {
+            "F115W": {
+                "i2d": "data/mosaics/spt/SPT0418-47/F115W/spt0418-47_f115w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 64.6653292,
+                "center_dec": -47.8646333,
+                "n_bad": 0,
+                "weight_uniformity": 0.0939,
+                "corr_factor": 1.0,
+                "corr_source": "default",
+                "casertano_r": 1.5254
+            },
+            "F150W": {
+                "i2d": "data/mosaics/spt/SPT0418-47/F150W/spt0418-47_f150w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 64.6653292,
+                "center_dec": -47.8646333,
+                "n_bad": 0,
+                "weight_uniformity": 0.0782,
+                "corr_factor": 1.0,
+                "corr_source": "default",
+                "casertano_r": 1.5254
+            },
+            "F200W": {
+                "i2d": "data/mosaics/spt/SPT0418-47/F200W/spt0418-47_f200w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 64.6653292,
+                "center_dec": -47.8646333,
+                "n_bad": 0,
+                "weight_uniformity": 0.093,
+                "corr_factor": 1.0,
+                "corr_source": "default",
+                "casertano_r": 1.5254
+            },
+            "F277W": {
+                "i2d": "data/mosaics/spt/SPT0418-47/F277W/spt0418-47_f277w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 64.6653292,
+                "center_dec": -47.8646333,
+                "n_bad": 0,
+                "weight_uniformity": 0.1241,
+                "corr_factor": 1.0,
+                "corr_source": "default",
+                "casertano_r": 1.5384
+            },
+            "F356W": {
+                "i2d": "data/mosaics/spt/SPT0418-47/F356W/spt0418-47_f356w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 64.6653292,
+                "center_dec": -47.8646333,
+                "n_bad": 0,
+                "weight_uniformity": 0.1067,
+                "corr_factor": 1.0,
+                "corr_source": "default",
+                "casertano_r": 1.5384
+            },
+            "F444W": {
+                "i2d": "data/mosaics/spt/SPT0418-47/F444W/spt0418-47_f444w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 64.6653292,
+                "center_dec": -47.8646333,
+                "n_bad": 0,
+                "weight_uniformity": 0.1025,
+                "corr_factor": 1.0,
+                "corr_source": "default",
+                "casertano_r": 1.5384
+            }
+        },
+        "SPT2147-50": {
+            "F200W": {
+                "i2d": "data/mosaics/spt/SPT2147-50/F200W/spt2147-50_f200w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 326.8292167,
+                "center_dec": -50.5984722,
+                "n_bad": 0,
+                "weight_uniformity": 0.0758,
+                "corr_factor": 1.0,
+                "corr_source": "default",
+                "casertano_r": 1.5254
+            },
+            "F277W": {
+                "i2d": "data/mosaics/spt/SPT2147-50/F277W/spt2147-50_f277w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 326.8292167,
+                "center_dec": -50.5984722,
+                "n_bad": 0,
+                "weight_uniformity": 0.1261,
+                "corr_factor": 1.0,
+                "corr_source": "default",
+                "casertano_r": 1.5384
+            },
+            "F356W": {
+                "i2d": "data/mosaics/spt/SPT2147-50/F356W/spt2147-50_f356w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 326.8292167,
+                "center_dec": -50.5984722,
+                "n_bad": 0,
+                "weight_uniformity": 0.1341,
+                "corr_factor": 1.0,
+                "corr_source": "default",
+                "casertano_r": 1.5384
+            },
+            "F444W": {
+                "i2d": "data/mosaics/spt/SPT2147-50/F444W/spt2147-50_f444w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 326.8292167,
+                "center_dec": -50.5984722,
+                "n_bad": 0,
+                "weight_uniformity": 0.1172,
+                "corr_factor": 1.0,
+                "corr_source": "default",
+                "casertano_r": 1.5384
+            }
+        }
+    }
+}

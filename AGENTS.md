@@ -17,9 +17,26 @@ jwst 3.0.0 docs. Program 8281 (B1938+666) became public at 03:16 UTC that day.
 
 | lens | sample | downloaded | reduced | stamps | PSF | masks |
 |---|---|---|---|---|---|---|
-| SPT2147-50 | spt | uncal, all 4 filters | F444W verified; others in the batch run | F444W | F444W empirical, 10 stars | – |
-| SPT0418-47 | spt | uncal, all 6 filters | in the batch run | – | – | – |
-| B1938+666 | b1938 | in progress (~1 file/min of 210) | – | – | – | – |
+| SPT2147-50 | spt | uncal, 4 filters | F200W F277W F356W F444W | all 4 | see info/lens_psf.json | – |
+| SPT0418-47 | spt | uncal, 6 filters | F115W F150W F200W F277W F356W F444W | all 6 | see info/lens_psf.json | – |
+| B1938+666 | b1938 | in progress (~100/210 files at 02:10) | – | – | – | – |
+
+**The whole SPT sample reduced in one `run_reduce_all.sh spt` pass (2026-10-02 02:06): 10 ok,
+0 failed.** Per band: SW (4 detectors × 2 dithers) 220–250 s, SW F200W of SPT2147 (24 frames)
+690 s, LW 60 s — after the references were cached; the CRDS pull dominated the wall clock
+(30 GB in all, a 6.3 GB dark per SW detector at ~30 min each). tweakreg relative shifts
+were 1–44 mas on every band (fit RMSE 0.10–0.19", i.e. the finder's centroid scatter on
+galaxies, not a WCS problem). Weight uniformity over every 12" stamp 0.08–0.13 (< 0.2).
+0 bad pixels in any stamp.
+
+**Residual diagonal striping is visible in the SW stamps' background (F115W, F150W, F200W;
+not in LW).** Stripes run diagonally because the detector rows are rotated against the
+North-up grid, so this is a detector-row effect — 1/f that `clean_flicker_noise` did not
+fully remove, or amplifier offsets. It is at the noise level in a 12" stamp, but it is
+exactly the correlated structure a pixelized source will absorb. Owed: the `--start rate`
+comparison (MAST's rate files, no flicker step) and `--flicker-by-channel`; if neither
+clears it, a rate-level destripe of the TEMPLATES kind (object-masked per-amplifier row
+medians, Rigby+25 §6.2) before Image2.
 
 **First verified product — SPT2147-50 F444W (2026-10-01 23:15):** 2 uncal → Detector1
 23 s + 16 s → Image2 → Image3 21 s → `spt2147-50_f444w_i2d.fits`, 2500² px at 0.060"/px,

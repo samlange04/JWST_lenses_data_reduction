@@ -1,0 +1,248 @@
+{
+    "spt": {
+        "SPT0418-47": {
+            "F115W": {
+                "rootnames": [
+                    "jw01355016001_02101_00001_nrcb1",
+                    "jw01355016001_02101_00001_nrcb2",
+                    "jw01355016001_02101_00001_nrcb3",
+                    "jw01355016001_02101_00001_nrcb4",
+                    "jw01355016001_02101_00002_nrcb1",
+                    "jw01355016001_02101_00002_nrcb2",
+                    "jw01355016001_02101_00002_nrcb3",
+                    "jw01355016001_02101_00002_nrcb4"
+                ],
+                "n_frames": 8,
+                "start": "uncal",
+                "variant": "",
+                "scale": 0.03,
+                "field_arcsec": 150.0,
+                "tweakreg": "relative",
+                "flicker_by_channel": false,
+                "jwst_version": "3.0.0",
+                "crds_context": "jwst_1584.pmap",
+                "pixfrac": null,
+                "bunit": "MJy/sr",
+                "photmjsr": 3.260999917984009,
+                "pixar_sr": 2.1153987485188e-14,
+                "i2d": "data/mosaics/spt/SPT0418-47/F115W/spt0418-47_f115w_i2d.fits"
+            },
+            "F150W": {
+                "rootnames": [
+                    "jw01355016001_02103_00001_nrcb1",
+                    "jw01355016001_02103_00001_nrcb2",
+                    "jw01355016001_02103_00001_nrcb3",
+                    "jw01355016001_02103_00001_nrcb4",
+                    "jw01355016001_02103_00002_nrcb1",
+                    "jw01355016001_02103_00002_nrcb2",
+                    "jw01355016001_02103_00002_nrcb3",
+                    "jw01355016001_02103_00002_nrcb4"
+                ],
+                "n_frames": 8,
+                "start": "uncal",
+                "variant": "",
+                "scale": 0.03,
+                "field_arcsec": 150.0,
+                "tweakreg": "relative",
+                "flicker_by_channel": false,
+                "jwst_version": "3.0.0",
+                "crds_context": "jwst_1584.pmap",
+                "pixfrac": null,
+                "bunit": "MJy/sr",
+                "photmjsr": 2.385999917984009,
+                "pixar_sr": 2.1153987485188e-14,
+                "i2d": "data/mosaics/spt/SPT0418-47/F150W/spt0418-47_f150w_i2d.fits"
+            },
+            "F200W": {
+                "rootnames": [
+                    "jw01355016001_02105_00001_nrcb1",
+                    "jw01355016001_02105_00001_nrcb2",
+                    "jw01355016001_02105_00001_nrcb3",
+                    "jw01355016001_02105_00001_nrcb4",
+                    "jw01355016001_02105_00002_nrcb1",
+                    "jw01355016001_02105_00002_nrcb2",
+                    "jw01355016001_02105_00002_nrcb3",
+                    "jw01355016001_02105_00002_nrcb4"
+                ],
+                "n_frames": 8,
+                "start": "uncal",
+                "variant": "",
+                "scale": 0.03,
+                "field_arcsec": 150.0,
+                "tweakreg": "relative",
+                "flicker_by_channel": false,
+                "jwst_version": "3.0.0",
+                "crds_context": "jwst_1584.pmap",
+                "pixfrac": null,
+                "bunit": "MJy/sr",
+                "photmjsr": 1.9980000257492065,
+                "pixar_sr": 2.1153987485188e-14,
+                "i2d": "data/mosaics/spt/SPT0418-47/F200W/spt0418-47_f200w_i2d.fits"
+            },
+            "F277W": {
+                "rootnames": [
+                    "jw01355016001_02101_00001_nrcblong",
+                    "jw01355016001_02101_00002_nrcblong"
+                ],
+                "n_frames": 2,
+                "start": "uncal",
+                "variant": "",
+                "scale": 0.06,
+                "field_arcsec": 150.0,
+                "tweakreg": "relative",
+                "flicker_by_channel": false,
+                "jwst_version": "3.0.0",
+                "crds_context": "jwst_1584.pmap",
+                "pixfrac": null,
+                "bunit": "MJy/sr",
+                "photmjsr": 0.4180000126361847,
+                "pixar_sr": 8.46159499407523e-14,
+                "i2d": "data/mosaics/spt/SPT0418-47/F277W/spt0418-47_f277w_i2d.fits"
+            },
+            "F356W": {
+                "rootnames": [
+                    "jw01355016001_02103_00001_nrcblong",
+                    "jw01355016001_02103_00002_nrcblong"
+                ],
+                "n_frames": 2,
+                "start": "uncal",
+                "variant": "",
+                "scale": 0.06,
+                "field_arcsec": 150.0,
+                "tweakreg": "relative",
+                "flicker_by_channel": false,
+                "jwst_version": "3.0.0",
+                "crds_context": "jwst_1584.pmap",
+                "pixfrac": null,
+                "bunit": "MJy/sr",
+                "photmjsr": 0.37700000405311584,
+                "pixar_sr": 8.46159499407523e-14,
+                "i2d": "data/mosaics/spt/SPT0418-47/F356W/spt0418-47_f356w_i2d.fits"
+            },
+            "F444W": {
+                "rootnames": [
+                    "jw01355016001_02105_00001_nrcblong",
+                    "jw01355016001_02105_00002_nrcblong"
+                ],
+                "n_frames": 2,
+                "start": "uncal",
+                "variant": "",
+                "scale": 0.06,
+                "field_arcsec": 150.0,
+                "tweakreg": "relative",
+                "flicker_by_channel": false,
+                "jwst_version": "3.0.0",
+                "crds_context": "jwst_1584.pmap",
+                "pixfrac": null,
+                "bunit": "MJy/sr",
+                "photmjsr": 0.36500000953674316,
+                "pixar_sr": 8.46159499407523e-14,
+                "i2d": "data/mosaics/spt/SPT0418-47/F444W/spt0418-47_f444w_i2d.fits"
+            }
+        },
+        "SPT2147-50": {
+            "F200W": {
+                "rootnames": [
+                    "jw01355024001_03101_00001_nrcb1",
+                    "jw01355024001_03101_00001_nrcb2",
+                    "jw01355024001_03101_00001_nrcb3",
+                    "jw01355024001_03101_00001_nrcb4",
+                    "jw01355024001_03101_00002_nrcb1",
+                    "jw01355024001_03101_00002_nrcb2",
+                    "jw01355024001_03101_00002_nrcb3",
+                    "jw01355024001_03101_00002_nrcb4",
+                    "jw01355024001_05101_00001_nrcb1",
+                    "jw01355024001_05101_00001_nrcb2",
+                    "jw01355024001_05101_00001_nrcb3",
+                    "jw01355024001_05101_00001_nrcb4",
+                    "jw01355024001_05101_00002_nrcb1",
+                    "jw01355024001_05101_00002_nrcb2",
+                    "jw01355024001_05101_00002_nrcb3",
+                    "jw01355024001_05101_00002_nrcb4",
+                    "jw01355024001_07101_00001_nrcb1",
+                    "jw01355024001_07101_00001_nrcb2",
+                    "jw01355024001_07101_00001_nrcb3",
+                    "jw01355024001_07101_00001_nrcb4",
+                    "jw01355024001_07101_00002_nrcb1",
+                    "jw01355024001_07101_00002_nrcb2",
+                    "jw01355024001_07101_00002_nrcb3",
+                    "jw01355024001_07101_00002_nrcb4"
+                ],
+                "n_frames": 24,
+                "start": "uncal",
+                "variant": "",
+                "scale": 0.03,
+                "field_arcsec": 150.0,
+                "tweakreg": "relative",
+                "flicker_by_channel": false,
+                "jwst_version": "3.0.0",
+                "crds_context": "jwst_1584.pmap",
+                "pixfrac": null,
+                "bunit": "MJy/sr",
+                "photmjsr": 1.9980000257492065,
+                "pixar_sr": 2.1153987485188e-14,
+                "i2d": "data/mosaics/spt/SPT2147-50/F200W/spt2147-50_f200w_i2d.fits"
+            },
+            "F277W": {
+                "rootnames": [
+                    "jw01355024001_07101_00001_nrcblong",
+                    "jw01355024001_07101_00002_nrcblong"
+                ],
+                "n_frames": 2,
+                "start": "uncal",
+                "variant": "",
+                "scale": 0.06,
+                "field_arcsec": 150.0,
+                "tweakreg": "relative",
+                "flicker_by_channel": false,
+                "jwst_version": "3.0.0",
+                "crds_context": "jwst_1584.pmap",
+                "pixfrac": null,
+                "bunit": "MJy/sr",
+                "photmjsr": 0.4180000126361847,
+                "pixar_sr": 8.46159499407523e-14,
+                "i2d": "data/mosaics/spt/SPT2147-50/F277W/spt2147-50_f277w_i2d.fits"
+            },
+            "F356W": {
+                "rootnames": [
+                    "jw01355024001_03101_00001_nrcblong",
+                    "jw01355024001_03101_00002_nrcblong"
+                ],
+                "n_frames": 2,
+                "start": "uncal",
+                "variant": "",
+                "scale": 0.06,
+                "field_arcsec": 150.0,
+                "tweakreg": "relative",
+                "flicker_by_channel": false,
+                "jwst_version": "3.0.0",
+                "crds_context": "jwst_1584.pmap",
+                "pixfrac": null,
+                "bunit": "MJy/sr",
+                "photmjsr": 0.37700000405311584,
+                "pixar_sr": 8.46159499407523e-14,
+                "i2d": "data/mosaics/spt/SPT2147-50/F356W/spt2147-50_f356w_i2d.fits"
+            },
+            "F444W": {
+                "rootnames": [
+                    "jw01355024001_05101_00001_nrcblong",
+                    "jw01355024001_05101_00002_nrcblong"
+                ],
+                "n_frames": 2,
+                "start": "uncal",
+                "variant": "",
+                "scale": 0.06,
+                "field_arcsec": 150.0,
+                "tweakreg": "relative",
+                "flicker_by_channel": false,
+                "jwst_version": "3.0.0",
+                "crds_context": "jwst_1584.pmap",
+                "pixfrac": null,
+                "bunit": "MJy/sr",
+                "photmjsr": 0.36500000953674316,
+                "pixar_sr": 8.46159499407523e-14,
+                "i2d": "data/mosaics/spt/SPT2147-50/F444W/spt2147-50_f444w_i2d.fits"
+            }
+        }
+    }
+}
