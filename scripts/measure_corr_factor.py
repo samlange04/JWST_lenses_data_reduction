@@ -30,6 +30,9 @@ filter) medians in the shape of info/noise_corr_factors.json (which it does NOT 
 copy the values in by hand after reading them).
 
     uv run python scripts/measure_corr_factor.py [--sample S ...] [--jobs 8]
+
+JWST port: reads the i2d SCI/ERR/WHT (var = ERR^2, no WHT calibration constant), PIXFRAC from
+the header and the native scale from the channel; otherwise the HST method unchanged.
 """
 import argparse
 import glob
@@ -47,7 +50,7 @@ from scipy import ndimage
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import cutout_paths                                  # noqa: E402
-from make_cutouts import find_products              # noqa: E402
+import lens_samples                                 # noqa: E402
 
 WS = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HALF = 30.0                              # arcsec half-width of the measurement region
@@ -136,43 +139,43 @@ def measure(job):
     sample, lens, filt, stamp = job
     out = dict(sample=sample, lens=lens, filt=filt, stamp=os.path.basename(stamp))
     try:
-        prefix = 'cutout_cr' if os.path.basename(stamp).startswith('cutout_cr') else 'cutout'
         variant = cutout_paths.stamp_variant(stamp)
-        ddir = os.path.join(cutout_paths.drizzled_root(WS, variant), sample, lens, filt)
-        sci_f, wht_f = find_products(ddir, 'cr' if prefix == 'cutout_cr' else 'nocrrej')
+        mdir = cutout_paths.mosaic_dir(WS, sample, lens, filt, variant)
+        i2d = cutout_paths.find_i2d(mdir)
         stamp_sci = fits.getdata(stamp).astype(np.float64)
         nh = fits.getheader(stamp.replace('_sci.fits', '_noise.fits'))
-        k = float(nh.get('NOISEK', 1.0))
+        k = 1.0                                   # the i2d ERR is already a sigma
         sh = fits.getheader(stamp)
-        with fits.open(sci_f, memmap=True) as h:
-            hdr = h[0].header
+        with fits.open(i2d, memmap=True) as h:
+            phdr = h[0].header
+            hdr = h['SCI'].header
             wcs = WCS(hdr)
-            # Stamp pixel (0,0) in the mosaic, via the sky (Cutout2D keeps whole pixels).
             sky0 = WCS(sh).celestial.pixel_to_world(0, 0)
             x0, y0 = (int(round(float(v))) for v in wcs.world_to_pixel(sky0))
             ny, nx = stamp_sci.shape
-            mos_patch = np.asarray(h[0].data[y0:y0 + ny, x0:x0 + nx], dtype=np.float64)
+            mos_patch = np.asarray(h['SCI'].data[y0:y0 + ny, x0:x0 + nx], dtype=np.float64)
+            # the stamp zeroes its bad pixels, the mosaic has NaN there
             out['stale'] = not (mos_patch.shape == stamp_sci.shape and
-                                np.array_equal(mos_patch, stamp_sci, equal_nan=True))
+                                np.allclose(np.nan_to_num(mos_patch), stamp_sci, equal_nan=True))
             scale = proj_plane_pixel_scales(wcs.celestial)[0] * 3600.0
             cx, cy = x0 + (nx - 1) / 2.0, y0 + (ny - 1) / 2.0
             hw = int(HALF / scale)
             Y0, Y1 = max(0, int(cy) - hw), min(hdr['NAXIS2'], int(cy) + hw)
             X0, X1 = max(0, int(cx) - hw), min(hdr['NAXIS1'], int(cx) + hw)
-            img = np.asarray(h[0].data[Y0:Y1, X0:X1], dtype=np.float64)
-        with fits.open(wht_f, memmap=True) as h:
-            wht = np.asarray(h[0].data[Y0:Y1, X0:X1], dtype=np.float64)
-        good = np.isfinite(img) & np.isfinite(wht) & (wht > 0)
+            img = np.asarray(h['SCI'].data[Y0:Y1, X0:X1], dtype=np.float64)
+            err = np.asarray(h['ERR'].data[Y0:Y1, X0:X1], dtype=np.float64)
+            wht = np.asarray(h['WHT'].data[Y0:Y1, X0:X1], dtype=np.float64)
+        channel = lens_samples.channel(filt)
+        good = np.isfinite(img) & np.isfinite(err) & (err > 0) & np.isfinite(wht) & (wht > 0)
         yy, xx = np.mgrid[Y0:Y1, X0:X1]
         good &= np.hypot(xx - cx, yy - cy) * scale > LENS_R
-        var = np.where(good, k * k / np.where(good, wht, 1.0), 0.0)
+        var = np.where(good, err ** 2, 0.0)
         img = np.where(good, img, 0.0)
-        out.update(scale=float(scale), instrume=str(hdr.get('INSTRUME', '')).strip(),
-                   detector=str(hdr.get('DETECTOR', '')).strip(),
-                   casr=nh.get('CASR'), ndrizim=hdr.get('NDRIZIM'),
-                   pixfrac=hdr.get('D001PIXF'), native_scale=hdr.get('D001ISCL'),
-                   region_arcsec=[(X1 - X0) * scale,
-                                                               (Y1 - Y0) * scale])
+        out.update(scale=float(scale), instrume='NIRCAM', detector=channel,
+                   casr=nh.get('CASR'), ndrizim=phdr.get('NDRIZIM', hdr.get('NDRIZIM')),
+                   pixfrac=float(hdr.get('PIXFRAC', phdr.get('PIXFRAC', 1.0))),
+                   native_scale=lens_samples.NATIVE_SCALE[channel],
+                   region_arcsec=[(X1 - X0) * scale, (Y1 - Y0) * scale])
         rng = np.random.default_rng(0)
         for nsig in THRESHOLDS:
             usable = good & ~source_mask(img, good, nsig)
@@ -200,7 +203,7 @@ def summarise(results, thr='thr3'):
     for r in results:
         if 'error' in r:
             continue
-        inst = 'WFPC2' if r['instrume'] == 'WFPC2' else f"{r['instrume']}/{r['detector']}"
+        inst = f"{r['instrume']}/{r['detector']}"
         groups.setdefault((inst, r['filt'].split('_')[0]), []).append(r)
     print(f'\nper-(instrument, filter) factor, {thr} mask, kernel-window ACF (median, 16-84%):')
     for (inst, band), rs in sorted(groups.items()):
@@ -225,7 +228,7 @@ def jobs_for(samples):
 def main():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--sample', nargs='+', default=['slacs_gold', 'slacs_other', 'gallery'])
+    p.add_argument('--sample', nargs='+', default=lens_samples.samples())
     p.add_argument('--lens', default=None, help='restrict to one lens (testing)')
     p.add_argument('--jobs', type=int, default=6)
     p.add_argument('--out', default=os.path.join(WS, 'diagnostics', 'corr_factor',
