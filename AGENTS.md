@@ -10,18 +10,41 @@ from there it says so, and that file's measurements are not restated here.
 > reporting what is outstanding, verify against source — argparse defaults, what the
 > runner actually passes, tracking JSONs vs what is on disk.
 
-## Current state (2026-10-01, day one)
+## Current state (2026-10-01, day one, evening)
 
 Repo created 2026-10-01 from the HST repo's structure, PyAutoReduce's JWST path and the
 jwst 3.0.0 docs. Program 8281 (B1938+666) became public at 03:16 UTC that day.
 
 | lens | sample | downloaded | reduced | stamps | PSF | masks |
 |---|---|---|---|---|---|---|
-| SPT2147-50 | spt | uncal, all 4 filters | F444W in progress | – | – | – |
-| SPT0418-47 | spt | in progress | – | – | – | – |
-| B1938+666 | b1938 | queued (79 GB) | – | – | – | – |
+| SPT2147-50 | spt | uncal, all 4 filters | F444W verified; others in the batch run | F444W | F444W empirical, 10 stars | – |
+| SPT0418-47 | spt | uncal, all 6 filters | in the batch run | – | – | – |
+| B1938+666 | b1938 | in progress (~1 file/min of 210) | – | – | – | – |
 
-See the end of this file for what is verified and what is still an untested port.
+**First verified product — SPT2147-50 F444W (2026-10-01 23:15):** 2 uncal → Detector1
+23 s + 16 s → Image2 → Image3 21 s → `spt2147-50_f444w_i2d.fits`, 2500² px at 0.060"/px,
+CD = diag(−1, 1) (North-up), CRVAL at the catalogue position, `BUNIT=MJy/sr`,
+`PHOTMJSR=0.365`, `PIXAR_SR=8.46e-14`, `PIXFRAC=1.0`, `PXSCLRT=0.95`, `CRDS_CTX=jwst_1584.pmap`,
+`CAL_VER=3.0.0`. tweakreg relative fit: 72 matches, shift 16 mas, so the a-priori WCS was
+already good. skymatch: 0.230 MJy/sr sky, subtracted at resample. The 12" stamp (200² px) is
+fully covered, 0 bad pixels, and shows the ring + lens galaxy exactly as in Lange+25. Blank-sky
+robust std 0.011 vs median ERR 0.015 MJy/sr: per-pixel scatter BELOW the noise map, as
+resampling predicts — judge the map by block sums (`measure_corr_factor.py`), not per pixel.
+Empirical PSF: 281 detections → 10 PSF-grade stars, FWHM 2.83 px = 0.170" (JDox 0.145"
+nominal; a resampled, 2-dither ePSF is expected broader), 41 px kernel trimmed to 25 px,
+bootstrap PSF error fraction 2.4e-2. The six-spike NIRCam pattern is visible in the log
+panel of `data/psf/spt/SPT2147-50/F444W/psf.png`. `export_dataset.py` on this band
+produced the SPT_rerun layout with `pixel_scale 0.06` and the redshifts.
+
+**Day-one outages and the fixes they forced:** jwst-crds.stsci.edu returned 502/504 then
+timed out for ~2 h (MAST stayed up), killing the first run mid-Detector1 and leaving a
+truncated 4.4 GB dark in the cache → `reduce_nircam.sync_references` (pre-sync with
+`crds sync --check-files --repair-files`, 30 × 300 s retries). MAST dropped a connection
+mid-file on the 8th B1938 uncal (IncompleteRead), which astroquery's batch call raised out
+of and then would have treated the truncated file as cached → `download_nircam.download`
+fetches one file at a time, checks size against MAST's catalogue, deletes and retries.
+Both are the HST repo's "silently wrong product" class: a truncated reference or exposure
+produces no error downstream.
 
 ## Environment
 
@@ -345,7 +368,12 @@ Verified by running: `download_nircam.py` (SPT2147-50: 30 uncal, sorted F200W 24
 specs quoted above (`ResampleStep.spec`, `TweakRegStep.spec`, `CleanFlickerNoiseStep.spec`,
 `JumpStep.spec`); stcal's sky subtraction at resample time.
 
-Written and syntax-checked, first real run pending or in progress at time of writing:
-`reduce_nircam.py`, `make_cutouts.py`, `make_psf.py`/`psf_models.py`, `export_dataset.py`,
-the runners. Raw copies awaiting a port: `measure_corr_factor.py` (reads `D001*` cards and
-the drizzled sci/wht pair; needs `find_i2d` + `PIXFRAC`/`PXSCLRT`). Stubs: `detect_arcs.py`.
+Verified end to end on SPT2147-50 F444W (see *Current state*): `reduce_nircam.py`
+(all three stages, with the CRDS pre-sync), `make_cutouts.py`, `make_psf.py` empirical tier
+(two photutils-3.0 fixes: `x_centroid`/`y_centroid` column names, a missing import),
+`export_dataset.py`, `run_reduce_all.sh`. `make_dataset_subplots.py` runs and correctly
+refuses a band with no mask yet.
+
+Not yet exercised: the STPSF model tier of `make_psf.py` (needs stpsf-data), the three GUIs,
+`make_arc_masks.py`, `make_qc_grids.py`, `measure_corr_factor.py` (ported to i2d, unrun),
+`--start rate`, `--tweakreg gaia`. Stubs: `detect_arcs.py`.
