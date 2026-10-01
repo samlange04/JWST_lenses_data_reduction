@@ -94,7 +94,7 @@ def crds_context():
         return f'unknown ({e.__class__.__name__})'
 
 
-def sync_references(files, attempts=12, wait=120):
+def sync_references(files, attempts=30, wait=300):
     """Download (and verify) every CRDS reference the given exposures need, BEFORE a
     pipeline stage touches them, retrying through server outages.
 
