@@ -13,6 +13,16 @@ re-run only redoes what is missing:
       -> Image2Pipeline    ->  data/stage2/<sample>/<lens>/<FILT>/*_cal.fits
       -> Image3Pipeline    ->  data/mosaics/<sample>/<lens>/<FILT>/<lens>_<FILT>_i2d.fits  (+ .png)
 
+--destripe (opt-in, variant `destriped`) adds, after the standard product exists:
+      -> destripe_nircam   ->  data/stage1_destriped/.../*_rate.fits   (object mask from the
+                               standard mosaic; TEMPLATES recipe, Rigby+25 s6.3)
+      -> Image2Pipeline    ->  data/stage2_destriped/.../*_cal.fits
+      -> Image3Pipeline    ->  data/mosaics_destriped/.../<lens>_<FILT>_i2d.fits
+It is not the default because, measured on SPT0418-47 F150W, it does not reduce the banding
+in the lens stamp: the residual 1/f after clean_flicker_noise is coherent over only ~100 px
+along a row, so no row template estimated outside the lens mask predicts it (AGENTS.md,
+*striping*). It does clean blank sky, which is what a background-limited use wants.
+
 Non-default pipeline settings, and why (AGENTS.md has the long form):
 
   Detector1  jump.expand_large_events=True      snowball flagging (NIR detectors)
@@ -40,6 +50,9 @@ Non-default pipeline settings, and why (AGENTS.md has the long form):
 --start rate|cal skips the earlier stages and reads MAST's own products from
 data/calibrated/.../<FILT>/*_rate.fits (download_nircam.py --level rate); the mosaic then
 goes to data/mosaics_mastrate/ so it can never be confused with the full reduction.
+--flicker-by-channel (clean_flicker_noise.fit_by_channel, one 1/f fit per amplifier) is
+likewise its own variant, `bychan`: data/stage1_bychan, stage2_bychan, mosaics_bychan.
+Without that the flag would be a silent no-op on any band whose rate files already exist.
 
 Units: everything stays in MJy/sr (the jwst convention; PHOTMJSR / PIXAR_SR in the header
 convert to DN/s or Jy/pixel). PyAutoLens is unit-agnostic as long as data, noise and the
@@ -138,7 +151,10 @@ def sync_references(files, attempts=30, wait=300):
 
 
 def _stage_dir(kind, sample, lens, filt, variant=''):
-    root = {'stage1': 'stage1', 'stage2': 'stage2',
+    """data/<stage1|stage2|mosaics>[_<variant>]/<sample>/<lens>/<FILT> -- the variant tags
+    the stage ROOT, so a variant reduction never shares a cache with the standard one."""
+    tag = cutout_paths.variant_tag(variant)
+    root = {'stage1': f'stage1{tag}', 'stage2': f'stage2{tag}',
             'mosaics': os.path.basename(cutout_paths.mosaics_root(ws_path, variant))}[kind]
     return os.path.join(ws_path, 'data', root, sample, lens, filt)
 
@@ -290,6 +306,9 @@ def main():
     p.add_argument('--tweakreg', choices=['relative', 'gaia', 'skip'], default='relative')
     p.add_argument('--flicker-by-channel', action='store_true', default=False,
                    help='clean_flicker_noise.fit_by_channel=True (per-amplifier 1/f fit)')
+    p.add_argument('--destripe', action='store_true', default=False,
+                   help='variant `destriped`: rate-level TEMPLATES 1/f destripe, object mask '
+                        'from the standard mosaic (which must exist or is built first)')
     p.add_argument('--force', action='store_true', help='rebuild the mosaic (stages 1-2 are kept)')
     a = p.parse_args()
 
@@ -301,7 +320,15 @@ def main():
     scale = a.scale if a.scale is not None else DEFAULT_SCALE[ch]
     coord = lens_samples.coord(a.lens, sample)
     variant = {'uncal': '', 'rate': 'mastrate', 'cal': 'mastcal'}[a.start]
-    key = filt                                  # tracking-JSON key = product dir name
+    if a.flicker_by_channel:
+        if a.start != 'uncal':
+            p.error('--flicker-by-channel only applies to --start uncal (Detector1)')
+        variant = 'bychan'                      # own stage1/stage2/mosaic trees, never a no-op
+    if a.destripe:
+        if a.start != 'uncal' or a.flicker_by_channel:
+            p.error('--destripe applies to the standard reduction only (--start uncal, no --flicker-by-channel)')
+        variant = 'destriped'
+    key = filt + cutout_paths.variant_tag(variant)   # tracking-JSON key: <FILT>[_<variant>]
 
     cal_dir = os.path.join(ws_path, 'data', 'calibrated', sample, a.lens, filt)
     inputs = sorted(glob.glob(os.path.join(cal_dir, f'*_{a.start}.fits')))
@@ -324,15 +351,34 @@ def main():
         return 0
 
     sync_references(kept)
+    base_variant = '' if a.destripe else variant      # the destripe starts from the standard stages
     if a.start == 'uncal':
-        rates = run_detector1(kept, _stage_dir('stage1', sample, a.lens, filt), a.flicker_by_channel)
-        cals = run_image2(rates, _stage_dir('stage2', sample, a.lens, filt))
+        rates = run_detector1(kept, _stage_dir('stage1', sample, a.lens, filt, base_variant), a.flicker_by_channel)
+        cals = run_image2(rates, _stage_dir('stage2', sample, a.lens, filt, base_variant))
     elif a.start == 'rate':
-        cals = run_image2(kept, _stage_dir('stage2', sample, a.lens, filt) + '_mastrate')
+        rates = kept
+        cals = run_image2(kept, _stage_dir('stage2', sample, a.lens, filt, variant))
     else:
         cals = kept
 
+    destripe_stats = None
+    if a.destripe:
+        import destripe_nircam
+        # the standard mosaic is the object-mask source; build it if it is not there yet
+        std_dir = _stage_dir('mosaics', sample, a.lens, filt, '')
+        i2d0 = os.path.join(std_dir, f'{product_name}_i2d.fits')
+        if not os.path.exists(i2d0):
+            i2d0 = run_image3(cals, std_dir, product_name, coord, scale, a.field, a.tweakreg)
+            plot_i2d(i2d0, i2d0.replace('_i2d.fits', '_i2d.png'))
+        rates, destripe_stats = destripe_nircam.destripe_frames(
+            rates, cals, i2d0, _stage_dir('stage1', sample, a.lens, filt, variant))
+        cals = run_image2(rates, _stage_dir('stage2', sample, a.lens, filt, variant))
+
     i2d = run_image3(cals, mosaic_dir, product_name, coord, scale, a.field, a.tweakreg)
+    if a.destripe:
+        from astropy.io import fits as _fits
+        with _fits.open(i2d, mode='update') as h:
+            h[0].header['S_DESTRP'] = ('COMPLETE', 'rate-level 1/f destripe (destripe_nircam.py)')
     plot_i2d(i2d, i2d.replace('_i2d.fits', '_i2d.png'))
 
     from astropy.io import fits
@@ -342,16 +388,19 @@ def main():
         'rootnames': [_rootname(f) for f in cals], 'n_frames': len(cals),
         'start': a.start, 'variant': variant, 'scale': scale, 'field_arcsec': a.field,
         'tweakreg': a.tweakreg, 'flicker_by_channel': a.flicker_by_channel,
+        'destripe': bool(a.destripe),
+        'destripe_mask': None if destripe_stats is None else destripe_stats['mask'],
         'jwst_version': hdr.get('CAL_VER'), 'crds_context': hdr.get('CRDS_CTX', crds_context()),
         'pixfrac': sci_hdr.get('PIXFRAC'), 'bunit': sci_hdr.get('BUNIT'),
         'photmjsr': sci_hdr.get('PHOTMJSR'), 'pixar_sr': sci_hdr.get('PIXAR_SR'),
         'i2d': os.path.relpath(i2d, ws_path),
     }
     info_json.update(products_json, sample, a.lens, key, rec)
-    info_json.update(os.path.join(ws_path, 'info', 'lens_exptime.json'), sample, a.lens, key,
-                     round(float(sum(_exptime(f) for f in cals)), 1))
-    info_json.update(os.path.join(ws_path, 'info', 'lens_instrument.json'), sample, a.lens, key,
-                     f'NIRCAM/{ch}')
+    if not variant:                             # exptime / instrument are band properties
+        info_json.update(os.path.join(ws_path, 'info', 'lens_exptime.json'), sample, a.lens, key,
+                         round(float(sum(_exptime(f) for f in cals)), 1))
+        info_json.update(os.path.join(ws_path, 'info', 'lens_instrument.json'), sample, a.lens, key,
+                         f'NIRCAM/{ch}')
     print(f'=== done: {i2d}')
     return 0
 

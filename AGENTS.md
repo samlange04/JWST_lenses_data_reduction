@@ -52,10 +52,50 @@ SPT2147-50 F277W 3-star build is borderline (err 2%) — check `psf.png` before 
 not in LW).** Stripes run diagonally because the detector rows are rotated against the
 North-up grid, so this is a detector-row effect — 1/f that `clean_flicker_noise` did not
 fully remove, or amplifier offsets. It is at the noise level in a 12" stamp, but it is
-exactly the correlated structure a pixelized source will absorb. Owed: the `--start rate`
-comparison (MAST's rate files, no flicker step) and `--flicker-by-channel`; if neither
-clears it, a rate-level destripe of the TEMPLATES kind (object-masked per-amplifier row
-medians, Rigby+25 §6.2) before Image2.
+exactly the correlated structure a pixelized source will absorb.
+
+*Diagnosed on SPT0418-47 F150W (2026-10-02, afternoon).* Stamp metric: high-pass (25 px
+median), mask sources and the lens (r < 110 px), rotate through every angle, rms of the row
+medians. The banding peaks sharply at a rotation of 66°, matching the detector x axis on the
+sky (65°): the stripes run along detector ROWS, the fast-read direction, so it is 1/f and
+not a sky or mosaic artefact. Row-median rms along the stripes vs perpendicular (MJy/sr;
+per-pixel high-passed rms 0.031 in every case):
+
+| reduction | along | perp | excess banding (quadrature) |
+|---|---|---|---|
+| MAST rate (`--start rate`, no flicker step) | 0.0054 | 0.0030 | 0.0045 |
+| standard (`clean_flicker_noise`, one fit per row) | 0.0041 | 0.0029 | 0.0029 |
+| `--flicker-by-channel` (variant `bychan`) | 0.0043 | 0.0031 | 0.0030 |
+| `--destripe` (variant `destriped`, TEMPLATES rate-level recipe) | 0.0039 | 0.0028 | 0.0027 |
+
+So the ramp-level step removes about a third of the banding amplitude, the per-amplifier
+fit adds nothing, and the TEMPLATES destripe (`scripts/destripe_nircam.py`: object mask from
+the standard mosaic propagated through each frame's gwcs OR a per-frame high-pass mask,
+amplifier offsets, then one median per row per 512-column amplifier; Rigby+25 §6.3,
+`rigby2025templates`) adds nothing at the lens either, though it does clean blank sky
+(blank 12" stamps 39" from the lens: along/perp ratio 1.49 → 1.05, 1.71 → 1.33).
+
+**Why nothing row-based can fix the lens stamp.** The autocorrelation of a high-passed B4
+rate frame along the row is 0.13 at 1 px, 0.05 at 32 px, 0.02 at 128 px and zero by 256 px:
+the residual after the ramp step is high-frequency 1/f, coherent over ~100 px (3"), not a
+512-px stripe. A row template estimated outside the lens mask therefore does not predict
+the noise under it — tested directly: with a 400-px box hidden from the template, the
+per-amplifier template makes the box WORSE (0.0044 → 0.0073 DN/s few-row rms: it adds its
+own ~0.002 DN/s of row-coherent noise) and a full-row template changes nothing (0.0042).
+jwst's `fit_method='fft'` (NSClean) would address these frequencies but is NIRSpec-only in
+jwst 3.0. A running median along the row (window ≲ 129 px) does remove it on blank sky but
+would subtract the lens galaxy's unmasked wings near the mask edge (halo SB at the 2σ mask
+edge ≈ 0.02 DN/s, several times the 1/f) — do not do this without a model-based mask.
+
+**Consequence: the residual is correlated noise at ~6% of the per-pixel sigma with a 3"
+correlation length along the detector row, and it has to be carried in the noise model, not
+removed.** `measure_corr_factor.py` (block sums) is the tool; a pixelized source fit should
+expect to absorb some of it. `--destripe` stays available as a variant for background-
+limited uses. The rate-level pedestal removes only amplifier DIFFERENCES (the common level
+is sky and must stay for the flat field). `--flicker-by-channel` and `--destripe` route to
+their own `_bychan` / `_destriped` stage1/stage2/mosaic trees (the flag used to be a silent
+no-op on existing rate files). The measurement scripts live in the session scratchpad only;
+port the rotate-and-row-median scan into `scripts/` if the metric is needed again.
 
 **First verified product — SPT2147-50 F444W (2026-10-01 23:15):** 2 uncal → Detector1
 23 s + 16 s → Image2 → Image3 21 s → `spt2147-50_f444w_i2d.fits`, 2500² px at 0.060"/px,
@@ -138,6 +178,7 @@ the modelling project (`z_projects/SPT_rerun/hpc/data`) reads.
 ```
 download_nircam.py  MAST uncal -> data/calibrated/<sample>/<lens>/pool/ -> hard-linked into <FILT>/
 reduce_nircam.py    uncal -> Detector1 -> rate -> Image2 -> cal -> Image3 -> <lens>_<filt>_i2d.fits
+destripe_nircam.py  rate-level TEMPLATES 1/f destripe (reduce_nircam.py --destripe, variant `destriped`; opt-in)
 make_cutouts.py     i2d SCI/ERR/WHT -> cutout_sci.fits, cutout_noise.fits, cutout.png
 make_psf.py         i2d field stars -> ePSF -> cutout_psf.fits  (STPSF fallback)
 make_masks.py / make_arc_masks.py / make_positions.py   GUIs, one draw per band, broadcast by WCS

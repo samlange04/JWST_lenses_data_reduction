@@ -1,6 +1,32 @@
 {
+    "b1938": {
+        "B1938+666": {
+            "uncal": {
+                "obs_ids": [
+                    "jw08281-o001_t001_nircam_clear-f115w",
+                    "jw08281-o001_t001_nircam_clear-f277w"
+                ],
+                "n_files": 210,
+                "size_gb": 79.29,
+                "per_filter": {
+                    "F115W": 168,
+                    "F277W": 42
+                }
+            }
+        }
+    },
     "spt": {
         "SPT0418-47": {
+            "rate": {
+                "obs_ids": [
+                    "jw01355-o016_t001_nircam_clear-f150w"
+                ],
+                "n_files": 8,
+                "size_gb": 0.67,
+                "per_filter": {
+                    "F150W": 8
+                }
+            },
             "uncal": {
                 "obs_ids": [
                     "jw01355-o016_t001_nircam_clear-f115w",

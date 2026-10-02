@@ -16,6 +16,12 @@ that carries the hand-drawn masks.
     standard (uncal -> our Detector1/Image2/Image3)   data/mosaics/          cutout_sci.fits
     mastrate (MAST's rate files -> our Image2/Image3) data/mosaics_mastrate/ cutout_mastrate_sci.fits
     mastcal  (MAST's cal files -> our Image3)         data/mosaics_mastcal/  cutout_mastcal_sci.fits
+    bychan   (standard, but clean_flicker_noise fits   data/mosaics_bychan/   cutout_bychan_sci.fits
+              1/f per amplifier: --flicker-by-channel; stage1/2 go to data/stage{1,2}_bychan/)
+    destriped (standard rates put through the rate-level TEMPLATES destripe of
+              destripe_nircam.py, object mask from the standard mosaic; opt-in, see
+              AGENTS.md *striping* for why it is not the default)
+                                                      data/mosaics_destriped/ cutout_destriped_sci.fits
 
 Only the sci/noise stamps and their PNG are tagged. Masks, arc masks, positions and PSFs keep
 the bare `cutout` prefix: they describe the band's *grid*, identical across reductions (same
@@ -31,7 +37,7 @@ import os
 DEFAULT_SIZE = 12.0            # arcsec; the modelling stamp
 PREFIX = 'cutout'
 PREFIXES = (PREFIX,)           # HST had ('cutout_cr', 'cutout'); JWST has one pass
-VARIANT_COMPONENTS = ('mastrate', 'mastcal')
+VARIANT_COMPONENTS = ('mastrate', 'mastcal', 'bychan', 'destriped')
 STAMP_KINDS = ('sci', 'noise')
 
 
