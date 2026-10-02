@@ -397,8 +397,11 @@ def main():
     }
     info_json.update(products_json, sample, a.lens, key, rec)
     if not variant:                             # exptime / instrument are band properties
+        # exposure time AT THE LENS: one detector per dither, so sum EFFEXPTM once per
+        # exposure (rootname minus the detector suffix), not over every detector's frame
+        per_exposure = {_rootname(f).rsplit('_', 1)[0]: _exptime(f) for f in cals}
         info_json.update(os.path.join(ws_path, 'info', 'lens_exptime.json'), sample, a.lens, key,
-                         round(float(sum(_exptime(f) for f in cals)), 1))
+                         round(float(sum(per_exposure.values())), 1))
         info_json.update(os.path.join(ws_path, 'info', 'lens_instrument.json'), sample, a.lens, key,
                          f'NIRCAM/{ch}')
     print(f'=== done: {i2d}')

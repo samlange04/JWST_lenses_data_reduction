@@ -1,4 +1,10 @@
 {
+    "b1938": {
+        "B1938+666": {
+            "F115W": "NIRCAM/SW",
+            "F277W": "NIRCAM/LW"
+        }
+    },
     "spt": {
         "SPT0418-47": {
             "F115W": "NIRCAM/SW",

@@ -295,7 +295,7 @@ DN/s = SCI / PHOTMJSR. PyAutoLens is unit-agnostic as long as data, noise and th
 normalisation agree.
 
 Tracking JSONs updated per product: `lens_products.json` (rootnames, jwst version, CRDS
-context, pixfrac, scale, PHOTMJSR/PIXAR_SR, i2d path), `lens_exptime.json` (sum of
+context, pixfrac, scale, PHOTMJSR/PIXAR_SR, i2d path), `lens_exptime.json` (sum per exposure, one detector per dither, of
 EFFEXPTM), `lens_instrument.json` (`NIRCAM/SW` or `NIRCAM/LW`). No data → `null`, exit 0.
 
 ### Not done yet, and known to matter

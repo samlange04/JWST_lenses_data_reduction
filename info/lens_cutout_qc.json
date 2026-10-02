@@ -1,4 +1,44 @@
 {
+    "b1938": {
+        "B1938+666": {
+            "F115W": {
+                "i2d": "data/mosaics/b1938/B1938+666/F115W/b1938p666_f115w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 294.6053333,
+                "center_dec": 66.8147,
+                "n_bad": 0,
+                "weight_uniformity": 0.0338,
+                "corr_factor": 1.0,
+                "corr_source": "default",
+                "casertano_r": 1.5254
+            },
+            "F277W": {
+                "i2d": "data/mosaics/b1938/B1938+666/F277W/b1938p666_f277w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 294.6053333,
+                "center_dec": 66.8147,
+                "n_bad": 0,
+                "weight_uniformity": 0.0524,
+                "corr_factor": 1.0,
+                "corr_source": "default",
+                "casertano_r": 1.5384
+            }
+        }
+    },
     "spt": {
         "SPT0418-47": {
             "F115W": {
