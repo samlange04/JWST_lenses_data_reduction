@@ -1,4 +1,48 @@
 {
+    "b1938": {
+        "B1938+666": {
+            "F115W": {
+                "method": "empirical",
+                "n_stars": 8,
+                "n_crowded_rejected": 0,
+                "fwhm_pix": 1.8103,
+                "fwhm_arcsec": 0.0543,
+                "oversample": 2,
+                "kernel_size": 41,
+                "cutout_kernel_size": 27,
+                "trim_threshold": 0.001,
+                "pedestal_frac": 0.000393,
+                "fwhm_pix_err": 0.044,
+                "psf_err_frac": 0.02363695,
+                "err_method": "bootstrap",
+                "err_source": "stars",
+                "n_boot_valid": 100,
+                "variant": "standard",
+                "broadening": null,
+                "model_info": null
+            },
+            "F277W": {
+                "method": "empirical",
+                "n_stars": 12,
+                "n_crowded_rejected": 0,
+                "fwhm_pix": 2.0109,
+                "fwhm_arcsec": 0.1207,
+                "oversample": 2,
+                "kernel_size": 41,
+                "cutout_kernel_size": 21,
+                "trim_threshold": 0.001,
+                "pedestal_frac": 0.000223,
+                "fwhm_pix_err": 0.0285,
+                "psf_err_frac": 0.01176262,
+                "err_method": "bootstrap",
+                "err_source": "stars",
+                "n_boot_valid": 100,
+                "variant": "standard",
+                "broadening": null,
+                "model_info": null
+            }
+        }
+    },
     "spt": {
         "SPT0418-47": {
             "F115W": {
