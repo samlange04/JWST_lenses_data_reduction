@@ -55,7 +55,7 @@ import lens_samples                                 # noqa: E402
 WS = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 HALF = 30.0                              # arcsec half-width of the measurement region
 LENS_R = 6.0                             # arcsec radius around the lens left out
-BLOCKS_ARCSEC = (0.05, 0.25, 0.5, 1.0, 1.5, 2.0)
+BLOCKS_ARCSEC = (0.05, 0.1, 0.15, 0.2, 0.3, 0.5, 1.0, 2.0, 3.0)   # 0.1-0.3": the source-pixel scales (JWST, 2026-10-04)
 THRESHOLDS = (1.5, 3.0)                  # detection thresholds (x background rms)
 N_BOOT = 300
 

@@ -15,8 +15,8 @@
                 "center_dec": 66.8147,
                 "n_bad": 0,
                 "weight_uniformity": 0.0338,
-                "corr_factor": 1.0,
-                "corr_source": "default",
+                "corr_factor": 1.3,
+                "corr_source": "json:channel",
                 "casertano_r": 1.5254
             },
             "F277W": {
@@ -33,8 +33,8 @@
                 "center_dec": 66.8147,
                 "n_bad": 0,
                 "weight_uniformity": 0.0524,
-                "corr_factor": 1.0,
-                "corr_source": "default",
+                "corr_factor": 1.5,
+                "corr_source": "json:lens",
                 "casertano_r": 1.5384
             }
         }
@@ -55,8 +55,8 @@
                 "center_dec": -47.8646333,
                 "n_bad": 0,
                 "weight_uniformity": 0.0939,
-                "corr_factor": 1.0,
-                "corr_source": "default",
+                "corr_factor": 1.3,
+                "corr_source": "json:channel",
                 "casertano_r": 1.5254
             },
             "F150W": {
@@ -73,8 +73,8 @@
                 "center_dec": -47.8646333,
                 "n_bad": 0,
                 "weight_uniformity": 0.0782,
-                "corr_factor": 1.0,
-                "corr_source": "default",
+                "corr_factor": 1.3,
+                "corr_source": "json:channel",
                 "casertano_r": 1.5254
             },
             "F200W": {
@@ -91,8 +91,8 @@
                 "center_dec": -47.8646333,
                 "n_bad": 0,
                 "weight_uniformity": 0.093,
-                "corr_factor": 1.0,
-                "corr_source": "default",
+                "corr_factor": 1.3,
+                "corr_source": "json:channel",
                 "casertano_r": 1.5254
             },
             "F277W": {
@@ -109,8 +109,8 @@
                 "center_dec": -47.8646333,
                 "n_bad": 0,
                 "weight_uniformity": 0.1241,
-                "corr_factor": 1.0,
-                "corr_source": "default",
+                "corr_factor": 1.03,
+                "corr_source": "json:channel",
                 "casertano_r": 1.5384
             },
             "F356W": {
@@ -127,8 +127,8 @@
                 "center_dec": -47.8646333,
                 "n_bad": 0,
                 "weight_uniformity": 0.1067,
-                "corr_factor": 1.0,
-                "corr_source": "default",
+                "corr_factor": 1.03,
+                "corr_source": "json:channel",
                 "casertano_r": 1.5384
             },
             "F444W": {
@@ -145,8 +145,8 @@
                 "center_dec": -47.8646333,
                 "n_bad": 0,
                 "weight_uniformity": 0.1025,
-                "corr_factor": 1.0,
-                "corr_source": "default",
+                "corr_factor": 1.03,
+                "corr_source": "json:channel",
                 "casertano_r": 1.5384
             }
         },
@@ -165,8 +165,8 @@
                 "center_dec": -50.5984722,
                 "n_bad": 0,
                 "weight_uniformity": 0.0758,
-                "corr_factor": 1.0,
-                "corr_source": "default",
+                "corr_factor": 1.3,
+                "corr_source": "json:channel",
                 "casertano_r": 1.5254
             },
             "F277W": {
@@ -183,8 +183,8 @@
                 "center_dec": -50.5984722,
                 "n_bad": 0,
                 "weight_uniformity": 0.1261,
-                "corr_factor": 1.0,
-                "corr_source": "default",
+                "corr_factor": 1.03,
+                "corr_source": "json:channel",
                 "casertano_r": 1.5384
             },
             "F356W": {
@@ -201,8 +201,8 @@
                 "center_dec": -50.5984722,
                 "n_bad": 0,
                 "weight_uniformity": 0.1341,
-                "corr_factor": 1.0,
-                "corr_source": "default",
+                "corr_factor": 1.03,
+                "corr_source": "json:channel",
                 "casertano_r": 1.5384
             },
             "F444W": {
@@ -219,8 +219,8 @@
                 "center_dec": -50.5984722,
                 "n_bad": 0,
                 "weight_uniformity": 0.1172,
-                "corr_factor": 1.0,
-                "corr_source": "default",
+                "corr_factor": 1.03,
+                "corr_source": "json:channel",
                 "casertano_r": 1.5384
             }
         }

@@ -25,8 +25,11 @@ VAR_RNOISE + VAR_FLAT), each variance drizzled with the science weights -- i.e. 
 already the total noise including source Poisson, and it is "read, not constructed"
 (PyAutoReduce's rule). The stamp's noise is ERR x NOISECOR, where NOISECOR comes from
 info/noise_corr_factors.json (per channel/filter, default 1.0; measured with
-measure_corr_factor.py once a sample's mosaics exist -- the HST repo found its ERR arrays
-understate the noise by 5-25%, white, and the same test is owed here). The Casertano R for
+measure_corr_factor.py). Unlike the HST repo, which applied the drop-window ACF factor,
+the JWST factor is the blank-sky block-sum ratio at the SOURCE-PIXEL scale (the JSON's
+`scale_arcsec`), because the residual 1/f after clean_flicker_noise is correlated over ~3"
+along detector rows and a 1-px window does not see it; the scale and the correlation
+length are stamped as NOISESCL / NOISECRL (AGENTS.md *Correlated noise*). The Casertano R for
 the drop/scale pair is stamped as CASR for information only (it corrects an image-estimated
 rms, not an ERR map; see AGENTS.md *Correlated noise*). Pixels with NaN SCI, non-finite or
 zero ERR, or zero WHT get sci=0, noise=1e8 (the autolens "masked-by-noise" sentinel).
@@ -83,6 +86,14 @@ def casertano_r(pixfrac, scale_ratio):
     p, s = pixfrac, scale_ratio
     r = (s / p) * (1.0 - s / (3.0 * p)) if s < p else 1.0 - p / (3.0 * s)
     return 1.0 / r
+
+
+def corr_factor_meta():
+    """The JSON's `scale_arcsec` (the block scale NOISECOR was read at) and `correlation`
+    note (what the factor does not encode: the row-correlated 1/f residual), for the headers
+    and the exported info.json. Empty when the JSON is absent."""
+    data = info_json.load(CORR_FACTORS_JSON)
+    return data.get('scale_arcsec'), data.get('correlation', {})
 
 
 def resolve_corr_factor(cli_value, channel, filt, sample, lens):
@@ -237,6 +248,12 @@ def main():
     noise_hdr['NOISESRC'] = ('i2d ERR', 'propagated sigma: sqrt(VAR_POISSON+RNOISE+FLAT)')
     noise_hdr['NOISECOR'] = (corr, 'inflation applied to ERR (noise_corr_factors.json)')
     noise_hdr['NOISECRS'] = (corr_src, 'where NOISECOR came from')
+    corr_scale, corr_note = corr_factor_meta()
+    if corr_scale is not None:
+        noise_hdr['NOISESCL'] = (float(corr_scale), 'arcsec block scale NOISECOR was measured at')
+    if corr_note.get('length_arcsec') is not None:
+        noise_hdr['NOISECRL'] = (float(corr_note['length_arcsec']),
+                                 'arcsec corr. length of 1/f residual along det. rows (NOT in NOISECOR)')
     if casr is not None:
         noise_hdr['CASR'] = (round(casr, 4), 'Casertano R for this pixfrac/scale (info only)')
     if wu is not None:

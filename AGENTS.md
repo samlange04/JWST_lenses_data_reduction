@@ -10,7 +10,7 @@ from there it says so, and that file's measurements are not restated here.
 > reporting what is outstanding, verify against source — argparse defaults, what the
 > runner actually passes, tracking JSONs vs what is on disk.
 
-## Current state (2026-10-01, day one, evening)
+## Current state (2026-10-04)
 
 Repo created 2026-10-01 from the HST repo's structure, PyAutoReduce's JWST path and the
 jwst 3.0.0 docs. Program 8281 (B1938+666) became public at 03:16 UTC that day.
@@ -19,7 +19,7 @@ jwst 3.0.0 docs. Program 8281 (B1938+666) became public at 03:16 UTC that day.
 |---|---|---|---|---|---|---|
 | SPT2147-50 | spt | uncal, 4 filters | F200W F277W F356W F444W | all 4 | see info/lens_psf.json | – |
 | SPT0418-47 | spt | uncal, 6 filters | F115W F150W F200W F277W F356W F444W | all 6 | see info/lens_psf.json | – |
-| B1938+666 | b1938 | in progress (~100/210 files at 02:10) | – | – | – | – |
+| B1938+666 | b1938 | uncal, 210 files / 79 GB | F115W F277W (2026-10-02, 8.5 h) | both | both, see info/lens_psf.json | – |
 
 **The whole SPT sample reduced in one `run_reduce_all.sh spt` pass (2026-10-02 02:06): 10 ok,
 0 failed.** Per band: SW (4 detectors × 2 dithers) 220–250 s, SW F200W of SPT2147 (24 frames)
@@ -89,8 +89,10 @@ edge ≈ 0.02 DN/s, several times the 1/f) — do not do this without a model-ba
 
 **Consequence: the residual is correlated noise at ~6% of the per-pixel sigma with a 3"
 correlation length along the detector row, and it has to be carried in the noise model, not
-removed.** `measure_corr_factor.py` (block sums) is the tool; a pixelized source fit should
-expect to absorb some of it. `--destripe` stays available as a variant for background-
+removed.** Done 2026-10-04 as a scale-matched `NOISECOR` (SW 1.30, LW 1.03 at 0.2") with
+the full block-ratio curve exported — see *Noise*. A pixelized source fit should still
+expect to absorb some of it in the sky-dominated part of the mask; on the ring the Poisson
+noise is ~10x the sky sigma and the 1/f is irrelevant. `--destripe` stays available as a variant for background-
 limited uses. The rate-level pedestal removes only amplifier DIFFERENCES (the common level
 is sky and must stay for the flat field). `--flicker-by-channel` and `--destripe` route to
 their own `_bychan` / `_destriped` stage1/stage2/mosaic trees (the flag used to be a silent
@@ -304,9 +306,9 @@ EFFEXPTM), `lens_instrument.json` (`NIRCAM/SW` or `NIRCAM/LW`). No data → `nul
 - **1/f verification**: `clean_flicker_noise` is on by default here on the strength of the
   JDox recommendation, not a measurement on these data. Owed: a blank-sky ACF of a stamp
   cut from `--start rate` (MAST's rate, no flicker step) vs the default.
-- **Noise inflation factors** (`info/noise_corr_factors.json`): all 1.0 until
-  `measure_corr_factor.py` has been run on real mosaics (it is a raw copy of the HST script
-  and needs its product locator and `D001*` header reads ported to i2d — see *Noise*).
+- **Noise inflation factors** (`info/noise_corr_factors.json`): measured 2026-10-04, SW 1.30 /
+  LW 1.03 at 0.2" (see *Noise*). Owed: the B1938+666 F277W `ERR` deficit (1.46 per frame),
+  and a scale-matched rescale once the modelling project fixes its source-pixel scale.
 - **Model PSF broadening by injection**: the STPSF tier uses the analytic drop box; the
   HST repo's injection route (`make_psf_inject.py`) is not ported.
 - **Automatic arc detection** (`detect_arcs.py`) is a stub.
@@ -338,17 +340,38 @@ or ≤ 0, or WHT is 0 (those pixels get sci = 0). `ERR` = sqrt(VAR_POISSON + VAR
 VAR_FLAT), each variance resampled with the science weights — the total per-pixel sigma
 including source Poisson noise, "read, not constructed". `NOISECOR` comes from
 `info/noise_corr_factors.json` (`factors` keyed `NIRCAM/SW`, `NIRCAM/LW` or a filter;
-`lens_overrides[sample][lens][FILT]`), default **1.0**, source recorded as `NOISECRS`.
+`lens_overrides[sample][lens][FILT]`), source recorded as `NOISECRS`, the block scale it was
+read at as `NOISESCL`, and the 1/f correlation length it does NOT cover as `NOISECRL`.
 
-What the HST repo learned and what carries over (its AGENTS.md *Drizzle correlated noise*
-has the numbers): drizzle/resample **conserves** noise (ΣC = 1 over the drop), so the
-propagated sigma is already right for any patch ≥ the drop and resampling itself needs no
-factor; the HST factors of 1.05–1.26 measured an **ERR-array deficit in the inputs** plus a
-few percent of faint unmasked structure. The same test is owed for the jwst `ERR`: blank-sky
-block sums against the noise map (never per-pixel MAD, which resampling drives below 1), via
-`measure_corr_factor.py`. Casertano's R for the drop/scale pair is stamped as `CASR` for
-information — it corrects an image-estimated rms, not an ERR map, and must not be compared to
-`NOISECOR`.
+**Correlated noise — measured 2026-10-04 (`measure_corr_factor.py`, all 12 stamps,
+`diagnostics/corr_factor/`).** Current factors: **SW 1.30, LW 1.03 at 0.2"**, plus a lens
+override **B1938+666 F277W 1.5**. How they were chosen, and why not the HST recipe:
+
+- Drizzle itself behaves: per-pixel C(0) = 0.45–0.55 in every SPT band (pixfrac 1,
+  native→output 0.031→0.03 and 0.063→0.06 halve the per-pixel variance), and the
+  drop-window ACF factor the HST repo applied comes out SW 1.17, LW 1.22 — an ERR deficit
+  of the same size the HST repo saw.
+- But that 1-px-window factor is blind to the residual 1/f (*striping* above: 6% of sigma,
+  coherent over ~3" along detector rows). The blank-sky block-sum ratio shows it: it never
+  plateaus (SW 1.04 at 0.1", 1.30 at 0.2", 2.0 at 0.5", 3.5 at 1", 9 at 3"; LW 0.83, 1.03,
+  1.36, 1.85, 3.8). The full curves are in the JSON (`block_ratio_curve`) and are exported
+  to the modelling project's `info.json` as `noise_correlation`.
+- The applied factor is the block ratio at **0.2"**, roughly the image-plane footprint of a
+  source pixel at these resolutions. This is a convention, not a plateau: a modelling run
+  whose source pixels map to a coarser image-plane scale (high magnification, coarse
+  pixelization — SPT0418-47 is μ ≈ 30) should rescale from the curve. The factor is a
+  scalar: it encodes neither the anisotropy nor the scale dependence. autoarray 2026.9.27
+  accepts a dense `noise_covariance_matrix` for parametric fits only; the inversion ignores
+  it, so there is no consumer for the full structure yet (and a 3" SW mask is 31k px).
+- B1938+666 cannot be measured this way: at 88 ks the 60" blank-sky region is dominated by
+  unmasked faint galaxies, star halos and diffraction spikes (C(0) 12 and 103). It takes
+  the channel factors. Its F277W `ERR` is low by 1.46 on a single cal frame (blank region,
+  high-passed; F115W 1.07, SPT F150W 0.96 by the same test) and by 1.77 inside the stamp,
+  hence the 1.5 override. **Open: why the MEDIUM8 8-group × 5-integration LW rate ERR is
+  low** — check the ramp-fit variance combination for multi-integration exposures.
+
+Casertano's R for the drop/scale pair is stamped as `CASR` for information — it corrects
+an image-estimated rms, not an ERR map, and must not be compared to `NOISECOR`.
 
 ## PSF (`scripts/make_psf.py`, `scripts/psf_models.py`)
 
@@ -453,5 +476,6 @@ Verified end to end on SPT2147-50 F444W (see *Current state*): `reduce_nircam.py
 refuses a band with no mask yet.
 
 Not yet exercised: the STPSF model tier of `make_psf.py` (needs stpsf-data), the three GUIs,
-`make_arc_masks.py`, `make_qc_grids.py`, `measure_corr_factor.py` (ported to i2d, unrun),
-`--start rate`, `--tweakreg gaia`. Stubs: `detect_arcs.py`.
+`make_arc_masks.py`, `make_qc_grids.py`, `--tweakreg gaia`. Stubs: `detect_arcs.py`.
+Exercised since: `measure_corr_factor.py` (12 stamps, 2026-10-04), `--start rate` and
+`--flicker-by-channel` (SPT0418-47 F150W, 2026-10-02), `destripe_nircam.py`.

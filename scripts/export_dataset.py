@@ -74,7 +74,9 @@ def export_band(sample, lens, filt, dest, mask_radius, size):
         'redshift_lens': zl, 'redshift_source': zs,
         'bunit': hdr.get('BUNIT'), 'photmjsr': hdr.get('PHOTMJSR'), 'pixar_sr': hdr.get('PIXAR_SR'),
         'variant': hdr.get('REDUCVAR', 'standard'), 'jwst_version': hdr.get('CAL_VER'),
-        'noise_corr_factor': nhdr.get('NOISECOR'), 'source_repo': 'JWST_lenses_data_reduction',
+        'noise_corr_factor': nhdr.get('NOISECOR'), 'noise_corr_scale_arcsec': nhdr.get('NOISESCL'),
+        'noise_correlation': info_json.load(os.path.join(ws_path, 'info', 'noise_corr_factors.json')).get('correlation'),
+        'source_repo': 'JWST_lenses_data_reduction',
         'source_stamp': os.path.relpath(sci, ws_path), **optional,
     }
     with open(os.path.join(out, 'info.json'), 'w') as fh:
