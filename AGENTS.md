@@ -181,6 +181,8 @@ the modelling project (`z_projects/SPT_rerun/hpc/data`) reads.
 download_nircam.py  MAST uncal -> data/calibrated/<sample>/<lens>/pool/ -> hard-linked into <FILT>/
 reduce_nircam.py    uncal -> Detector1 -> rate -> Image2 -> cal -> Image3 -> <lens>_<filt>_i2d.fits
 destripe_nircam.py  rate-level TEMPLATES 1/f destripe (reduce_nircam.py --destripe, variant `destriped`; opt-in)
+split_noise_test.py half-dither mosaics A, B -> A-B null image -> block-sum ratio vs ERR (deep fields' NOISECOR)
+measure_corr_factor.py  blank-sky block-sum / ACF ratios on every stamp (shallow fields' NOISECOR)
 make_cutouts.py     i2d SCI/ERR/WHT -> cutout_sci.fits, cutout_noise.fits, cutout.png
 make_psf.py         i2d field stars -> ePSF -> cutout_psf.fits  (STPSF fallback)
 make_masks.py / make_arc_masks.py / make_positions.py   GUIs, one draw per band, broadcast by WCS
@@ -307,8 +309,8 @@ EFFEXPTM), `lens_instrument.json` (`NIRCAM/SW` or `NIRCAM/LW`). No data → `nul
   JDox recommendation, not a measurement on these data. Owed: a blank-sky ACF of a stamp
   cut from `--start rate` (MAST's rate, no flicker step) vs the default.
 - **Noise inflation factors** (`info/noise_corr_factors.json`): measured 2026-10-04, SW 1.30 /
-  LW 1.03 at 0.2" (see *Noise*). Owed: the B1938+666 F277W `ERR` deficit (1.46 per frame),
-  and a scale-matched rescale once the modelling project fixes its source-pixel scale.
+  LW 1.03 at 0.2"; B1938+666 by the split-dither test, F115W 0.94 / F277W 1.12 (see *Noise*).
+  Owed: a scale-matched rescale once the modelling project fixes its source-pixel scale.
 - **Model PSF broadening by injection**: the STPSF tier uses the analytic drop box; the
   HST repo's injection route (`make_psf_inject.py`) is not ported.
 - **Automatic arc detection** (`detect_arcs.py`) is a stub.
@@ -363,12 +365,30 @@ override **B1938+666 F277W 1.5**. How they were chosen, and why not the HST reci
   scalar: it encodes neither the anisotropy nor the scale dependence. autoarray 2026.9.27
   accepts a dense `noise_covariance_matrix` for parametric fits only; the inversion ignores
   it, so there is no consumer for the full structure yet (and a 3" SW mask is 31k px).
-- B1938+666 cannot be measured this way: at 88 ks the 60" blank-sky region is dominated by
-  unmasked faint galaxies, star halos and diffraction spikes (C(0) 12 and 103). It takes
-  the channel factors. Its F277W `ERR` is low by 1.46 on a single cal frame (blank region,
-  high-passed; F115W 1.07, SPT F150W 0.96 by the same test) and by 1.77 inside the stamp,
-  hence the 1.5 override. **Open: why the MEDIUM8 8-group × 5-integration LW rate ERR is
-  low** — check the ramp-fit variance combination for multi-integration exposures.
+- **B1938+666 cannot be measured this way** (at 88 ks the 60" blank-sky region is dominated by
+  unmasked faint galaxies, star halos and diffraction spikes: C(0) 12 and 103), so it has its
+  own test, `split_noise_test.py`: the 21 dithers split into two interleaved halves (every
+  detector of a dither together), each run through Image3 as the standard product is, and
+  the difference A − B — pure noise with this dataset's own correlation structure, every
+  astrophysical feature cancelled — measured against sqrt(ERR_A² + ERR_B²). This is the
+  method for any deep or crowded field. Result (2026-10-04, 12" stamp region, 0.2"):
+  **F115W 0.94, F277W 1.12**, applied as lens overrides. The curves (JSON `split_test`):
+
+  | B1938+666 | per px | 0.1" | 0.2" | 0.3" | 0.5" | 1" |
+  |---|---|---|---|---|---|---|
+  | F115W | 0.75 | 0.74 | 0.94 | 1.03 | 1.28 | 1.75 |
+  | F277W | 1.04 | 1.00 | 1.12 | 1.13 | 1.25 | 1.56 |
+
+  Two things worth knowing. The F277W `ERR` IS low per pixel (ratio 1.04 where drizzle alone
+  gives 0.7; the single-cal-frame test gave 1.46), but it cancels against the drizzle
+  correlation by 0.2", so no per-pixel correction is applied; why the 8-group × 5-integration
+  LW rate ERR is low per pixel is still open but no longer matters for the noise map. And the
+  SW factor is far below the SPT channel's 1.30 because the 1/f is relatively weaker in
+  MEDIUM8 8-group × 5-integration ramps than in TEMPLATES' 2–3-group BRIGHT2/SHALLOW2
+  exposures (Rigby+25 §7.2 says as much) and the per-frame ERR has no deficit (1.07). The
+  provisional values used earlier that day (channel 1.30 and an override of 1.5 from
+  multiplying two measurements) were wrong by 40% and 35%: do not borrow factors across
+  samples with different readout patterns.
 
 Casertano's R for the drop/scale pair is stamped as `CASR` for information — it corrects
 an image-estimated rms, not an ERR map, and must not be compared to `NOISECOR`.

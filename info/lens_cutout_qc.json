@@ -15,8 +15,8 @@
                 "center_dec": 66.8147,
                 "n_bad": 0,
                 "weight_uniformity": 0.0338,
-                "corr_factor": 1.3,
-                "corr_source": "json:channel",
+                "corr_factor": 0.94,
+                "corr_source": "json:lens",
                 "casertano_r": 1.5254
             },
             "F277W": {
@@ -33,7 +33,7 @@
                 "center_dec": 66.8147,
                 "n_bad": 0,
                 "weight_uniformity": 0.0524,
-                "corr_factor": 1.5,
+                "corr_factor": 1.12,
                 "corr_source": "json:lens",
                 "casertano_r": 1.5384
             }

@@ -3,24 +3,55 @@
     "_how": "Blank-sky block-sum ratio at scale_arcsec (the noise of an s x s patch over what ERR predicts), median over the SPT stamps per channel, thr3 source mask. Not the HST repo's drop-window ACF factor: the residual 1/f after clean_flicker_noise is correlated over ~3 arcsec along detector rows and a 1-px window never sees it. The ratio keeps growing with scale (block_ratio_curve), so the modelling project must rescale if its source pixels footprint the image plane at a coarser scale than scale_arcsec.",
     "scale_arcsec": 0.2,
     "factors": {
-        "NIRCAM/SW": 1.30,
+        "NIRCAM/SW": 1.3,
         "NIRCAM/LW": 1.03
     },
     "block_ratio_curve": {
-        "scale_arcsec": [0.1, 0.15, 0.2, 0.3, 0.5, 1.0, 2.0, 3.0],
-        "NIRCAM/SW": [1.04, 1.17, 1.30, 1.52, 2.01, 3.53, 6.87, 9.25],
-        "NIRCAM/LW": [0.83, 0.95, 1.03, 1.16, 1.36, 1.85, 2.98, 3.80],
-        "drop_window_acf_factor": {"NIRCAM/SW": 1.17, "NIRCAM/LW": 1.22},
+        "scale_arcsec": [
+            0.1,
+            0.15,
+            0.2,
+            0.3,
+            0.5,
+            1.0,
+            2.0,
+            3.0
+        ],
+        "NIRCAM/SW": [
+            1.04,
+            1.17,
+            1.3,
+            1.52,
+            2.01,
+            3.53,
+            6.87,
+            9.25
+        ],
+        "NIRCAM/LW": [
+            0.83,
+            0.95,
+            1.03,
+            1.16,
+            1.36,
+            1.85,
+            2.98,
+            3.8
+        ],
+        "drop_window_acf_factor": {
+            "NIRCAM/SW": 1.17,
+            "NIRCAM/LW": 1.22
+        },
         "per_pixel_c0": "0.45-0.55 in every SPT band: drizzle (pixfrac 1, 0.031->0.03 and 0.063->0.06) halves the per-pixel variance, as it should"
     },
     "lens_overrides": {
         "b1938": {
             "B1938+666": {
-                "F277W": 1.5
+                "F115W": 0.94,
+                "F277W": 1.12
             }
         }
     },
-    "_overrides_why": "B1938+666 is too deep (88 ks) for the 60-arcsec blank-sky measurement: unmasked faint galaxies, star halos and diffraction spikes dominate (c0 12 and 103). Channel factors are used instead, except F277W, whose ERR is low by 1.46 on a single cal frame (blank region, high-passed; F115W 1.07, SPT F150W 0.96) and by 1.77 inside the stamp: 1.03 x 1.46 = 1.5. Open item: why the 8-group x 5-int LW rate ERR is low.",
+    "_overrides_why": "B1938+666 (88 ks) is too deep for the blank-sky method, so its factors come from split_noise_test.py (2026-10-04): the 21 dithers split into two half-mosaics, A-B cancels every astrophysical feature, block-sum ratio of A-B against sqrt(ERR_A^2+ERR_B^2) inside the 12\" stamp region at 0.2\". F115W 0.94, F277W 1.12. Per pixel the F277W ERR is low by ~1.5 (ratio 1.04 where drizzle alone gives 0.7; also seen on single cal frames) but that cancels against the drizzle correlation by 0.2\". The SW value is well below the SPT channel 1.30 because the 1/f is relatively weaker in MEDIUM8 8-group x 5-integration ramps than in TEMPLATES' 2-3 group BRIGHT2/SHALLOW2 exposures (Rigby+25 s7.2), and the per-frame ERR has no deficit (1.07).",
     "correlation": {
         "kind": "residual 1/f after clean_flicker_noise, coherent along detector rows (fast-read axis)",
         "length_arcsec": 3.0,
@@ -28,5 +59,61 @@
         "row_direction_deg_from_x": -65,
         "row_direction_note": "SPT module-B frames; B1938 frames have their own roll. Use the stamp's detector PA if it matters.",
         "not_in_factor": "The factor is a scalar at scale_arcsec; it does not encode the anisotropy or the scale dependence. PyAutoLens's inversion ignores noise_covariance_matrix (autoarray 2026.9.27), so there is no consumer for the full structure yet."
+    },
+    "split_test": {
+        "B1938+666": {
+            "F115W": {
+                "per_pixel": 0.752,
+                "stamp": {
+                    "0.06": 0.66,
+                    "0.09": 0.74,
+                    "0.15": 0.86,
+                    "0.21": 0.94,
+                    "0.30": 1.03,
+                    "0.51": 1.28,
+                    "0.99": 1.75
+                },
+                "field": {
+                    "0.06": 0.67,
+                    "0.15": 0.84,
+                    "0.21": 0.9,
+                    "0.30": 1.0,
+                    "0.51": 1.22,
+                    "0.99": 1.83,
+                    "2.01": 3.7,
+                    "3.00": 6.38
+                },
+                "along_vs_across_rows_1arcsec": [
+                    0.81,
+                    0.74
+                ]
+            },
+            "F277W": {
+                "per_pixel": 1.035,
+                "stamp": {
+                    "0.06": 0.73,
+                    "0.12": 1.0,
+                    "0.18": 1.12,
+                    "0.30": 1.13,
+                    "0.48": 1.25,
+                    "1.02": 1.56
+                },
+                "field": {
+                    "0.06": 0.71,
+                    "0.12": 0.97,
+                    "0.18": 1.05,
+                    "0.30": 1.05,
+                    "0.48": 1.08,
+                    "1.02": 1.23,
+                    "1.98": 1.69,
+                    "3.00": 2.3
+                },
+                "along_vs_across_rows_1arcsec": [
+                    0.99,
+                    0.82
+                ]
+            }
+        },
+        "_note": "diagnostics/split_noise/<lens>_<FILT>.json has the full output; half-mosaics in data/mosaics_splitA|B/."
     }
 }
