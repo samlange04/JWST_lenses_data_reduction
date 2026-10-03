@@ -120,8 +120,13 @@ _INSTR = {
     # functions: F115W 0.040", F150W 0.050", F200W 0.066", F277W 0.092", F356W 0.116",
     # F444W 0.145"); resolve_params picks the filter's value from _PSF_FWHM_ARCSEC below.
     # The SW bands are undersampled (1.3-2.2 px), so oversample=2 is the floor, not a
-    # choice; star_size covers the first Airy ring plus the near wings at each scale.
-    'NIRCAM/SW': dict(fwhm=2.0, psf_fwhm=1.7, oversample=2, star_size=41, max_stars=25,
+    # choice. star_size is set so the stamp spans ~2.4" at either scale (SW 81 px, LW
+    # 41 px): subtract_pedestal reads its "background" from the outer quarter of the
+    # stamp, and at 41 px SW that annulus (0.45-0.6") still holds real PSF wing light
+    # (~3e-4 of peak per pixel), which was being subtracted -- the B1938+666 F115W kernel
+    # came out with 2% of its flux in negative wings and 6% too much in the core
+    # (2026-10-03). At 81 px the annulus sits at 0.9-1.2" and the pedestal is < 1e-4.
+    'NIRCAM/SW': dict(fwhm=2.0, psf_fwhm=1.7, oversample=2, star_size=81, max_stars=25,
                       min_sep=25.0, sharplo=0.2, sharphi=1.0, roundlo=-0.7, roundhi=0.7),
     'NIRCAM/LW': dict(fwhm=2.2, psf_fwhm=2.0, oversample=2, star_size=41, max_stars=25,
                       min_sep=25.0, sharplo=0.2, sharphi=1.0, roundlo=-0.7, roundhi=0.7),
