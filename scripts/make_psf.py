@@ -465,7 +465,7 @@ def oversampled_to_kernel(epsf_data, oversample, kernel_size):
                      'cannot normalise a kernel from it')
 
 
-def trim_kernel_to_amplitude(kernel, threshold=1e-3, min_half=3):
+def trim_kernel_to_amplitude(kernel, threshold=3e-4, min_half=3):
     """Crop a full image-scale kernel to the radius where the azimuthally-averaged PSF
     drops below `threshold` x peak, then renormalise to unit sum.
 
@@ -784,9 +784,10 @@ def main():
                    help="'auto' (default) builds an empirical ePSF and falls back to the "
                         "STPSF model only when usable stars < --min-stars; 'empirical' "
                         "forces the star build (fails if too few); 'model' forces STPSF.")
-    p.add_argument('--trim-threshold', dest='trim_threshold', type=float, default=1e-3,
+    p.add_argument('--trim-threshold', dest='trim_threshold', type=float, default=3e-4,
                    help="amplitude fraction of peak at which the trimmed modelling kernel "
-                        "(cutout_psf.fits) is cut. Default 1e-3 -- an amplitude criterion.")
+                        "(cutout_psf.fits) is cut. Default 3e-4 -- an amplitude criterion; 1e-3 kept only "
+                        "95% of the F115W flux (user's call, 2026-10-04).")
     p.add_argument('--n-boot', dest='n_boot', type=int, default=None,
                    help='bootstrap resamples for the empirical PSF error map (default 100; '
                         'jackknife below %d stars).' % JACKKNIFE_MAX_STARS)

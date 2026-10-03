@@ -361,7 +361,8 @@ The HST repo's empirical ePSF machinery, verbatim where it is instrument-agnosti
 from the full mosaic (lens masked to 5", no-coverage and edge masked), gates on peak S/N ≥
 30, fitted FWHM within [0.75, 1.4] × the filter's PSF FWHM, ellipticity ≤ 0.15, crowding,
 a 5% flux floor; photutils `EPSFBuilder` at oversample 2; validation; wing pedestal
-subtraction; amplitude trim at 1e-3 of peak for the modelling kernel; bootstrap/jackknife
+subtraction; amplitude trim at 3e-4 of peak for the modelling kernel (1e-3 enclosed only 95%
+of the F115W flux and overweighted the core; 3e-4 encloses 98% at 39 px = 1.17" SW); bootstrap/jackknife
 error map. Products: `data/psf/<s>/<l>/<F>/psf_kernel.fits` (+`_err`, `psf.png`) and
 `data/cutouts/<s>/<l>/<F>/cutout_psf.fits` (+`_err`). Overrides in `info/psf_stars.json`.
 
