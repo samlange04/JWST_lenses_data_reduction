@@ -8,7 +8,14 @@
 data/*
 !data/cutouts/
 !data/qc/
+# QC renders, as in the HST repo (2026-10-04): cutout_positions.png is a view OF the tracked
+# positions JSON (rebuilt by make_positions.py --overlays-only), and cutout.png a plain render
+# of the tracked sci stamp (rebuilt by make_cutouts.py). Neither is a product, and every
+# re-cut adds a ~0.5-1.2 MB version to history. Variant renders (cutout_<variant>.png) are not
+# covered: there are none yet, and a cutout_*.png rule would also catch future _dataset.png
+# and _mask_arcs.png, which the HST repo keeps tracked.
 data/cutouts/**/*_positions.png
+data/cutouts/**/cutout.png
 
 # ── Generated / local ───────────────────────────────────────────────────────────
 output/

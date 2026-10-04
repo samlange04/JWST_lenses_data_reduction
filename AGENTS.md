@@ -469,7 +469,8 @@ data/
   calibrated/<sample>/<lens>/<FILT>/      hard links into pool/, by header FILTER
   stage1/  stage2/                        our rate / cal products
   mosaics[_<variant>]/<sample>/<lens>/<FILT>/   <lens>_<filt>_{asn.json,i2d.fits,i2d.png} + Image3 by-products
-  cutouts[_<S>arcsec]/<sample>/<lens>/<FILT>/   THE science tree (tracked at the default size)
+  cutouts[_<S>arcsec]/<sample>/<lens>/<FILT>/   THE science tree (tracked at the default size; cutout.png and
+                                          *_positions.png are gitignored QC renders, rebuilt by the scripts)
   psf/<sample>/<lens>/<FILT>/             archival kernels + psf.png
   qc[_<S>arcsec]/<sample>/                stamp grids
   reference_files/                        CRDS cache, stpsf-data/
