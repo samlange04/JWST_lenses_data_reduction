@@ -1,0 +1,56 @@
+{
+    "b1938": {
+        "B1938+666": {
+            "F277W": {
+                "n_positions": 2,
+                "positions_arcsec": [
+                    [
+                        -0.51,
+                        0.03
+                    ],
+                    [
+                        0.39,
+                        -0.15
+                    ]
+                ],
+                "marked_filt": "F277W",
+                "marked_prefix": "cutout",
+                "drizzle_pass": "single",
+                "pixel_scale_arcsec": 0.06,
+                "search_box_size": 2,
+                "snap_moved_px_max": 0.62,
+                "snap_moved_px_mean": 0.53,
+                "broadcast": "sky (WCS pixel->world->pixel per band)",
+                "display": "S/N, radial-subtracted + as-observed",
+                "display_mask_center_arcsec": null,
+                "display_vmax_value": null,
+                "display_subtract_radial": true,
+                "display_side_by_side": true,
+                "display_hidden_contaminant_px": null,
+                "n_positions_on_contaminant": 0,
+                "broadcast_to": [
+                    {
+                        "filt": "F115W",
+                        "prefix": "cutout",
+                        "reprojection_shift_mas": 0.0,
+                        "band_tie_mas": 11.3,
+                        "band_tie_px": 0.376,
+                        "band_tie_scatter_mas": 21.6,
+                        "band_tie_n_sources": 8,
+                        "band_tie_method": "field sources"
+                    },
+                    {
+                        "filt": "F277W",
+                        "prefix": "cutout",
+                        "reprojection_shift_mas": 0.0,
+                        "band_tie_mas": null,
+                        "band_tie_px": null,
+                        "band_tie_scatter_mas": null,
+                        "band_tie_n_sources": null,
+                        "band_tie_method": null
+                    }
+                ]
+            }
+        }
+    }
+}

@@ -139,31 +139,105 @@ def reproject_positions(positions, src_hdr, dst_hdr):
     return out
 
 
-def deflector_sky(cutout_dir, prefix):
-    """Sky position of the deflector in this band, by flux centroid at the stamp centre.
+TIE_EXCLUDE_ARCSEC = 2.5   # field sources only: lens, ring and arcs live inside this radius
+TIE_APERTURE_ARCSEC = 0.24 # centroid window, the same SKY size in every band
+TIE_MIN_SOURCES = 3
 
-    Used only to CHECK the band tie: every stamp is recentred on the deflector, so the same
-    galaxy should land on the same sky coordinate in every band. Where it does not, the
-    bands are misregistered and a broadcast position will miss the lensed images in that
-    band by the same amount, however it is computed.
+
+def _windowed_centroid(img, x, y, r_px, n_iter=5):
+    """Iterated flux centroid in a circle of r_px about (x, y); None if it walks off."""
+    ny, nx = img.shape
+    b = int(np.ceil(r_px))
+    for _ in range(n_iter):
+        ix, iy = int(round(x)), int(round(y))
+        if ix - b < 0 or iy - b < 0 or ix + b >= nx or iy + b >= ny:
+            return None
+        yy, xx = np.mgrid[iy-b:iy+b+1, ix-b:ix+b+1]
+        box = img[iy-b:iy+b+1, ix-b:ix+b+1]
+        w = np.clip(box - np.median(box), 0, None) * (np.hypot(xx - x, yy - y) <= r_px)
+        if not np.isfinite(w).all() or w.sum() <= 0:
+            return None
+        x, y = (xx*w).sum()/w.sum(), (yy*w).sum()/w.sum()
+    return x, y
+
+
+def band_tie(marked_dir, marked_prefix, band_dir, band_prefix):
+    """How far this band's pixels sit from the marked band's on SKY, from FIELD sources.
+
+    Compact sources outside TIE_EXCLUDE_ARCSEC are detected on the coarser of the two
+    stamps, centroided in the same sky aperture in both, and the median (dRA*, dDec) offset
+    is returned as {'mas', 'scatter_mas', 'n', 'method': 'field sources'}.
+
+    A 12" stamp of a shallow field can hold no compact source at all (the SPT stamps: 0-1).
+    Then, and only then, it falls back to the lens core: both bands centroided in the same
+    TIE_APERTURE_ARCSEC window, iterated from the SAME sky point (the marked stamp's centre,
+    which make_cutouts puts on the deflector). Starting both from one sky point, not from each
+    band's own brightest pixel, is what keeps a ring that outshines its lens in one band from
+    being taken for the lens; it still assumes the core is the local light peak in both
+    bands, so the result is labelled 'lens core (fallback)'. 'mas' is None if that fails too.
+
+    WHY NOT THE DEFLECTOR. This used to centroid "the brightest thing near the stamp
+    centre" in each band, which assumes that thing is the same object in both. On B1938+666
+    (2026-10-04) it was not: the stamps were 0.52" off the lens and in F277W the Einstein
+    ring outshines the galaxy, so the check found the lens core in F115W and the top of the
+    ring in F277W and reported a 281 mas misregistration between bands that field sources
+    tie to 10 mas. Any lens whose arcs rival its light in one band fails the same way.
     """
     from scipy import ndimage
-    hdr = fits.getheader(cutout_paths.find_stamp(cutout_dir, prefix, 'sci'))
-    sci = np.asarray(fits.getdata(cutout_paths.find_stamp(cutout_dir, prefix, 'sci')), float)
-    ps = make_masks.pixel_scale_from_header(hdr)
-    n_y, n_x = sci.shape
-    cy, cx = (n_y - 1) / 2.0, (n_x - 1) / 2.0
-    h = int(round(1.2 / ps))
-    sub = sci[int(cy)-h:int(cy)+h+1, int(cx)-h:int(cx)+h+1]
-    iy, ix = np.unravel_index(np.argmax(ndimage.gaussian_filter(sub, 1.0)), sub.shape)
-    iy += int(cy) - h; ix += int(cx) - h
-    b = int(round(0.6 / ps))
-    box = sci[iy-b:iy+b+1, ix-b:ix+b+1].astype(float)
-    w = np.clip(box - np.median(box), 0, None)
-    if w.sum() <= 0:
-        return None, ps
-    yy, xx = np.mgrid[iy-b:iy+b+1, ix-b:ix+b+1]
-    return WCS(hdr).pixel_to_world((xx*w).sum()/w.sum(), (yy*w).sum()/w.sum()), ps
+
+    def load(d, prefix):
+        path = cutout_paths.find_stamp(d, prefix, 'sci')
+        hdr = fits.getheader(path)
+        img = np.nan_to_num(np.asarray(fits.getdata(path), float))
+        return img, WCS(hdr), make_masks.pixel_scale_from_header(hdr)
+
+    stamps = [load(marked_dir, marked_prefix), load(band_dir, band_prefix)]
+    det, det_wcs, det_ps = max(stamps, key=lambda t: t[2])
+    ny, nx = det.shape
+    med = np.median(det)
+    sig = 1.4826 * np.median(np.abs(det - med))
+    lab, _ = ndimage.label(ndimage.gaussian_filter(det, 1.5) > med + 8.0 * sig)
+    r_det = TIE_APERTURE_ARCSEC / det_ps
+    offsets = []
+    for sl in ndimage.find_objects(lab):
+        cy = (sl[0].start + sl[0].stop - 1) / 2.0
+        cx = (sl[1].start + sl[1].stop - 1) / 2.0
+        size = (sl[0].stop - sl[0].start) * (sl[1].stop - sl[1].start)
+        if (np.hypot(cx - (nx - 1) / 2.0, cy - (ny - 1) / 2.0) * det_ps < TIE_EXCLUDE_ARCSEC
+                or size * det_ps**2 > 0.5):            # extended: no well-defined centroid
+            continue
+        sky = []
+        for img, w, ps in stamps:
+            if not sky:
+                guess = (cx, cy) if img is det else tuple(float(v) for v in w.world_to_pixel(
+                    det_wcs.pixel_to_world(cx, cy)))
+            else:
+                guess = tuple(float(v) for v in w.world_to_pixel(sky[0]))
+            c = _windowed_centroid(img, guess[0], guess[1], TIE_APERTURE_ARCSEC / ps)
+            if c is None:
+                break
+            sky.append(w.pixel_to_world(*c))
+        if len(sky) == 2:
+            dra, ddec = sky[0].spherical_offsets_to(sky[1])
+            offsets.append((dra.arcsec * 1e3, ddec.arcsec * 1e3))
+    if len(offsets) >= TIE_MIN_SOURCES:
+        off = np.asarray(offsets)
+        med_off = np.median(off, axis=0)
+        scatter = 1.4826 * np.median(np.hypot(*(off - med_off).T))
+        return {'mas': float(np.hypot(*med_off)), 'scatter_mas': float(scatter),
+                'n': len(offsets), 'method': 'field sources'}
+
+    img0, w0, ps0 = stamps[0]
+    start = w0.pixel_to_world((img0.shape[1] - 1) / 2.0, (img0.shape[0] - 1) / 2.0)
+    core = []
+    for img, w, ps in stamps:
+        gx, gy = (float(v) for v in w.world_to_pixel(start))
+        c = _windowed_centroid(img, gx, gy, TIE_APERTURE_ARCSEC / ps)
+        if c is None:
+            return {'mas': None, 'scatter_mas': None, 'n': len(offsets), 'method': None}
+        core.append(w.pixel_to_world(*c))
+    return {'mas': float(core[0].separation(core[1]).arcsec * 1e3), 'scatter_mas': None,
+            'n': len(offsets), 'method': 'lens core (fallback)'}
 
 
 def save_overlay_png(sci_native, pixel_scales, positions, out_path,
@@ -536,7 +610,6 @@ def process_lens(lens, filt_dirs, sample, requested_filt, drizzle_pass, force,
                       f"into a blanked region. Re-run with --force to re-mark it.")
 
     marked_hdr = fits.getheader(sci_path)
-    marked_sky, _ = deflector_sky(display_dir, display_prefix)
 
     # Broadcast THROUGH SKY, not by copying arcsec (see reproject_positions). Each band gets
     # its own Grid2DIrregular in its own frame, one file per band into that band's cutout
@@ -559,17 +632,24 @@ def process_lens(lens, filt_dirs, sample, requested_filt, drizzle_pass, force,
 
         # Does this band's own image actually sit where the marked band says it does? A
         # broadcast cannot fix a misregistered band; it can only be honest about it.
-        tie_mas = None
-        if marked_sky is not None and filt != display_filt:
-            band_sky, _ = deflector_sky(cutout_dir, prefix)
-            if band_sky is not None:
-                tie_mas = float(band_sky.separation(marked_sky).arcsec * 1000.0)
-                if tie_mas / (band_ps * 1000.0) > 1.0:
-                    print(f"  WARNING: {filt} is MISREGISTERED against {display_filt} by "
-                          f"{tie_mas:.0f} mas = {tie_mas/(band_ps*1000.0):.2f} {filt} px "
-                          f"(deflector centroid). The broadcast positions are correct on "
-                          f"SKY but will sit that far off this band's images. Fix the "
-                          f"astrometry, don't re-mark.")
+        tie = None
+        if filt != display_filt:
+            tie = band_tie(display_dir, display_prefix, cutout_dir, prefix)
+            how = (f"median of {tie['n']} field sources, scatter {tie['scatter_mas']:.0f} mas"
+                   if tie['method'] == 'field sources' else
+                   f"lens core -- only {tie['n']} field source(s) outside "
+                   f"{TIE_EXCLUDE_ARCSEC:g}\", so check the overlay by eye")
+            if tie['mas'] is None:
+                print(f"  NOTE: {filt} tie to {display_filt} NOT checked -- {tie['n']} field "
+                      f"source(s) and no lens-core centroid")
+            elif tie['mas'] / (band_ps * 1000.0) > 1.0:
+                print(f"  WARNING: {filt} is MISREGISTERED against {display_filt} by "
+                      f"{tie['mas']:.0f} mas = {tie['mas']/(band_ps*1000.0):.2f} {filt} px "
+                      f"({how}). The broadcast positions are correct on SKY but will sit "
+                      f"that far off this band's images. Fix the astrometry, don't re-mark.")
+            else:
+                print(f"  {filt} tie to {display_filt}: {tie['mas']:.0f} mas "
+                      f"({tie['mas']/(band_ps*1000.0):.2f} px; {how})")
 
         json_path = os.path.join(cutout_dir, f'{prefix}_positions.json')
         al.output_to_json(obj=al.Grid2DIrregular(values=band_positions), file_path=json_path)
@@ -581,9 +661,14 @@ def process_lens(lens, filt_dirs, sample, requested_filt, drizzle_pass, force,
                          vmax_value=vmax_value)
         written.append({'filt': filt, 'prefix': prefix,
                         'reprojection_shift_mas': round(shift_mas, 2),
-                        'deflector_tie_mas': None if tie_mas is None else round(tie_mas, 1),
-                        'deflector_tie_px': (None if tie_mas is None
-                                             else round(tie_mas / (band_ps*1000.0), 3))})
+                        'band_tie_mas': (None if tie is None or tie['mas'] is None
+                                         else round(tie['mas'], 1)),
+                        'band_tie_px': (None if tie is None or tie['mas'] is None
+                                        else round(tie['mas'] / (band_ps*1000.0), 3)),
+                        'band_tie_scatter_mas': (None if tie is None or tie['scatter_mas'] is None
+                                                 else round(tie['scatter_mas'], 1)),
+                        'band_tie_n_sources': None if tie is None else tie['n'],
+                        'band_tie_method': None if tie is None else tie['method']})
         extra = '' if filt == display_filt else f'  (+{shift_mas:.0f} mas vs a raw copy)'
         print(f"  wrote {json_path}{extra}")
 

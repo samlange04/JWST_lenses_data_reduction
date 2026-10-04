@@ -318,7 +318,7 @@ EFFEXPTM), `lens_instrument.json` (`NIRCAM/SW` or `NIRCAM/LW`). No data → `nul
 ## Cutouts (`scripts/make_cutouts.py`)
 
 ```bash
-uv run python scripts/make_cutouts.py --lens SPT2147-50 --filt F444W [--size 12] [--center catalogue|peak] [--variant mastrate]
+uv run python scripts/make_cutouts.py --lens SPT2147-50 --filt F444W [--size 12] [--center auto|catalogue|deflector|peak] [--variant mastrate]
 bash scripts/run_cutouts_all.sh spt [SIZE] [--variant V]
 ```
 
@@ -329,11 +329,24 @@ variant tags the sci/noise names, masks/positions/PSFs keep the bare `cutout_` p
 `find_stamp` raises `AmbiguousStampError` if two reductions' stamps share a dir. One stamp per
 band; a second variant is refused without `--force`.
 
-**Centre = catalogue position by default.** Every filter's mosaic has `crval` at the catalogue
-coordinate and `rotation=0`, so the stamps are co-registered across filters by construction and
-the HST repo's peak-search / `--center-band` machinery is unnecessary. `--center peak` exists for
-a wrong catalogue position; whichever is used lands in the header (`CUTCENT`, `CUTRA`, `CUTDEC`)
-and in `info/lens_cutout_qc.json`.
+**Centre = the deflector, on the shared grid.** Every filter's mosaic has `crval` at the
+catalogue coordinate and `rotation=0`, so cutting at the catalogue position gives stamps
+co-registered across filters by construction. **But the catalogue position is not always the
+galaxy: B1938+666's APT coordinate is 0.479" E, 0.201" S of the lens core** (both bands agree,
+and field sources tie the bands to 11 mas, so it is the coordinate, not the astrometry). A
+stamp that far off breaks everything that assumes the lens is at (0, 0): the radial-profile
+display in `make_positions.py`, centred masks, `mask_radius` at export. So a lens can carry a
+measured `deflector_ra`/`deflector_dec` (+ `deflector_note`) in `info/lens_samples.json`, and
+the default `--center auto` cuts there. `ra`/`dec` are NOT edited to match — they are the
+mosaics' CRVAL, and changing them would only take effect on an Image3 re-run. The offset from
+CRVAL is snapped to whole 0.06" LW pixels (= 2 SW pixels), so each band's stamp moves by whole
+pixels of its own grid and the SW/LW stamps stay nested about one sky point (verified: stamp
+centres identical to 0 mas, pixels an exact shift of the catalogue-centred stamp); the lens
+then sits ≤ 0.03" per axis from (0, 0) (B1938: 22 mas). `--center peak` is per band, so it
+does NOT keep the bands co-registered, and where a ring outshines its lens (B1938 F277W) it
+finds the ring. Whichever is used lands in the header (`CUTCENT`, `CUTRA`, `CUTDEC` = the
+actual stamp centre) and in `info/lens_cutout_qc.json`. B1938 was re-cut this way 2026-10-04;
+PSFs and NOISECOR are unaffected (neither depends on the stamp centre).
 
 ### Noise
 
@@ -440,6 +453,16 @@ always answers `cutout`). The semantics are unchanged and matter:
   Here the SW→LW reprojection is a 2:1 regrid, like the HST f160W case.
 - Positions are marked once on the best band and broadcast pixel→sky→pixel; an empty file
   means "decided: none".
+- **The band-registration check is field sources, not the deflector** (`band_tie`, 2026-10-04).
+  It used to centroid the brightest object near each stamp's centre; on B1938 (stamps 0.5" off
+  the lens, ring brighter than the lens in F277W) that found the lens core in F115W and the top
+  of the ring in F277W and reported a 281 mas MISREGISTERED warning for bands that tie to
+  11 mas. Now: compact sources > 2.5" from the centre, centroided in the same 0.24" sky window
+  in both bands, median offset (≥ 3 sources). The SPT stamps hold 0 such sources at their
+  depth, so there it falls back to the lens core, both bands iterated from the SAME sky point
+  (the stamp centre), labelled `lens core (fallback)` — which is only right when the stamp is
+  centred on the lens. Recorded as `band_tie_{mas,px,scatter_mas,n_sources,method}` in
+  `info/lens_positions.json`.
 - GUI orientation: North down, East left on screen (row 0 at the top). Quote offsets as
   ΔRA/ΔDec or (col, row).
 - `make_qc_grids.py` is the HST `make_mosaics.py`, renamed because "mosaic" here means the

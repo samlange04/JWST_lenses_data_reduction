@@ -15,10 +15,16 @@ data/cutouts[_<S>arcsec]/<sample>/<lens>/<FILT>/:
 **Centre.** Every filter's mosaic was resampled with crval at the catalogue position and
 rotation 0 (reduce_nircam.py), so the catalogue coordinate IS the common centre and the SW
 (0.03") and LW (0.06") grids nest 2:1 about it. The default `--center catalogue` therefore
-gives co-registered stamps across filters with no peak search; `--center peak` exists for a
-lens whose catalogue position is off (it finds the brightest median-filtered pixel in a
-`--box` window, as the HST repo does), and whichever is used is recorded in
-info/lens_cutout_qc.json.
+gives co-registered stamps across filters with no peak search. Where the catalogue position
+misses the galaxy (B1938+666: 0.52"), info/lens_samples.json carries a measured
+`deflector_ra`/`deflector_dec` and the default `--center auto` cuts there instead: the offset
+from CRVAL is snapped to whole LW pixels (0.06", = 2 SW pixels), so every band's stamp moves by
+whole pixels of its own grid and the SW/LW stamps stay nested about one sky point -- an
+arbitrary sky centre would land on different sub-pixel phases of the two grids. The stamp is
+then off the tangent point, which a TAN WCS carries exactly. `--center peak` (the brightest
+median-filtered pixel in a `--box` window, as the HST repo does) is per band and so does NOT
+keep the bands co-registered, and on a lens whose ring outshines the galaxy (B1938 F277W) it
+finds the ring. Whichever is used is recorded in CUTCENT and info/lens_cutout_qc.json.
 
 **Noise.** The i2d ERR extension is the propagated per-pixel sigma, sqrt(VAR_POISSON +
 VAR_RNOISE + VAR_FLAT), each variance drizzled with the science weights -- i.e. it is
@@ -64,6 +70,7 @@ ws_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SENTINEL = 1.0e8
 WEIGHT_UNIFORMITY_LIMIT = 0.2
 CORR_FACTORS_JSON = os.path.join(ws_path, 'info', 'noise_corr_factors.json')
+LW_GRID_STEP = 0.06   # arcsec, reduce_nircam.DEFAULT_SCALE['LW'] (not imported: it patches astropy.io.fits)
 
 
 def weight_uniformity(wht):
@@ -123,6 +130,25 @@ def brightest_pixel_position(cutout, box=100, median_size=5):
     return r + max(cy - h, 0), c + max(cx - h, 0)
 
 
+def grid_snapped_centre(wcs, target, scale):
+    """Mosaic pixel (x, y) nearest `target` whose offset from CRVAL is a whole number of LW
+    output pixels, and that offset in arcsec (east-west along -x, north along +y).
+
+    Every band's mosaic has crval at the catalogue position and crpix at its centre
+    (reduce_nircam.py), so moving the stamp centre from CRPIX by the same whole-LW-pixel
+    offset in every band keeps the stamps nested 2:1 about one sky point."""
+    step = LW_GRID_STEP
+    ratio = step / scale
+    if abs(ratio - round(ratio)) > 1e-6:
+        raise ValueError(f'mosaic scale {scale:.4f}" does not divide the {step}" LW grid; '
+                         f'a snapped centre would not nest across bands')
+    ref_x, ref_y = wcs.wcs.crpix[0] - 1.0, wcs.wcs.crpix[1] - 1.0
+    tx, ty = (float(v) for v in wcs.world_to_pixel(target))
+    nx = round((tx - ref_x) * scale / step)
+    ny = round((ty - ref_y) * scale / step)
+    return (ref_x + nx * round(ratio), ref_y + ny * round(ratio)), (nx * step, ny * step)
+
+
 def plot_cutouts(sci, noise, output_path, title):
     noise_display = np.where(noise >= SENTINEL, np.nan, noise)
     with np.errstate(divide='ignore', invalid='ignore'):
@@ -155,7 +181,9 @@ def main():
     p.add_argument('--size', type=float, default=cutout_paths.DEFAULT_SIZE, help='arcsec on a side')
     p.add_argument('--variant', default='', choices=('',) + cutout_paths.VARIANT_COMPONENTS,
                    help="which reduction's mosaic to cut (default: the standard one)")
-    p.add_argument('--center', choices=['catalogue', 'peak'], default='catalogue')
+    p.add_argument('--center', choices=['auto', 'catalogue', 'deflector', 'peak'], default='auto',
+                   help='auto: the measured deflector (lens_samples.json) if the lens has one, '
+                        'else the catalogue position')
     p.add_argument('--box', type=int, default=100, help='--center peak search window, px')
     p.add_argument('--median-size', type=int, default=5)
     p.add_argument('--corr-factor', type=float, default=None,
@@ -209,7 +237,25 @@ def main():
 
     position = coord
     centre_note = 'catalogue'
-    if a.center == 'peak':
+    deflector = lens_samples.deflector_coord(a.lens, sample)
+    center = a.center
+    if center == 'auto':
+        center = 'deflector' if deflector is not None else 'catalogue'
+    if center == 'deflector':
+        if deflector is None:
+            print(f'=== REFUSED: --center deflector but {a.lens} has no deflector_ra/dec in lens_samples.json')
+            return 1
+        crval = wcs.pixel_to_world(wcs.wcs.crpix[0] - 1.0, wcs.wcs.crpix[1] - 1.0)
+        if crval.separation(coord).arcsec > 0.001:
+            print(f'=== REFUSED: mosaic CRVAL is {crval.separation(coord).arcsec:.3f}" from the catalogue '
+                  f'position, so the bands do not share a tangent point to snap about')
+            return 1
+        position, (dx, dy) = grid_snapped_centre(wcs, deflector, scale)
+        miss = wcs.pixel_to_world(*position).separation(deflector).arcsec
+        centre_note = f'deflector, snap {dx:+.2f},{dy:+.2f}"'
+        print(f'  centre: measured deflector, snapped to ({dx:+.2f}, {dy:+.2f})" from CRVAL in '
+              f'mosaic x/y, {1000*miss:.0f} mas from the measured position')
+    elif center == 'peak':
         pre = Cutout2D(sci, position=coord, size=u.Quantity((a.size, a.size), u.arcsec), wcs=wcs,
                        mode='partial', fill_value=np.nan)
         r, c = brightest_pixel_position(pre.data, a.box, a.median_size)
@@ -240,8 +286,10 @@ def main():
     base_hdr['PIXSCALE'] = (round(scale, 6), 'arcsec/pixel (from the WCS)')
     base_hdr['CUTSIZE'] = (a.size, 'stamp side, arcsec')
     base_hdr['CUTCENT'] = (centre_note, 'how the stamp centre was chosen')
-    base_hdr['CUTRA'] = (float(position.ra.deg), 'stamp centre RA, deg')
-    base_hdr['CUTDEC'] = (float(position.dec.deg), 'stamp centre Dec, deg')
+    ny_c, nx_c = cut.data.shape
+    centre_sky = cut.wcs.pixel_to_world((nx_c - 1) / 2.0, (ny_c - 1) / 2.0)
+    base_hdr['CUTRA'] = (float(centre_sky.ra.deg), 'stamp centre RA, deg')
+    base_hdr['CUTDEC'] = (float(centre_sky.dec.deg), 'stamp centre Dec, deg')
     base_hdr['REDUCVAR'] = (a.variant or 'standard', 'reduction variant (cutout_paths.py)')
     base_hdr['NBADPIX'] = (int(bad.sum()), 'pixels set to sci=0, noise=1e8')
     noise_hdr = base_hdr.copy()
@@ -270,7 +318,7 @@ def main():
         info_json.update(cutout_paths.qc_json_path(ws_path, a.size), sample, a.lens, filt, {
             'i2d': os.path.relpath(i2d, ws_path), 'variant': a.variant or 'standard',
             'size_arcsec': a.size, 'shape': list(s.shape), 'pixel_scale': round(scale, 6),
-            'center': centre_note, 'center_ra': float(position.ra.deg), 'center_dec': float(position.dec.deg),
+            'center': centre_note, 'center_ra': float(centre_sky.ra.deg), 'center_dec': float(centre_sky.dec.deg),
             'n_bad': int(bad.sum()), 'weight_uniformity': None if wu is None else round(wu, 4),
             'corr_factor': corr, 'corr_source': corr_src, 'casertano_r': None if casr is None else round(casr, 4),
         })

@@ -7,6 +7,9 @@
                 "mast_target": "B1938+666",
                 "ra": 294.6053333,
                 "dec": 66.8147,
+                "deflector_ra": 294.6056716,
+                "deflector_dec": 66.814644,
+                "deflector_note": "Lens-core flux centroid on the F115W i2d (r = 0.09-0.18\", stable to 1 mas; F277W core agrees to 13 mas), 2026-10-04: 0.479\" E, 0.201\" S of the APT ra/dec, which is kept because it is the mosaics' CRVAL. make_cutouts --center auto cuts the stamp here, snapped to the 0.06\" LW grid.",
                 "redshift_lens": 0.881,
                 "redshift_source": 2.059
             }

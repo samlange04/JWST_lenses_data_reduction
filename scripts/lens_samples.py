@@ -3,7 +3,8 @@
 Mirrors ``mast_target_names.py`` in the HST repo, simplified for JWST: a JWST lens is
 located in MAST by **proposal ID + target name**, not by a wildcard on an SDSS designation,
 so there are no GAL-* quirks. Each sample block carries the program it comes from, and each
-lens carries what no FITS file does -- catalogue position (the stamp centre) and the
+lens carries what no FITS file does -- catalogue position (the mosaics' CRVAL and, unless a
+measured ``deflector_ra``/``deflector_dec`` overrides it, the stamp centre) and the
 redshifts that ``export_dataset.py`` writes into the modelling ``info.json``.
 
     b1938   JVAS B1938+666           GO 8281 (Vegetti)   F115W F277W
@@ -123,6 +124,20 @@ def coord(lens, sample=None):
     import astropy.units as u
     e = entry(lens, sample)
     return SkyCoord(e['ra'] * u.deg, e['dec'] * u.deg, frame='icrs')
+
+
+def deflector_coord(lens, sample=None):
+    """SkyCoord of the MEASURED deflector (``deflector_ra``/``deflector_dec``), or None.
+
+    Only for a lens whose catalogue position misses the galaxy by more than a pixel or two
+    (B1938+666: 0.52"). ``ra``/``dec`` stay the mosaics' CRVAL, so they are not edited to
+    match; make_cutouts cuts the stamp here instead (``--center auto``)."""
+    from astropy.coordinates import SkyCoord
+    import astropy.units as u
+    e = entry(lens, sample)
+    if 'deflector_ra' not in e:
+        return None
+    return SkyCoord(e['deflector_ra'] * u.deg, e['deflector_dec'] * u.deg, frame='icrs')
 
 
 def redshifts(lens, sample=None):

@@ -10,9 +10,9 @@
                     400
                 ],
                 "pixel_scale": 0.03,
-                "center": "catalogue",
-                "center_ra": 294.6053333,
-                "center_dec": 66.8147,
+                "center": "deflector, snap -0.48,-0.18\"",
+                "center_ra": 294.6056719614238,
+                "center_dec": 66.81464999963778,
                 "n_bad": 0,
                 "weight_uniformity": 0.0338,
                 "corr_factor": 0.94,
@@ -28,11 +28,11 @@
                     200
                 ],
                 "pixel_scale": 0.06,
-                "center": "catalogue",
-                "center_ra": 294.6053333,
-                "center_dec": 66.8147,
+                "center": "deflector, snap -0.48,-0.18\"",
+                "center_ra": 294.6056719614238,
+                "center_dec": 66.81464999963778,
                 "n_bad": 0,
-                "weight_uniformity": 0.0524,
+                "weight_uniformity": 0.0529,
                 "corr_factor": 1.12,
                 "corr_source": "json:lens",
                 "casertano_r": 1.5384
