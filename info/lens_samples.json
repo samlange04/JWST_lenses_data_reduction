@@ -10,6 +10,8 @@
                 "deflector_ra": 294.6056716,
                 "deflector_dec": 66.814644,
                 "deflector_note": "Lens-core flux centroid on the F115W i2d (r = 0.09-0.18\", stable to 1 mas; F277W core agrees to 13 mas), 2026-10-04: 0.479\" E, 0.201\" S of the APT ra/dec, which is kept because it is the mosaics' CRVAL. make_cutouts --center auto cuts the stamp here, snapped to the 0.06\" LW grid.",
+                "cutout_size": 7.0,
+                "cutout_size_note": "2026-10-04: 7\" (232 SW / 116 LW px, 6.96\") instead of 12\". The ring is 0.45\" and the lens light reaches ~2\"; at 12\" a third of the stamp was two detector streaks and a galaxy group to mask.",
                 "redshift_lens": 0.881,
                 "redshift_source": 2.059
             }

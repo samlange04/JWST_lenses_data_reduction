@@ -323,7 +323,17 @@ bash scripts/run_cutouts_all.sh spt [SIZE] [--variant V]
 ```
 
 Writes `data/cutouts[_<S>arcsec]/<sample>/<lens>/<FILT>/cutout[_<variant>]_{sci,noise}.fits`
-+ `.png`. Stamp = 12" (400 px SW, 200 px LW). Size and variant key the paths through
++ `.png`. Stamp = 12" (400 px SW, 200 px LW), unless the lens sets `cutout_size` in
+`info/lens_samples.json` (B1938+666: 7" → 232 / 116 px = 6.96", 2026-10-04; at 12" a third of
+its stamp was two detector streaks and a galaxy group to mask, around a 0.45" ring).
+**`cutout_size` is cut into the DEFAULT tree** when `--size` is omitted, so that lens's tracked
+stamp, masks, positions and export need no `--size` anywhere; an explicit `--size` still
+means "this size, in its own `cutouts_<S>arcsec/` tree". Every stamp side is rounded to an
+EVEN number of 0.06" LW pixels (`nested_shape`): the stamp centre sits on the pixel corner
+the mosaics share, which an odd side would move by half a pixel (15 mas SW, 30 mas LW) and
+split the bands' centres — hence 6.96", not 7.00". A re-size about the same centre is an exact
+central crop, so positions (arcsec from the centre) carry over unchanged; masks, being
+per-pixel, do not. Size and variant key the paths through
 `cutout_paths.py` exactly as in the HST repo: a non-default size writes a parallel tree, a
 variant tags the sci/noise names, masks/positions/PSFs keep the bare `cutout_` prefix, and
 `find_stamp` raises `AmbiguousStampError` if two reductions' stamps share a dir. One stamp per

@@ -149,6 +149,17 @@ def grid_snapped_centre(wcs, target, scale):
     return (ref_x + nx * round(ratio), ref_y + ny * round(ratio)), (nx * step, ny * step)
 
 
+def nested_shape(size, scale):
+    """(n, n) pixels for a `size`-arcsec stamp at `scale`: an EVEN number of LW pixels,
+    converted to this band's pixels. Every stamp centre sits on the pixel corner the mosaics
+    share (CRVAL plus whole LW pixels, see grid_snapped_centre), which only an even side keeps
+    at the centre; an odd count would move it half a pixel -- 15 mas SW, 30 mas LW, so the
+    bands would no longer share a centre. 12" -> 200 LW / 400 SW exactly; 7" -> 116 / 232."""
+    n_lw = 2 * int(round(size / (2.0 * LW_GRID_STEP)))
+    n = int(round(n_lw * LW_GRID_STEP / scale))
+    return (n, n)
+
+
 def plot_cutouts(sci, noise, output_path, title):
     noise_display = np.where(noise >= SENTINEL, np.nan, noise)
     with np.errstate(divide='ignore', invalid='ignore'):
@@ -178,7 +189,11 @@ def main():
     p.add_argument('--lens', required=True)
     p.add_argument('--filt', required=True)
     p.add_argument('--sample', default=None)
-    p.add_argument('--size', type=float, default=cutout_paths.DEFAULT_SIZE, help='arcsec on a side')
+    p.add_argument('--size', type=float, default=None,
+                   help='arcsec on a side, AND which tree: a size other than the default writes '
+                        'data/cutouts_<S>arcsec/. Omitted: the default (tracked) tree, at the '
+                        "lens's cutout_size from lens_samples.json if it has one, else "
+                        f'{cutout_paths.DEFAULT_SIZE:g}"')
     p.add_argument('--variant', default='', choices=('',) + cutout_paths.VARIANT_COMPONENTS,
                    help="which reduction's mosaic to cut (default: the standard one)")
     p.add_argument('--center', choices=['auto', 'catalogue', 'deflector', 'peak'], default='auto',
@@ -196,13 +211,16 @@ def main():
     filt = lens_samples.canonical_filter(a.filt)
     ch = lens_samples.channel(filt)
     coord = lens_samples.coord(a.lens, sample)
+    tree_size = cutout_paths.DEFAULT_SIZE if a.size is None else a.size
+    size = a.size if a.size is not None else (lens_samples.cutout_size(a.lens, sample)
+                                              or cutout_paths.DEFAULT_SIZE)
 
     mdir = cutout_paths.mosaic_dir(ws_path, sample, a.lens, filt, a.variant)
     i2d = cutout_paths.find_i2d(mdir)
     if i2d is None:
         print(f'=== NO MOSAIC: {mdir} -- run reduce_nircam.py first')
         return 0
-    out_dir = a.output or cutout_paths.cutout_dir(ws_path, sample, a.lens, filt, a.size)
+    out_dir = a.output or cutout_paths.cutout_dir(ws_path, sample, a.lens, filt, tree_size)
     os.makedirs(out_dir, exist_ok=True)
     sci_path = os.path.join(out_dir, cutout_paths.stamp_name(cutout_paths.PREFIX, 'sci', a.variant))
     noise_path = os.path.join(out_dir, cutout_paths.stamp_name(cutout_paths.PREFIX, 'noise', a.variant))
@@ -256,12 +274,16 @@ def main():
         print(f'  centre: measured deflector, snapped to ({dx:+.2f}, {dy:+.2f})" from CRVAL in '
               f'mosaic x/y, {1000*miss:.0f} mas from the measured position')
     elif center == 'peak':
-        pre = Cutout2D(sci, position=coord, size=u.Quantity((a.size, a.size), u.arcsec), wcs=wcs,
+        pre = Cutout2D(sci, position=coord, size=u.Quantity((size, size), u.arcsec), wcs=wcs,
                        mode='partial', fill_value=np.nan)
         r, c = brightest_pixel_position(pre.data, a.box, a.median_size)
         position = pre.wcs.pixel_to_world(c, r)
         centre_note = f'peak (box {a.box}, median {a.median_size})'
-    size_q = u.Quantity((a.size, a.size), u.arcsec)
+    size_q = nested_shape(size, scale)
+    if abs(size_q[0] * scale - size) > 1e-6:
+        print(f'  size: {size:g}" -> {size_q[0]} px = {size_q[0] * scale:g}" (even LW-pixel count, '
+              f'so the SW/LW stamps stay nested about one corner)')
+    size = round(size_q[0] * scale, 6)
     cut = Cutout2D(sci, position=position, size=size_q, wcs=wcs, mode='partial', fill_value=np.nan)
     cut_err = Cutout2D(err, position=position, size=size_q, wcs=wcs, mode='partial', fill_value=np.nan)
     cut_wht = Cutout2D(wht, position=position, size=size_q, wcs=wcs, mode='partial', fill_value=0.0)
@@ -284,7 +306,7 @@ def main():
             base_hdr[k] = phdr[k]
     base_hdr['BUNIT'] = (sci_hdr.get('BUNIT', 'MJy/sr'), 'surface brightness units of the stamp')
     base_hdr['PIXSCALE'] = (round(scale, 6), 'arcsec/pixel (from the WCS)')
-    base_hdr['CUTSIZE'] = (a.size, 'stamp side, arcsec')
+    base_hdr['CUTSIZE'] = (size, 'stamp side, arcsec')
     base_hdr['CUTCENT'] = (centre_note, 'how the stamp centre was chosen')
     ny_c, nx_c = cut.data.shape
     centre_sky = cut.wcs.pixel_to_world((nx_c - 1) / 2.0, (ny_c - 1) / 2.0)
@@ -310,14 +332,14 @@ def main():
 
     write_fits(s.astype(np.float32), cut.wcs, base_hdr, sci_path)
     write_fits(n.astype(np.float64), cut.wcs, noise_hdr, noise_path)
-    plot_cutouts(s, n, png_path, f'{a.lens} {filt} ({a.size:g}", {scale:.3f}"/px, x{corr:.2f} noise)')
+    plot_cutouts(s, n, png_path, f'{a.lens} {filt} ({size:g}", {scale:.3f}"/px, x{corr:.2f} noise)')
 
     if wu is not None and wu > WEIGHT_UNIFORMITY_LIMIT:
         print(f'  WARNING: weight uniformity {wu:.3f} > {WEIGHT_UNIFORMITY_LIMIT}')
     if not a.output:
-        info_json.update(cutout_paths.qc_json_path(ws_path, a.size), sample, a.lens, filt, {
+        info_json.update(cutout_paths.qc_json_path(ws_path, tree_size), sample, a.lens, filt, {
             'i2d': os.path.relpath(i2d, ws_path), 'variant': a.variant or 'standard',
-            'size_arcsec': a.size, 'shape': list(s.shape), 'pixel_scale': round(scale, 6),
+            'size_arcsec': size, 'shape': list(s.shape), 'pixel_scale': round(scale, 6),
             'center': centre_note, 'center_ra': float(centre_sky.ra.deg), 'center_dec': float(centre_sky.dec.deg),
             'n_bad': int(bad.sum()), 'weight_uniformity': None if wu is None else round(wu, 4),
             'corr_factor': corr, 'corr_source': corr_src, 'casertano_r': None if casr is None else round(casr, 4),

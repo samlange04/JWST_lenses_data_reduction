@@ -4,17 +4,17 @@
             "F115W": {
                 "i2d": "data/mosaics/b1938/B1938+666/F115W/b1938p666_f115w_i2d.fits",
                 "variant": "standard",
-                "size_arcsec": 12.0,
+                "size_arcsec": 6.96,
                 "shape": [
-                    400,
-                    400
+                    232,
+                    232
                 ],
                 "pixel_scale": 0.03,
                 "center": "deflector, snap -0.48,-0.18\"",
                 "center_ra": 294.6056719614238,
                 "center_dec": 66.81464999963778,
                 "n_bad": 0,
-                "weight_uniformity": 0.0338,
+                "weight_uniformity": 0.0317,
                 "corr_factor": 0.94,
                 "corr_source": "json:lens",
                 "casertano_r": 1.5254
@@ -22,17 +22,17 @@
             "F277W": {
                 "i2d": "data/mosaics/b1938/B1938+666/F277W/b1938p666_f277w_i2d.fits",
                 "variant": "standard",
-                "size_arcsec": 12.0,
+                "size_arcsec": 6.96,
                 "shape": [
-                    200,
-                    200
+                    116,
+                    116
                 ],
                 "pixel_scale": 0.06,
                 "center": "deflector, snap -0.48,-0.18\"",
                 "center_ra": 294.6056719614238,
                 "center_dec": 66.81464999963778,
                 "n_bad": 0,
-                "weight_uniformity": 0.0529,
+                "weight_uniformity": 0.0512,
                 "corr_factor": 1.12,
                 "corr_source": "json:lens",
                 "casertano_r": 1.5384

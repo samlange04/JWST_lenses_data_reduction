@@ -140,6 +140,15 @@ def deflector_coord(lens, sample=None):
     return SkyCoord(e['deflector_ra'] * u.deg, e['deflector_dec'] * u.deg, frame='icrs')
 
 
+def cutout_size(lens, sample=None):
+    """The lens's modelling-stamp side in arcsec (``cutout_size``), or None for the default.
+
+    For a lens the default 12" stamp does not suit (B1938+666: a 0.45" ring whose 12" stamp
+    is a third bright neighbours and detector streaks). make_cutouts.py cuts it at this size
+    INTO THE DEFAULT TREE, so the tracked stamp, masks, positions and export need no --size."""
+    return entry(lens, sample).get('cutout_size')
+
+
 def redshifts(lens, sample=None):
     e = entry(lens, sample)
     return e['redshift_lens'], e['redshift_source']
