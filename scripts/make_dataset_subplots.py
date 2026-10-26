@@ -40,7 +40,6 @@ import contextlib
 import glob
 import os
 import sys
-import warnings
 
 import numpy as np
 from astropy.io import fits
@@ -48,10 +47,6 @@ from astropy.visualization import AsinhStretch, ImageNormalize, PercentileInterv
 from astropy.wcs import WCS
 from astropy.wcs.utils import proj_plane_pixel_scales
 from matplotlib.colors import LogNorm
-
-# autonerves prints a workspace-version-mismatch UserWarning on import in this repo (it's
-# not an autolens_workspace checkout) -- harmless, silence it so it doesn't repeat per lens.
-warnings.filterwarnings('ignore', category=UserWarning, module='autonerves')
 
 import autolens as al
 import autolens.plot as aplt

@@ -33,17 +33,17 @@ quadrupole residual; an arc partly self-subtracts at its own radius). Pass
 --no-subtract-radial to draw against the raw image.
 
 ALREADY-MARKED POSITIONS ARE SHOWN. Where `make_positions.py` has recorded
-cutout_[cr_]positions.json for the band, each marked image is marked with a dark CROSS in
-the display so the arc mask can be drawn around the same multiple images. A cross, not a
-ring: the other two annotations here are closed boundaries (solid white arc proposal, dashed
-dark contaminant mask), and a third closed shape read as one more region masked OUT.
---no-show-positions turns it off.
+cutout_[cr_]positions.json for the band, each marked image is marked with a '+' CROSS in
+the display (al.Scribbler's `positions=`) so the arc mask can be drawn around the same
+multiple images. A cross, not a ring: the other two annotations here are closed boundaries
+(the arc proposal's contour, the contaminant mask's edge of black 'x's), and a third closed
+shape read as one more region masked OUT. --no-show-positions turns it off.
 
 YOU CORRECT A PROPOSAL, YOU DO NOT DRAW FROM SCRATCH (--propose-from, default 'auto').
 `scripts/detect_arcs.py` finds the arcs automatically -- a PSF-matched colour difference
 against the deflector (the source is blue, the deflector is red), thresholded inside the
 measured Auger+2009 Einstein radius -- and its region is OUTLINED over both panels for review.
-You then add with the green brush, erase with the red one, and on closing the GUI choose
+You then add with the white brush ('1'), erase with the black one ('2'), and on closing the GUI choose
 [a]pply proposal+edits, keep only what you [d]rew, or [s]kip. It is the same review loop
 make_masks.py uses for cross-band mask proposals, and the same `confirm_proposal` code: the
 detector proposes, nothing is ever written unapproved, and a band left unapproved stays
@@ -57,7 +57,7 @@ region you yourself reviewed, with the per-source breakdown printed (`detect 133
 detector sees what is blue in this lens now, your own mask carries a judgement it cannot make,
 and neither is authoritative, since an arc detected in one filter is often ABSENT in another
 and its usable extent changes with each band's depth and PSF. That is exactly why the union is
-a proposal, outlined for review and trimmed with the red brush, and never a broadcast. Takes
+a proposal, outlined for review and trimmed with the black brush, and never a broadcast. Takes
 an explicit comma-separated list too ('detect,f814W', 'f814W'), or 'none' for a blank canvas.
 Under --force the draw band's own mask joins the union, so refining a mask is not redrawing it.
 --detect-* pass detector parameters through (--detect-snr is the one to reach for: lower it to
@@ -86,16 +86,15 @@ Usage:
 import argparse
 import os
 import sys
-import warnings
 
 import numpy as np
 from astropy.io import fits
 from astropy.wcs import WCS
 
-warnings.filterwarnings('ignore', category=UserWarning, module='autonerves')
-
 import autolens as al
 import autolens.plot as aplt
+# The Scribbler's own display transforms, reused so the QC PNG shows what the GUI showed.
+from autogalaxy.gui.display_util import arcsinh_stretch, radial_median_subtract
 from matplotlib import pyplot as plt
 
 ws_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -111,13 +110,6 @@ import detect_arcs
 ARC_MASKS_JSON = os.path.join(ws_path, 'info', 'lens_arc_masks.json')
 
 ARC_SUFFIX = 'mask_arcs'          # cutout_[cr_]mask_arcs.fits, beside cutout_[cr_]mask.fits
-
-# Geometry of the position crosses (see cross_overlay): 3 px-thick arms starting 2 px out, so
-# the marked pixel itself is never covered and the marker is about as many display pixels as
-# the 6 px ring it replaced (~50 vs ~38) -- a cross made of hairlines reads as fainter than a
-# ring of the same radius, and it has to survive being drawn over a bright arc.
-_CROSS_HALF_WIDTH_PX = 1.0
-_CROSS_GAP_PX = 2.0
 
 
 def _one_arc_source(filt_dirs, prefixes, display_filt, dst_wcs, dst_shape, lens, source,
@@ -193,7 +185,7 @@ def find_arc_proposal(filt_dirs, prefixes, display_filt, display_hdr, lens, prop
     drew for another band carries a judgement it cannot make. Neither is authoritative: an arc
     detected in one filter is often simply ABSENT in another, and its usable extent changes
     with each band's depth and PSF -- which is exactly why the union is a proposal, outlined
-    for review and trimmed with the red brush, and never a broadcast.
+    for review and trimmed with the black brush, and never a broadcast.
 
     With 'auto' (the default) the first band of a lens gets the detector alone, and every band
     after it gets the detector plus your own reviewed region, with the per-source breakdown
@@ -245,102 +237,16 @@ def load_positions(cutout_dir, prefix):
         return []
 
 
-def cross_overlay(positions, cross_size_px=6):
-    """Return an `overlay(disp_array, pixel_scales)` callable for make_masks.draw_mask_gui
-    that marks each `make_positions.py` image with a CROSS in the DISPLAYED array.
-
-    A CROSS, NOT A RING (2026-09-21). Every other annotation on this GUI is a closed
-    boundary -- the arc proposal is a solid white outline and the contaminant mask is a
-    dashed dark one -- so a dark ring read as a third small closed region, i.e. as something
-    masked out, which is the opposite of what a marked image means. Four open ticks cannot be
-    read as an enclosed area at all, so the annotations no longer have to be told apart by
-    line style alone.
-
-    Burned in at the display MINIMUM (dark), as the ring was: dark reads clearly against both
-    the mid-tone background and the bright arcs of a radial-subtracted image, where a
-    maximum-valued marker would be indistinguishable from arc flux -- the one thing it must
-    not hide. The arms stop short of the centre (`_CROSS_GAP_PX`) for the same reason the
-    contaminant outline is not filled: the marked pixel is the one you are judging, so the
-    marker points at it rather than covering it.
-
-    Display only: the Scribbler returns brush positions, so this cannot enter the mask.
-    """
-    def _overlay(disp_array, pixel_scales):
-        a = np.array(disp_array.native, dtype=float)
-        n_y, n_x = a.shape
-        cy, cx = (n_y - 1) / 2.0, (n_x - 1) / 2.0
-        yy, xx = np.mgrid[0:n_y, 0:n_x]
-        dark = float(a.min())
-        for (y_as, x_as) in positions:
-            # arcsec -> pixel. +x arcsec is +column, but +y arcsec is -ROW: autoarray's
-            # native grid puts row 0 at the TOP (+y), verified against
-            # al.Grid2D.uniform(...).native[0, 0] == (+5.975, -5.975) for a 240px/0.05"
-            # stamp. Getting this sign wrong silently marks the mirror image of each
-            # position -- it lands plausibly near the lens and on nothing.
-            py, px = cy - y_as / pixel_scales, cx + x_as / pixel_scales
-            dy, dx = np.abs(yy - py), np.abs(xx - px)
-            arm = float(cross_size_px)
-            vertical = (dx <= _CROSS_HALF_WIDTH_PX) & (dy >= _CROSS_GAP_PX) & (dy <= arm)
-            horizontal = (dy <= _CROSS_HALF_WIDTH_PX) & (dx >= _CROSS_GAP_PX) & (dx <= arm)
-            a[vertical | horizontal] = dark
-        return al.Array2D.no_mask(values=a, pixel_scales=pixel_scales).native
-    return _overlay
-
-
-def contaminant_overlay(mask_bool):
-    """Return an `overlay(disp_array, pixel_scales)` that outlines the CONTAMINANT mask
-    (`cutout_[cr_]mask.fits`, what make_masks.py excludes) in the displayed array.
-
-    Why it is here: painting arcs and painting contaminants are opposite jobs, and the thing
-    most likely to be mistaken for a lensed image is a neighbour or field source that has
-    ALREADY been judged a contaminant on this very band. Showing that verdict while you paint
-    means you are not re-deciding it from memory.
-
-    DASHED and burned at the display MINIMUM, which keeps three annotations apart at a glance:
-    the arc proposal is a solid WHITE outline (display max), marked image positions are DARK
-    CROSSES, and this is a DASHED DARK boundary. The interior is deliberately NOT filled --
-    the same call `make_masks.py` made and recorded: blanking a region hides the very pixels
-    you are judging it against. Display only; the Scribbler returns brush positions, so
-    nothing here can enter the saved mask.
-    """
-    def _overlay(disp_array, pixel_scales):
-        a = np.array(disp_array.native, dtype=float)
-        edge = make_masks.mask_boundary(np.asarray(mask_bool, dtype=bool))
-        if edge.shape == a.shape:
-            yy, xx = np.mgrid[0:a.shape[0], 0:a.shape[1]]
-            a[edge & (((yy + xx) % 3) != 0)] = float(a.min())    # dashed, not solid
-        return al.Array2D.no_mask(values=a, pixel_scales=pixel_scales).native
-    return _overlay
-
-
-def compose_overlays(*fns):
-    """Chain overlay callables in order; None entries are ignored. Returns None if none remain,
-    so draw_mask_gui's `overlay is not None` fast path is preserved."""
-    fns = [f for f in fns if f is not None]
-    if not fns:
-        return None
-    if len(fns) == 1:
-        return fns[0]
-
-    def _overlay(disp_array, pixel_scales):
-        for fn in fns:
-            disp_array = fn(disp_array, pixel_scales)
-        return disp_array
-    return _overlay
-
-
-def save_arc_qc_png(cutout_dir, prefix, arc_bool, pixel_scales, out_path, lens, filt,
-                    stretch='asinh', vmin_percent=5.0, vmax_percent=99.5, asinh_a=0.1):
+def save_arc_qc_png(cutout_dir, prefix, arc_bool, pixel_scales, out_path, lens, filt):
     """QC overlay: the arc region outlined over the band's own (radial-subtracted) image.
 
     Written per band, so a broadcast can be checked where it actually matters -- the f160W
-    regrid (0.06"/px), where an array-index copy would land the region ~20px off.
+    regrid (0.06"/px), where an array-index copy would land the region ~20px off. Stretched
+    exactly as the GUI's left panel is (the Scribbler's radial_median_subtract +
+    arcsinh_stretch), so the PNG shows what was drawn on.
     """
     base, _ = make_masks.load_display_base(cutout_dir, prefix, 'snr', pixel_scales)
-    disp = make_masks.stretched_display(make_masks.radial_median_subtract(base), pixel_scales,
-                                        stretch=stretch, vmin_percent=vmin_percent,
-                                        vmax_percent=vmax_percent, asinh_a=asinh_a)
-    a = np.asarray(disp.native)
+    a = arcsinh_stretch(radial_median_subtract(np.asarray(base, dtype=float)))
     hw = int(a.shape[1] / 2) * pixel_scales
     ext = [-hw, hw, -hw, hw]
     fig = plt.figure(figsize=(7, 7))
@@ -372,19 +278,27 @@ def write_arc_mask(arc_bool, pixel_scales, path):
 
 
 def process_lens_arc_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass, force,
-                          broadcast, brush_radius, brush_width, display, stretch,
-                          vmin_percent, vmax_percent, asinh_a, subtract_radial,
-                          side_by_side, show_positions, cross_size_px,
+                          broadcast, brush_radius, brush_width, display, subtract_radial,
+                          side_by_side, show_positions, cross_size_px=None,
                           propose_from='auto', detect_kw=None, show_contaminants=True):
     """Draw the arc mask once for one lens, on its best/forced band only unless
     `broadcast` is set (then also WCS-reprojected to the lens's other bands). Mirrors
     make_masks.process_lens_mask; differs only in polarity, product name, and the arc-specific
-    display (radial subtraction + position crosses). Returns True if a mask was written.
+    display (radial subtraction, position crosses, contaminant-mask edge -- all al.Scribbler's
+    own `subtract_radial=` / `positions=` / `mask_overlay=`). Returns True if a mask was written.
 
     `propose_from` ('detect' by default) starts the draw from a REVIEWED PROPOSAL rather than
     a blank canvas: the proposed arc region is outlined on every panel, you correct it with
-    the green (add) / red (erase) brushes, and on closing the GUI you apply, reject or skip.
+    the white (add) / black (erase) brushes, and on closing the GUI you apply, reject or skip.
     'none' restores the from-scratch draw.
+
+    `show_contaminants` passes this band's `cutout_[cr_]mask.fits` as the Scribbler's
+    `mask_overlay`, whose edge it scatters as black 'x's. Why: painting arcs and painting
+    contaminants are opposite jobs, and the thing most likely to be mistaken for a lensed
+    image is a neighbour ALREADY judged a contaminant on this very band -- showing that
+    verdict while you paint means you are not re-deciding it from memory. The edge is
+    autoarray's `derive_grid.edge` (unmasked pixels bordering masked ones), so expect the
+    'x's to also run along the stamp border; the interior is deliberately not filled.
     """
     filts = sorted(filt_dirs)
     display_filt = make_masks.pick_display_filt(filts, requested_filt)
@@ -405,28 +319,27 @@ def process_lens_arc_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass,
         print(f"{lens}: arc mask already exists ({display_filt}), skipping (--force to redraw)")
         return False
 
+    display_hdr = fits.getheader(cutout_paths.find_stamp(display_dir, display_prefix, 'sci'))
     positions = load_positions(display_dir, display_prefix) if show_positions else []
-    overlay = cross_overlay(positions, cross_size_px) if positions else None
     if positions:
         print(f"  {len(positions)} marked position(s) crossed in the display "
               f"(from {display_prefix}_positions.json)")
-    contaminants = None
+    mask_overlay = None
     if show_contaminants:
         cont_path = os.path.join(display_dir, f'{display_prefix}_mask.fits')
         if os.path.exists(cont_path):
             contaminants = np.asarray(fits.getdata(cont_path), dtype=bool)
             if contaminants.any():
                 print(f"  {int(contaminants.sum())}px contaminant-masked on this band "
-                      f"(dashed dark outline; make_masks.py's verdict, and the detector "
+                      f"(edge shown as black x's; make_masks.py's verdict, and the detector "
                       f"already excluded them)")
-                overlay = compose_overlays(overlay, contaminant_overlay(contaminants))
-            else:
-                contaminants = None
+                mask_overlay = al.Mask2D(
+                    mask=contaminants,
+                    pixel_scales=make_masks.pixel_scale_from_header(display_hdr))
         else:
             print(f"  NOTE: no {display_prefix}_mask.fits on this band -- no contaminant "
                   f"outline to show (draw one with make_masks.py first if you want it)")
 
-    display_hdr = fits.getheader(cutout_paths.find_stamp(display_dir, display_prefix, 'sci'))
     prefixes = {f: make_masks.find_prefix(d, drizzle_pass) for f, d in filt_dirs.items()}
     proposal_from = proposal = None
     proposal_extra = {}
@@ -456,25 +369,27 @@ def process_lens_arc_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass,
         "  Scribbler GUI: paint ONLY the arcs / multiple images of the source.",
         "    Everything you do NOT paint is masked OUT (the deflector included) -- this is",
         "    the OPPOSITE polarity to make_masks.py, which paints what to remove.",
-        "    keys '1' = GREEN brush, paint arc   |   '2' = RED brush, un-paint (erase)",
+        "    keys '1' = WHITE brush, paint arc   |   '2' = BLACK brush, un-paint (erase)",
     ]
-    (painted, erased, src_ps, src_hdr, brush_width, start_radius,
+    title = f"{lens} {display_filt}: paint the ARCS to KEEP (everything unpainted is masked out)"
+    if proposal is not None:
+        title += f", reviewing the {proposal_from} arc region"
+    (reviewed, painted, erased, src_ps, src_hdr, brush_width, start_radius,
      source_label) = make_masks.draw_mask_gui(
         display_dir, display_prefix, lens, display_filt, brush_radius, brush_width,
-        display, stretch, vmin_percent, vmax_percent, asinh_a,
-        subtract_radial=subtract_radial, side_by_side=side_by_side,
-        prompt=prompt, overlay=overlay, proposal=proposal,
-        proposal_label=(f'{proposal_from} arc region' if proposal_from else None))
+        display, subtract_radial=subtract_radial, side_by_side=side_by_side,
+        prompt=prompt, proposal=proposal,
+        proposal_label=(f'{proposal_from} arc region' if proposal_from else None),
+        positions=positions, position_marker_size=cross_size_px, mask_overlay=mask_overlay,
+        title=title)
 
-    painted = np.asarray(painted, dtype=bool)
-    erased = np.asarray(erased, dtype=bool)
-    # painted = the arcs to KEEP; the red brush trims an over-painted stroke back off it.
-    drawn_only = painted & ~erased
+    # painted = the arcs to KEEP; the black brush trims an over-painted stroke back off it.
+    # `reviewed` is al.Scribbler.mask_from(): (proposal | painted) & ~erased.
     n_add, n_erase = int(painted.sum()), int(erased.sum())
     if proposal is None:
-        arc_region, source_tag = drawn_only, 'drawn'
+        arc_region, source_tag = reviewed, 'drawn'
     else:
-        reviewed = (proposal | painted) & ~erased
+        drawn_only = painted & ~erased          # the [d] outcome: the proposal rejected outright
         choice = make_masks.confirm_proposal(lens, display_filt, proposal_from,
                                              int(proposal.sum()), n_add, n_erase,
                                              int(reviewed.sum()), int(drawn_only.sum()))
@@ -511,9 +426,7 @@ def process_lens_arc_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass,
         mask_path = os.path.join(cutout_dir, f'{prefix}_{ARC_SUFFIX}.fits')
         write_arc_mask(band_arc, band_ps, mask_path)
         save_arc_qc_png(cutout_dir, prefix, band_arc, band_ps,
-                        os.path.join(cutout_dir, f'{prefix}_{ARC_SUFFIX}.png'), lens, filt,
-                        stretch=stretch, vmin_percent=vmin_percent,
-                        vmax_percent=vmax_percent, asinh_a=asinh_a)
+                        os.path.join(cutout_dir, f'{prefix}_{ARC_SUFFIX}.png'), lens, filt)
         n_arc = int(np.asarray(band_arc).sum())
         print(f"  wrote {mask_path}  ({source_tag if is_draw else f'reprojected<-{display_filt}'}, "
               f"{n_arc}px in the arc region, everything else masked out)")
@@ -584,15 +497,9 @@ def main():
     p.add_argument('--display', choices=['snr', 'sci'], default='snr',
                    help="image to scribble on: 'snr' (default) = signal/noise, which tracks "
                         "statistical significance given the non-uniform noise map; 'sci' = raw "
-                        'signal. Choice does not affect the saved mask')
-    p.add_argument('--stretch', choices=list(make_masks._STRETCHES), default='asinh',
-                   help='intensity stretch for the DISPLAYED image only (default asinh)')
-    p.add_argument('--asinh-a', type=float, default=0.1,
-                   help='asinh softening (smaller = stronger stretch; --stretch asinh only)')
-    p.add_argument('--vmin-percent', type=float, default=5.0,
-                   help='lower clip percentile for the display stretch (default 5.0)')
-    p.add_argument('--vmax-percent', type=float, default=99.5,
-                   help='upper clip percentile for the display stretch (default 99.5)')
+                        "signal. Choice does not affect the saved mask. The display stretch is "
+                        "al.Scribbler's own arcsinh; the former --stretch/--asinh-a/"
+                        '--vmin-percent/--vmax-percent knobs were dropped with it (2026-10-08)')
     p.add_argument('--subtract-radial', action=argparse.BooleanOptionalAction, default=True,
                    help="subtract the deflector's azimuthally-averaged radial profile from the "
                         'DISPLAYED image (DEFAULT ON here -- the arcs are this mask\'s subject '
@@ -605,16 +512,19 @@ def main():
                         'one is where their real extent against the galaxy envelope is '
                         '(default on)')
     p.add_argument('--show-positions', action=argparse.BooleanOptionalAction, default=True,
-                   help='mark the images already marked by make_positions.py with a dark '
-                        'cross in the display, as a guide for where the multiple images are '
-                        '(default on; silently inactive for a band with no positions file)')
-    p.add_argument('--cross-size', type=int, default=6,
-                   help='arm length in pixels of those position crosses (default 6)')
+                   help='mark the images already marked by make_positions.py with a black-'
+                        "on-white '+' cross in the display (al.Scribbler positions=), as a "
+                        'guide for where the multiple images are (default on; silently '
+                        'inactive for a band with no positions file)')
+    p.add_argument('--cross-size', type=int, default=None,
+                   help='arm length in pixels of those position crosses (default: the '
+                        "Scribbler's own, 1.5%% of the shorter stamp side, at least 3 px)")
     p.add_argument('--show-contaminants', action=argparse.BooleanOptionalAction, default=True,
-                   help="outline this band's CONTAMINANT mask (cutout_[cr_]mask.fits, what "
-                        'make_masks.py excludes) as a dashed dark boundary, so a neighbour '
-                        'already judged a contaminant is not mistaken for a lensed image '
-                        '(default on; display only, silently inactive where no mask exists)')
+                   help="show this band's CONTAMINANT mask (cutout_[cr_]mask.fits, what "
+                        "make_masks.py excludes) as the Scribbler's mask_overlay -- its edge "
+                        "scattered as black x's -- so a neighbour already judged a contaminant "
+                        'is not mistaken for a lensed image (default on; display only, '
+                        'silently inactive where no mask exists)')
     p.add_argument('--propose-from', default='auto',
                    help="where the arc region you review comes from. 'auto' (default) = the "
                         "automatic colour detector (scripts/detect_arcs.py) PLUS the "
@@ -623,8 +533,8 @@ def main():
                         "alone and every band after it starts from the detector plus your own "
                         "reviewed work. Also takes an explicit comma-separated list "
                         "('detect,f814W', 'f814W'), a single band, or 'none' for a blank "
-                        'canvas. You then add (green) / erase (red) and choose to apply, '
-                        'reject or skip on closing the GUI')
+                        "canvas. You then add ('1', white) / erase ('2', black) and choose "
+                        'to apply, reject or skip on closing the GUI')
     for name, val in detect_arcs.DEFAULTS.items():
         p.add_argument(f'--detect-{name.replace("_", "-")}', dest=f'detect_{name}',
                        type=type(val), default=val,
@@ -661,8 +571,7 @@ def main():
     for lens in sorted(lens_filts):
         if process_lens_arc_mask(lens, lens_filts[lens], a.sample, a.filt, a.drizzle_pass,
                                  a.force, a.broadcast, a.brush_radius, a.brush_width,
-                                 a.display, a.stretch, a.vmin_percent, a.vmax_percent,
-                                 a.asinh_a, a.subtract_radial, a.side_by_side,
+                                 a.display, a.subtract_radial, a.side_by_side,
                                  a.show_positions, a.cross_size,
                                  propose_from=a.propose_from, detect_kw=detect_kw,
                                  show_contaminants=a.show_contaminants):

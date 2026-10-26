@@ -66,18 +66,16 @@ Usage:
 import argparse
 import os
 import sys
-import warnings
 
 import numpy as np
 from astropy.io import fits
 from astropy.wcs import WCS
 from matplotlib import pyplot as plt
 
-# autonerves prints a workspace-version-mismatch UserWarning on import in this repo -- see
-# make_masks.py; silence it so it doesn't repeat per lens.
-warnings.filterwarnings('ignore', category=UserWarning, module='autonerves')
-
 import autolens as al
+# The same display helpers al.Scribbler uses internally (make_masks.py / make_arc_masks.py
+# no longer carry local copies), so the Clicker's panels match the mask GUIs'.
+from autogalaxy.gui.display_util import mask_boundary, radial_median_subtract
 
 ws_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -284,9 +282,9 @@ def mark_positions_gui(sci_native, pixel_scales, lens, filt, search_box_size,
     counts; `display_base` (raw signal, or S/N -- see load_display_base) is what we STRETCH
     and imshow, so bright cores and faint arcs are both visible while clicking.
 
-    PANELS ARE REAL AXES HERE, NOT A COMPOSITED ARRAY -- the opposite of make_masks.py, and
-    deliberately. The Scribbler reads one array back, so there the panels must be hstacked
-    into a single image and the scribble folded up afterwards (make_masks.fold_panels).
+    PANELS ARE REAL AXES HERE, NOT A COMPOSITED ARRAY -- the opposite of the mask GUIs, and
+    deliberately. al.Scribbler reads one array back, so there it hstacks the panels into a
+    single image and folds the scribble up afterwards (its `side_by_side=` path).
     al.Clicker takes only `event.xdata/ydata`, so a click needs no folding at all if every
     panel is its own axes over the SAME arcsec extent: a double-click anywhere then already
     carries panel-local sky coordinates, and is forwarded to `clicker.onclick` untouched.
@@ -335,8 +333,7 @@ def mark_positions_gui(sci_native, pixel_scales, lens, filt, search_box_size,
 
     panels = []
     if subtract_radial:
-        panels.append(('radial-subtracted',
-                       make_masks.radial_median_subtract(base, exclude=exclude)))
+        panels.append(('radial-subtracted', radial_median_subtract(base, exclude=exclude)))
     if not subtract_radial or side_by_side:
         panels.append(('as-observed', base))
 
@@ -354,7 +351,7 @@ def mark_positions_gui(sci_native, pixel_scales, lens, filt, search_box_size,
         if contaminants is not None and cont.any():
             # Outline ON the masked pixels (mask_boundary is an INNER boundary), so the
             # outline survives the interior being blanked to the colourmap floor.
-            disp[make_masks.mask_boundary(cont)] = 1.0
+            disp[mask_boundary(cont)] = 1.0
         im = ax.imshow(disp, cmap='jet', extent=ext)
         fig.colorbar(im, ax=ax, fraction=0.046)
         if mask_center and mask_center > 0:

@@ -26,8 +26,8 @@ about to be drawn and OUTLINED for approval over the usual two panels:
 
 The outline is all the review needs; a filled-in "mask applied" panel was tried and dropped,
 since it showed nothing the boundary does not already carry while hiding the pixels being
-judged. You then edit the proposal with two brushes --
-'1' GREEN adds to the mask, '2' RED erases from it, scribbling on whichever panel you like --
+judged. You then edit the proposal with al.Scribbler's two brushes --
+'1' WHITE adds to the mask, '2' BLACK erases from it, scribbling on whichever panel you like --
 and on closing the GUI choose to [a]pply proposal+edits, keep only what you [d]rew (rejecting
 the proposal outright), or [s]kip the band. Source: the band's own existing mask when
 --force-redrawing it (so refining a mask does not mean redrawing it), else the highest-priority
@@ -81,7 +81,6 @@ import argparse
 import glob
 import os
 import sys
-import warnings
 
 import numpy as np
 from astropy.io import fits
@@ -89,10 +88,6 @@ from astropy.wcs import WCS
 from astropy.wcs.utils import proj_plane_pixel_scales
 from astropy.visualization import (AsinhStretch, LogStretch, SqrtStretch,
                                    LinearStretch, ManualInterval)
-
-# autonerves prints a workspace-version-mismatch UserWarning on import in this repo (it's
-# not an autolens_workspace checkout) -- harmless, silence it so it doesn't repeat per lens.
-warnings.filterwarnings('ignore', category=UserWarning, module='autonerves')
 
 import autolens as al
 import autolens.plot as aplt
@@ -106,81 +101,15 @@ import cutout_paths
 MASKS_JSON = os.path.join(ws_path, 'info', 'lens_masks.json')
 
 
-class _GuardedScribbler(al.Scribbler):
-    """al.Scribbler with two behavioural fixes for this pipeline's masking.
-
-    1. Motion handler ignores events outside the image axes, and forces a redraw so
-       the brush circle always renders. Upstream `on_mouse_motion` (a) unconditionally
-       sets the brush-circle centre to (event.xdata, event.ydata), which are None when
-       the cursor is over non-image space (padding, colour-bar gutter, off-figure) --
-       the first such event raises `TypeError: unsupported operand type(s) for +:
-       'float' and 'NoneType'` inside matplotlib's `add_patch` (harmless -- the mask is
-       built from mouse-down scribbles, not motion events -- but it spams a traceback);
-       and (b) on the reposition path (`self.brush.center = center`) never asks the
-       canvas to redraw, so the blue brush circle only paints when some *other* event
-       forces a draw. On a fresh figure an idle-draw happens to service it, but from the
-       SECOND lens onward -- after show_mask()'s `plt.ioff()` and a figure close -- no
-       such draw fires, so the brush patch exists but is never painted and only the OS
-       cursor shows (scribbling still works, since mouse-down draws itself). Skipping
-       out-of-axes motion suppresses (a); a `draw_idle()` on every in-axes motion fixes
-       (b) so the circle tracks the cursor on every lens.
-
-    2. MID-RUN brush resizing is multiplicative, not a fixed +/-2px step. Press '='
-       to grow and '-' to shrink the brush (upstream keybindings, unchanged); each
-       press scales the radius by ~1.4x (at least +/-1px), so you can drop to a 1px
-       fine brush for detail and ramp up to a thick brush for the outskirts in a few
-       presses instead of dozens. The radius floor drops from 4px to 1px, and the
-       current radius is echoed to the console on every change.
-    """
-
-    _RESIZE_FACTOR = 1.4
-    _MIN_RADIUS = 1
-
-    #: set before construction to title the figure (used to label side-by-side panels).
-    #: al.Scribbler builds its figure and then BLOCKS inside __init__, so there is no
-    #: post-construction hook -- the title has to go on from inside, hence this class attr.
-    title = None
-
-    def __init__(self, *args, **kwargs):
-        title, type(self).title = type(self).title, None
-        self._pending_title = title
-        super().__init__(*args, **kwargs)
-
-    def on_mouse_motion(self, event):
-        if event.inaxes != self.ax or event.xdata is None or event.ydata is None:
-            return
-        pending = getattr(self, '_pending_title', None)
-        if pending is not None:                  # first in-axes motion: label the panels
-            self._pending_title = None
-            self.ax.set_title(pending, fontsize=11)
-        super().on_mouse_motion(event)
-        # Upstream repositions the brush patch but never redraws on the motion path, so
-        # the circle can stop painting on later lenses (see class docstring). Force a
-        # coalesced redraw so it always tracks the cursor. draw_idle (not draw) keeps
-        # this cheap -- one paint per event-loop idle, not one per motion event.
-        self.figure.canvas.draw_idle()
-
-    def _apply_radius(self, radius):
-        self.brush_radius = max(self._MIN_RADIUS, int(round(radius)))
-        if self.brush is not None:
-            self.brush.radius = self.brush_radius
-            self.figure.canvas.draw()
-        print(f"  brush radius = {self.brush_radius} px", flush=True)
-
-    def enlarge_brush(self):
-        # at least +1px, and faster (x1.4) the bigger it already is
-        self._apply_radius(max(self.brush_radius + 1,
-                               self.brush_radius * self._RESIZE_FACTOR))
-
-    def shrink_brush(self):
-        # at least -1px, so it always moves even at small radii
-        self._apply_radius(min(self.brush_radius - 1,
-                               self.brush_radius / self._RESIZE_FACTOR))
-
-
-#: blank columns between the two side-by-side display panels (see draw_mask_gui).
+#: blank columns between al.Scribbler's two side-by-side display panels (its `panel_gap`).
 _PANEL_GAP = 6
 
+# The Scribbler GUIs (this script, make_arc_masks.py) no longer stretch anything themselves:
+# since autolens 2026.10.7.1 `al.Scribbler` maps every panel through its own median/MAD-scaled
+# arcsinh stretch (autogalaxy.gui.display_util.arcsinh_stretch). `_STRETCHES` and
+# `stretched_display` survive for make_positions.py, whose Clicker panels are plain
+# matplotlib axes (not a Scribbler) and still take --stretch/--asinh-a/--vmin-percent/
+# --vmax-percent/--vmax-value, and for its QC PNG.
 _STRETCHES = {
     'asinh': AsinhStretch,   # bright cores + faint structure at once; --asinh-a tunes it
     'log': LogStretch,
@@ -193,12 +122,11 @@ def stretched_display(data_native, pixel_scales, stretch='asinh',
                       vmin_percent=5.0, vmax_percent=99.5, asinh_a=0.1,
                       exclude=None, vmax_value=None):
     """Return an al.Array2D holding a contrast-stretched COPY of `data_native`, for
-    display in the Scribbler/Clicker only.
+    display in make_positions.py's Clicker only (see the note above `_STRETCHES`).
 
-    The mask is built from the pixel positions of scribble circles (and positions from
-    click coordinates), never from pixel values, so remapping the displayed values cannot
-    change the saved product -- this is purely so bright cores and faint/problematic
-    structure are both visible while scribbling. Values are clipped to the
+    Positions come from click coordinates, never from pixel values, so remapping the
+    displayed values cannot change the saved product -- this is purely so bright cores and
+    faint/problematic structure are both visible while clicking. Values are clipped to the
     [vmin_percent, vmax_percent] percentiles then mapped through `stretch` onto [0, 1] (a
     plain linear imshow of that IS the stretch).
 
@@ -225,56 +153,6 @@ def stretched_display(data_native, pixel_scales, stretch='asinh',
     if exclude is not None:
         disp[np.asarray(exclude, dtype=bool)] = 0.0    # hidden region -> colourmap floor
     return al.Array2D.no_mask(values=disp, pixel_scales=pixel_scales).native
-
-
-def radial_median_subtract(data_native, exclude=None):
-    """Subtract the azimuthally-averaged (median) radial profile about the stamp centre.
-
-    A DISPLAY transform for finding lensed arcs: the deflector is a smooth, near-circular
-    elliptical, so its light is almost entirely a function of radius, while the arcs are
-    not -- subtracting the per-radius median removes the galaxy and leaves the source
-    images standing out, including the ones buried inside the galaxy envelope that a
-    central blank cannot reach without also hiding them. It is not a galaxy FIT: real
-    ellipticity leaves a quadrupole residual, and the arcs themselves bias the median at
-    their own radius (self-subtraction), so the result is a finding aid only -- never a
-    photometric product. Clicks snap on the untouched flux array regardless.
-
-    `exclude` (bool array, True = ignore) drops those pixels from the per-radius MEDIAN
-    while still subtracting the profile everywhere. Same reasoning as the self-subtraction
-    caveat above, applied to a region already known to be junk: a bright contaminant left in
-    the ring statistics drags that radius' median up and stamps a dark annulus clean across
-    the panel -- through the arcs, at the one radius where they live. A ring left with no
-    usable pixel keeps profile 0, so it is passed through rather than blanked. Default None
-    reproduces the unexcluded profile exactly.
-    """
-    a = np.asarray(data_native, dtype=float)
-    n_y, n_x = a.shape
-    yy, xx = np.mgrid[0:n_y, 0:n_x]
-    r_bin = np.hypot(yy - (n_y - 1) / 2.0, xx - (n_x - 1) / 2.0).astype(int)
-    usable = np.isfinite(a)
-    if exclude is not None:
-        usable &= ~np.asarray(exclude, dtype=bool)
-    prof = np.zeros(r_bin.max() + 1)
-    for i in range(prof.size):
-        ring = a[(r_bin == i) & usable]
-        if ring.size:
-            prof[i] = np.median(ring)
-    return a - prof[r_bin]
-
-
-def mask_boundary(m):
-    """1-pixel inner boundary of a boolean mask, for outlining a proposed mask in the display.
-
-    Inner (`m & ~erosion(m)`), so the outline lies ON masked pixels -- it therefore survives
-    the proposal panel, where the mask interior is blanked to the display floor. `border_value
-    =1` treats outside-the-array as masked, so a mask running off the stamp edge is not
-    outlined along the frame itself.
-    """
-    from scipy.ndimage import binary_erosion
-    m = np.asarray(m, dtype=bool)
-    if not m.any():
-        return m
-    return m & ~binary_erosion(m, np.ones((3, 3), dtype=bool), border_value=1)
 
 
 def central_disc(shape, pixel_scales, radius_arcsec):
@@ -412,6 +290,10 @@ def reproject_mask_bool(src_bool, src_wcs, dst_wcs, dst_shape):
     keep/exclude boolean -- no interpolation across the True/False boundary. Target pixels that
     fall outside the source footprint (only sub-pixel stamp-edge slivers, since every band cuts
     the same 12" angular size) default to False = kept.
+
+    Kept over `al.mask_2d_regridded_from` (autogalaxy.gui.display_util), which regrids by
+    pixel scale + origin only: our bands are separate Image3 WCS products, and only a
+    header-WCS transfer absorbs their real sub-pixel centre offsets (`band_tie` in AGENTS.md).
     """
     from scipy.ndimage import map_coordinates
     ny, nx = dst_shape
@@ -479,8 +361,9 @@ def confirm_proposal(lens, filt, source_filt, n_prop, n_add, n_erase, n_final, n
     decision is made having actually seen the mask over this band's own image.
 
     Three outcomes, and an empty answer means the common one (apply):
-      apply  -- write proposal + green additions - red erasures (the reviewed mask);
-      drawn  -- reject the proposal outright and keep only what was painted green;
+      apply  -- write proposal + white additions - black erasures (the reviewed mask,
+                al.Scribbler.mask_from());
+      drawn  -- reject the proposal outright and keep only what was painted white;
       skip   -- write NOTHING, leaving the band pending for a later run, which is also
                 what a non-interactive stdin or Ctrl-C gets (never silently write a mask
                 nobody approved).
@@ -502,71 +385,57 @@ def confirm_proposal(lens, filt, source_filt, n_prop, n_add, n_erase, n_final, n
     return 'skip'
 
 
-#: positional words used to label the composited panels in the figure title.
-_PANEL_POSITIONS = {1: [''], 2: ['LEFT', 'RIGHT'], 3: ['LEFT', 'MIDDLE', 'RIGHT'],
-                    4: ['1st', '2nd', '3rd', '4th']}
-
-
-def fold_panels(scribbled, n_panels, panel_n_x):
-    """Fold a scribble drawn on the horizontally-composited display back onto one band grid.
-
-    Every panel shows the SAME sky at the same pixel grid, so a stroke on any of them means
-    the same thing: the per-panel slices are OR-ed together. Panels are laid out at a stride
-    of `panel_n_x + _PANEL_GAP` (see draw_mask_gui). Returns (folded, px_per_panel).
-    """
-    scribbled = np.asarray(scribbled, dtype=bool)
-    if n_panels <= 1:
-        return scribbled, [int(scribbled.sum())]
-    step = panel_n_x + _PANEL_GAP
-    out = np.zeros((scribbled.shape[0], panel_n_x), dtype=bool)
-    per_panel = []
-    for i in range(n_panels):
-        s = scribbled[:, i * step: i * step + panel_n_x]
-        per_panel.append(int(s.sum()))
-        out |= s
-    return out, per_panel
-
-
 def draw_mask_gui(display_dir, display_prefix, lens, filt, brush_radius, brush_width,
-                  display, stretch, vmin_percent, vmax_percent, asinh_a,
-                  subtract_radial=False, side_by_side=True, prompt=None, overlay=None,
-                  proposal=None, proposal_label='proposed mask'):
-    """Run the Scribbler GUI once on the chosen band. Returns
-    (painted, erased, pixel_scales, sci_header, brush_width, start_radius, source_label).
+                  display, subtract_radial=False, side_by_side=True, prompt=None,
+                  proposal=None, proposal_label='proposed mask', positions=None,
+                  position_marker_size=None, mask_overlay=None, title=None):
+    """Run al.Scribbler once on the chosen band. Returns
+    (mask, painted, erased, pixel_scales, sci_header, brush_width, start_radius, source_label).
 
-    TWO BRUSHES. al.Scribbler carries two independent scribble segments; this pipeline uses
-    them as ADD (segment '1', GREEN, the default) and ERASE (segment '2', RED) -- press '1'
-    and '2' in the GUI to switch. `painted` is the green scribble and `erased` the red one;
-    the caller decides what they mean (make_masks: mask = (proposal | painted) & ~erased).
-    Erasing is what makes an inherited mask editable rather than all-or-nothing.
+    Everything on screen is al.Scribbler's own (autolens >= 2026.10.7.1): the two brushes,
+    the proposal outline, the radial-subtracted / as-observed panels and their arcsinh
+    stretch, the position crosses and the mask-overlay edge. This function only loads the
+    band, sizes the brush, titles the window and reads the result back. (Until 2026-10-08 the
+    repo hand-built all of that -- a guarded subclass, an hstacked two-panel composite with a
+    NaN gutter, a burned-in outline, overlay callables -- against an older Scribbler; those
+    features were upstreamed and the local copies deleted.)
+
+    TWO BRUSHES. '1' (WHITE) ADDS to the mask, '2' (BLACK) ERASES from it -- press the key to
+    switch. `painted` and `erased` are the two segments read back on this band's grid
+    (`get_scribble_masks()`); `mask` is `scribbler.mask_from()` = (proposal | painted) &
+    ~erased, i.e. painted & ~erased when there is no proposal. Erasing is what makes an
+    inherited mask editable rather than all-or-nothing.
 
     `proposal` (bool array on this band's grid, optional) is a mask inherited from another
-    band, shown for review as a 1-px OUTLINE burned into every panel -- where its edge falls
+    band, shown for review as a black-on-white CONTOUR on every panel -- where its edge falls
     against this band's own structure being the whole question. Only an outline: a filled-in
     "mask applied" panel was tried and dropped, since blanking the interior showed nothing the
     boundary does not already carry while hiding the pixels being judged.
 
-    `subtract_radial` shows the deflector's radial-median-subtracted image (see
-    radial_median_subtract) -- DISPLAY ONLY, the scribble is read back as pixel positions so
-    it cannot change what a given brush stroke masks. Off by default here (a contaminant mask
-    is drawn against the real sky), on by default in make_arc_masks.py, where the arcs are
-    the whole subject.
+    `subtract_radial` shows the deflector's radial-median-subtracted image
+    (autogalaxy.gui.display_util.radial_median_subtract) -- DISPLAY ONLY, the scribble is read
+    back as brush positions so it cannot change what a given stroke masks. Off by default here
+    (a contaminant mask is drawn against the real sky), on by default in make_arc_masks.py,
+    where the arcs are the whole subject.
 
     `side_by_side` (default True, and only meaningful with subtract_radial) shows BOTH views
-    at once -- subtracted on the left, as-observed on the right, separated by a blank gutter
-    -- because each answers a different question: the subtracted panel is where the arcs are
-    visible at all, the as-observed panel is where a contaminant's real extent and the
-    galaxy envelope are. You may scribble on EITHER panel: the two halves are read back and
-    UNIONed onto the single-band mask, so a stroke on the right lands at the same sky
-    position as the same stroke on the left. Each panel is stretched independently (their
-    dynamic ranges differ by orders of magnitude, so a shared scale would flatten one).
+    at once -- subtracted LEFT, as-observed RIGHT, separated by a blank gutter -- because
+    each answers a different question: the subtracted panel is where the arcs are visible at
+    all, the as-observed panel is where a contaminant's real extent and the galaxy envelope
+    are. Scribble on EITHER: the Scribbler folds strokes on both panels onto the one band
+    grid. Each panel is stretched independently (their dynamic ranges differ by orders of
+    magnitude, so a shared scale would flatten one).
 
-    `prompt` replaces the printed instruction lines (so the arc tool can state its own,
-    opposite, polarity) and `overlay` is a callable applied to each stretched panel just
-    before they are composited.
-    The scribbled array marks True = REMOVE from the fit (painted = excluded, unpainted =
-    kept -- al.Mask2D's own convention, so the scribbled array IS the mask, no inversion;
-    opposite polarity to autolens_workspace's mask.py, which scribbles the region to keep).
+    `positions` (list of (y, x) arcsec from the stamp centre) marks each with a '+' cross;
+    `position_marker_size` is the arm length in px (None = the Scribbler's own 1.5% of the
+    shorter side, min 3). `mask_overlay` (al.Mask2D, True = masked) scatters its edge as
+    black 'x's. `title` is the first line of the window title; the Scribbler appends the
+    panel layout, a legend for every marker it is showing, and the keys. `prompt` replaces
+    the printed polarity lines (so the arc tool can state its own, opposite, polarity).
+
+    The returned mask marks True = REMOVE from the fit (painted = excluded, unpainted = kept
+    -- al.Mask2D's own convention, so the scribbled array IS the mask, no inversion; opposite
+    polarity to autolens_workspace's mask.py, which scribbles the region to keep).
     """
     sci_path = cutout_paths.find_stamp(display_dir, display_prefix, 'sci')
     with fits.open(sci_path) as hdul:
@@ -580,92 +449,33 @@ def draw_mask_gui(display_dir, display_prefix, lens, filt, brush_radius, brush_w
             "  Scribbler GUI: scribble the areas to REMOVE from the fit (contaminants, field",
             "    sources, bad regions). Everything you do NOT paint is kept in the fit."]):
         print(line)
-    print("    keys:  '=' bigger brush | '-' smaller brush | 'z' undo last | Esc/q done")
 
+    # The raw base (S/N or signal, an Array2D carrying the stamp geometry -- `positions=` needs
+    # it); the Scribbler applies its own arcsinh stretch, per panel, for display.
     base, source_label = load_display_base(display_dir, display_prefix, display, pixel_scales)
-    # Which view(s) to show. Extra panels only when there is genuinely something to compare.
-    panels = []
-    if subtract_radial:
-        panels.append(('radial-subtracted', radial_median_subtract(base)))
-    if not subtract_radial or side_by_side:
-        panels.append(('as-observed', base))
-
-    def _panel(values):
-        d = stretched_display(values, pixel_scales, stretch=stretch, vmin_percent=vmin_percent,
-                              vmax_percent=vmax_percent, asinh_a=asinh_a)
-        return np.asarray((overlay(d, pixel_scales) if overlay is not None else d).native)
-
-    rendered = [_panel(v) for _, v in panels]
-    panel_names = [name for name, _ in panels]
-    title_extra = ''
-    if proposal is not None:
-        # OUTLINE ONLY, on every panel -- deliberately no extra "mask applied" panel. Blanking
-        # the interior showed nothing the boundary does not already carry, and it hid the very
-        # pixels you are judging the mask against while costing every other panel a third of
-        # the window. Where the edge falls against this band's structure is the question.
-        edge = mask_boundary(np.asarray(proposal, dtype=bool))
-        for r in rendered:
-            r[edge] = 1.0
-        title_extra = f'   --  {proposal_label} OUTLINED'
-
-    panel_n_x = rendered[0].shape[1]
-    if len(rendered) == 1:
-        composite, title = rendered[0], None
-    else:
-        # NaN, not 0: imshow leaves NaN unpainted (figure background), where 0 is the
-        # stretch floor and paints as the colour map's lowest colour -- a blue band that
-        # reads as the left panel running on past its edge. Same fix as autogalaxy PR #641's
-        # composite_panels (not yet released; this composite is built here, not there).
-        gutter = np.full((rendered[0].shape[0], _PANEL_GAP), np.nan)
-        parts = []
-        for i, r in enumerate(rendered):
-            if i:
-                parts.append(gutter)
-            parts.append(r)
-        composite = np.hstack(parts)
-        pos = _PANEL_POSITIONS.get(len(rendered),
-                                   [str(i + 1) for i in range(len(rendered))])
-        title = '   |   '.join(f'{p}: {n}' for p, n in zip(pos, panel_names))
-        title += title_extra + '   --  scribble on any panel'
-        if proposal is not None:
-            title += "   ('1' green = ADD, '2' red = ERASE)"
-    disp_array = al.Array2D.no_mask(values=composite, pixel_scales=pixel_scales).native
-    source_label += ', ' + ' + '.join(panel_names)
-    if proposal is not None:
-        source_label += f' ({proposal_label} outlined)'
     # al.Scribbler sizes the brush as int(image_height * brush_width), a fraction. To get a
     # stamp-independent default (--brush-radius px) we derive the fraction from this stamp's
     # own height; an explicit --brush-width fraction (if given) overrides it.
-    n_pix = disp_array.shape_native[0]
     if brush_width is None:
-        brush_width = brush_radius / n_pix
-    start_radius = int(n_pix * brush_width)
-    print(f"  display: {source_label}, {stretch} stretch"
-          + (f" (a={asinh_a})" if stretch == 'asinh' else '')
-          + f", clip [{vmin_percent:g}, {vmax_percent:g}] percentile")
-    if len(rendered) > 1:
-        print(f"  {len(rendered)} PANELS side by side -- "
-              + ", ".join(f"{p} {n}" for p, n in
-                          zip(_PANEL_POSITIONS.get(len(rendered), []), panel_names)) + ".")
-        print(f"    Scribble on any of them; the panels are combined onto the one mask "
-              f"(same sky position).")
+        brush_width = brush_radius / base.shape_native[0]
     if proposal is not None:
-        print(f"  the proposed mask ({proposal_label}) is OUTLINED on every panel.")
-        print(f"    keys '1' = GREEN brush, ADD to the mask   |   "
-              f"'2' = RED brush, ERASE from it")
-    print(f"  brush start radius = {start_radius} px")
-    _GuardedScribbler.title = title
-    scribbler = _GuardedScribbler(image=disp_array, brush_width=brush_width)
-    scribbler.show_mask()             # returns the ADD segment; also does the plt.ioff()
-    segments = scribbler.get_scribble_masks()     # both segments: '1' = add, '2' = erase
-
-    n_panels = len(rendered)
-    painted, add_per_panel = fold_panels(segments.get('1'), n_panels, panel_n_x)
-    erased, _ = fold_panels(segments.get('2'), n_panels, panel_n_x)
-    if n_panels > 1 and sum(1 for n in add_per_panel if n) > 1:
-        print("  combined panels (" + " + ".join(f"{n}px {p}" for n, p in
-              zip(add_per_panel, _PANEL_POSITIONS.get(n_panels, []))) + ")")
-    return painted, erased, pixel_scales, sci_hdr, brush_width, start_radius, source_label
+        print(f"  the proposed mask ({proposal_label}) is OUTLINED on every panel; "
+              f"'1' WHITE adds to it, '2' BLACK erases from it")
+    scribbler = al.Scribbler(
+        image=base, brush_width=brush_width, proposal=proposal,
+        subtract_radial=subtract_radial, side_by_side=side_by_side, panel_gap=_PANEL_GAP,
+        positions=positions or None, position_marker_size=position_marker_size,
+        mask_overlay=mask_overlay, title=title)
+    start_radius = scribbler.brush_radius
+    segments = scribbler.get_scribble_masks()     # both segments on the band grid, panels folded
+    painted = np.asarray(segments['1'], dtype=bool)
+    erased = np.asarray(segments['2'], dtype=bool)
+    source_label += ', ' + ' + '.join(scribbler.panel_names)
+    if proposal is not None:
+        source_label += f' ({proposal_label} outlined)'
+    print(f"  display: {source_label}, al.Scribbler arcsinh stretch")
+    return (scribbler.mask_from(), painted, erased, pixel_scales, sci_hdr, brush_width,
+            start_radius, source_label)
 
 
 def regenerate_dataset_subplot(lens, filt, sample, size, drizzle_pass):
@@ -695,7 +505,6 @@ def regenerate_dataset_subplot(lens, filt, sample, size, drizzle_pass):
 
 def process_lens_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass, force,
                       broadcast=False, brush_radius=6, brush_width=None, display='snr',
-                      stretch='asinh', vmin_percent=5.0, vmax_percent=99.5, asinh_a=0.1,
                       subtract_radial=None, side_by_side=True,
                       size=cutout_paths.DEFAULT_SIZE, dataset_subplot=True,
                       propose_from='auto'):
@@ -707,9 +516,10 @@ def process_lens_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass, for
     `propose_from` ('auto' by default, 'none' to disable, or an explicit band) turns this into
     a REVIEW of a mask already drawn for another band of this lens instead of a blank canvas:
     the inherited mask is reprojected onto this band and outlined on every panel, and you then
-    add (green) / erase (red) parts of it before choosing to apply, reject, or skip. It is the deliberate alternative to `--broadcast`, which writes the
-    same mask to every band unseen -- what a mask should exclude is not band-independent in
-    practice, so the transfer is worth looking at in the band it is landing on.
+    add (white) / erase (black) parts of it before choosing to apply, reject, or skip. It is
+    the deliberate alternative to `--broadcast`, which writes the same mask to every band
+    unseen -- what a mask should exclude is not band-independent in practice, so the transfer
+    is worth looking at in the band it is landing on.
     """
     filts = sorted(filt_dirs)
     display_filt = pick_display_filt(filts, requested_filt)
@@ -742,16 +552,18 @@ def process_lens_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass, for
     if subtract_radial is None:
         subtract_radial = proposal is not None
 
-    (painted, erased, src_ps, src_hdr, brush_width, start_radius,
+    title = f"{lens} {display_filt}: paint what to REMOVE from the fit"
+    if proposal is not None:
+        title += f", reviewing the {proposal_from} mask"
+    (reviewed, painted, erased, src_ps, src_hdr, brush_width, start_radius,
      source_label) = draw_mask_gui(
         display_dir, display_prefix, lens, display_filt, brush_radius, brush_width,
-        display, stretch, vmin_percent, vmax_percent, asinh_a,
-        subtract_radial=subtract_radial, side_by_side=side_by_side,
-        proposal=proposal, proposal_label=f'{proposal_from} mask' if proposal_from else None)
+        display, subtract_radial=subtract_radial, side_by_side=side_by_side,
+        proposal=proposal, proposal_label=f'{proposal_from} mask' if proposal_from else None,
+        title=title)
 
-    painted = np.asarray(painted, dtype=bool)
-    erased = np.asarray(erased, dtype=bool)
-    drawn_only = painted & ~erased
+    # `reviewed` is al.Scribbler.mask_from(): (proposal | painted) & ~erased, or just
+    # painted & ~erased with no proposal.
     n_add, n_erase = int(painted.sum()), int(erased.sum())
 
     # Nothing painted = you skipped this lens: write NO file. An all-False mask would be a
@@ -760,9 +572,9 @@ def process_lens_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass, for
     # silently mark it finished. The same rule holds after a review: an approved mask that
     # ends up empty (everything erased) is not written either.
     if proposal is None:
-        scribbled, source_tag = drawn_only, 'drawn'
+        scribbled, source_tag = reviewed, 'drawn'
     else:
-        reviewed = (proposal | painted) & ~erased
+        drawn_only = painted & ~erased          # the [d] outcome: the proposal rejected outright
         choice = confirm_proposal(lens, display_filt, proposal_from, int(proposal.sum()),
                                   n_add, n_erase, int(reviewed.sum()), int(drawn_only.sum()))
         if choice == 'skip':
@@ -855,9 +667,9 @@ def main():
                         'when --force-redrawing it, else the highest-priority other band that '
                         'has one; a band name (e.g. f814W) forces the source; \'none\' disables '
                         'it. The proposal is reprojected onto the drawn band and OUTLINED on '
-                        'every panel, and you add (green) / erase '
-                        '(red) parts of it before choosing to apply, reject, or skip -- the '
-                        'reviewed alternative to --broadcast')
+                        "every panel, and you add ('1', white) / erase ('2', black) parts of "
+                        'it before choosing to apply, reject, or skip -- the reviewed '
+                        'alternative to --broadcast')
     p.add_argument('--pass', dest='drizzle_pass', choices=['auto', 'cr', 'nocrrej'],
                    default='auto',
                    help="which cutout pass to mask, matching make_cutouts.py's --pass: "
@@ -882,19 +694,12 @@ def main():
                    help="image to scribble on: 'snr' (default) = signal/noise, which tracks "
                         "statistical significance -- the right criterion for what to keep, "
                         "given this pipeline's non-uniform noise map; 'sci' = raw signal, a "
-                        "morphology cross-check. Choice does not affect the saved mask")
-    p.add_argument('--stretch', choices=list(_STRETCHES), default='asinh',
-                   help='intensity stretch for the DISPLAYED image only (does not affect the '
-                        'saved mask): asinh (default) shows bright cores and faint structure '
-                        'together; log/sqrt/linear also available')
-    p.add_argument('--asinh-a', type=float, default=0.1,
-                   help='asinh softening parameter (smaller = stronger stretch, more faint '
-                        'detail; only used with --stretch asinh; default 0.1)')
-    p.add_argument('--vmin-percent', type=float, default=5.0,
-                   help='lower clip percentile for the display stretch (default 5.0)')
-    p.add_argument('--vmax-percent', type=float, default=99.5,
-                   help='upper clip percentile for the display stretch; lower it to brighten '
-                        'and reveal problematic bright areas (default 99.5)')
+                        "morphology cross-check. Choice does not affect the saved mask. The "
+                        "display stretch is al.Scribbler's own arcsinh (linear within a noise "
+                        'sigma of the sky, logarithmic beyond, clipped at the 0.5/99.5 '
+                        'percentiles); the former --stretch/--asinh-a/--vmin-percent/'
+                        '--vmax-percent knobs were dropped with it (2026-10-08) and now exist '
+                        'only in make_positions.py')
     p.add_argument('--side-by-side', action=argparse.BooleanOptionalAction, default=True,
                    help='with --subtract-radial, show BOTH views at once -- subtracted left, '
                         'as-observed right -- and accept scribbles on either panel, combining '
@@ -948,9 +753,8 @@ def main():
     for lens in sorted(lens_filts):
         if process_lens_mask(lens, lens_filts[lens], a.sample, a.filt, a.drizzle_pass,
                              a.force, a.broadcast, brush_radius=a.brush_radius,
-                             brush_width=a.brush_width, display=a.display, stretch=a.stretch,
-                             vmin_percent=a.vmin_percent, vmax_percent=a.vmax_percent,
-                             asinh_a=a.asinh_a, subtract_radial=a.subtract_radial,
+                             brush_width=a.brush_width, display=a.display,
+                             subtract_radial=a.subtract_radial,
                              side_by_side=a.side_by_side, size=a.size,
                              dataset_subplot=a.dataset_subplot,
                              propose_from=a.propose_from):

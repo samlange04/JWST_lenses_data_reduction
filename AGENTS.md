@@ -151,8 +151,9 @@ Python **3.13** (not the HST repo's 3.12.13: `jwst` 3.0.0 needs ≥3.11, and the
 have separate envs anyway). Pinned: `jwst==3.0.0` (STScI Build 13.0, the ops version from
 2026-09), `stpsf==2.2.0` (WebbPSF's successor). `astropy`, `numpy`, `photutils`, `scipy`,
 `crds`, `astroquery`, `matplotlib`, `tqdm` float at ≥ the versions jwst 3.0.0 wants.
-`autolens` (≥2026.9.27) is there for the GUI scripts (`al.Scribbler`) and the dataset
-subplots, exactly as in the HST repo; it resolved cleanly beside jwst (checked 2026-10-01).
+`autolens` (≥2026.10.7.1) is there for the GUI scripts (`al.Scribbler`) and the dataset
+subplots; it resolved cleanly beside jwst (checked 2026-10-01). The floor is 2026.10.7.1
+because the mask GUIs now rely on that release's `Scribbler` features (see *Masks*).
 
 **The repo root is derived from `__file__`, never hard-coded** — every script sets
 `ws_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))`, runners take
@@ -485,6 +486,28 @@ always answers `cutout`). The semantics are unchanged and matter:
 
 - Masks are `al.Mask2D` convention, **True = excluded**; `make_masks.py` paints what to
   remove, `make_arc_masks.py` paints what to keep and saves it inverted.
+- **The mask GUIs are native `al.Scribbler` (2026-10-08, autolens 2026.10.7.1).** The HST
+  port hand-built everything the Scribbler lacked: a `_GuardedScribbler` subclass (motion
+  guard, `draw_idle`, ×1.4 brush resize, 1 px floor, class-attribute title hack), an
+  hstacked two-panel composite with a NaN gutter plus `fold_panels` to read it back, a
+  burned-in proposal outline, overlay callables for position crosses and the contaminant
+  edge, and its own percentile+asinh `stretched_display`. All of that is upstream now and
+  the local copies are gone: `make_masks.draw_mask_gui` passes the raw S/N (or signal)
+  `Array2D` with `proposal=`, `subtract_radial=`, `side_by_side=`, `panel_gap=6`,
+  `positions=` (list of (y, x) arcsec), `mask_overlay=` (an `al.Mask2D`) and `title=`, and
+  reads back `get_scribble_masks()` ('1' = add, '2' = erase) and `mask_from()`
+  (`(proposal | added) & ~erased`). Consequences to know: brushes are **'1' white = add,
+  '2' black = erase** (was green/red); the display stretch is the Scribbler's median/MAD
+  arcsinh, so `--stretch/--asinh-a/--vmin-percent/--vmax-percent` are gone from
+  `make_masks.py` and `make_arc_masks.py` (they survive in `make_positions.py`, whose
+  Clicker panels are plain axes, and `make_masks._STRETCHES`/`stretched_display` stay for
+  it); the proposal is a black-on-white contour rather than a 1 px burned-in line; the
+  contaminant edge in `make_arc_masks.py` is black 'x's from autoarray's `derive_grid.edge`,
+  which also runs along the stamp border; `--cross-size` defaults to the Scribbler's own
+  (1.5% of the shorter side, ≥3 px); the arc QC PNG uses the same
+  `display_util.radial_median_subtract` + `arcsinh_stretch` as the GUI's left panel.
+  `reproject_mask_bool` is deliberately kept over `al.mask_2d_regridded_from`: ours
+  transfers through the two bands' header WCS, upstream's by pixel scale + origin only.
 - One draw per band; the next band starts from a reviewed proposal reprojected by WCS.
   Here the SW→LW reprojection is a 2:1 regrid, like the HST f160W case.
 - Positions are marked once on the best band and broadcast pixel→sky→pixel; an empty file
@@ -505,7 +528,9 @@ always answers `cutout`). The semantics are unchanged and matter:
   Image3 product; it writes `data/qc/<sample>/`.
 
 **None of the five has been exercised on a JWST stamp yet.** Expect small breakages (header
-cards, the `--pass` plumbing) on first use; fix them in place.
+cards, the `--pass` plumbing) on first use; fix them in place. The native-Scribbler rewrite
+was verified headless only (`backend='Agg'`, synthetic stamps, strokes injected through
+`add_circle_to_scribble`); the first real TkAgg run is still to come.
 
 ## Export to the modelling project (`scripts/export_dataset.py`)
 

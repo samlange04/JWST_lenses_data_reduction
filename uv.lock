@@ -235,7 +235,7 @@ wheels = [
 
 [[package]]
 name = "autoarray"
-version = "2026.9.27.2"
+version = "2026.10.7.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "astropy" },
@@ -248,14 +248,14 @@ dependencies = [
     { name = "scipy" },
     { name = "tqdm" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d5/97/7dcc03e20a172fac5bd8cf0332d6a12c05271ecd536765000643f63dbc39/autoarray-2026.9.27.2.tar.gz", hash = "sha256:e95ff1689a60c65ea96c4c75c2e091cac9adb1cfcc25b4e2b1f5dfe426842948", size = 2190083, upload-time = "2026-09-27T21:57:26.234Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/0a/78/147a9875abd0d9fd7d64b07db893a54ae09b19ddba056b7239ff0791040f/autoarray-2026.10.7.1.tar.gz", hash = "sha256:e887565f67229fa5658c02d9524e185e1ec9040e1c7382f60f30d3c4e35d7907", size = 2222077, upload-time = "2026-10-07T16:53:04.112Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d2/ca/1cf9079a6fb312a8ca555a7a6cdba67b7941995a0db513835796a651dd70/autoarray-2026.9.27.2-py3-none-any.whl", hash = "sha256:209cb503a92113d59c5d24c1c0a059f78fb8abac3d4c196346ef1b61d8dbfbdf", size = 2304249, upload-time = "2026-09-27T21:57:24.239Z" },
+    { url = "https://files.pythonhosted.org/packages/98/4c/5802d9dfdaf99b0a1ac2e2dbd8cc330b474549a988ed5a2c738fbfab9cd5/autoarray-2026.10.7.1-py3-none-any.whl", hash = "sha256:c6b541f30fceff8f33bd3154168b9f4e286219fe1bd9fa9667275778495cfa5a", size = 683842, upload-time = "2026-10-07T16:53:02.493Z" },
 ]
 
 [[package]]
 name = "autofit"
-version = "2026.9.27.2"
+version = "2026.10.7.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anesthetic" },
@@ -282,43 +282,45 @@ dependencies = [
     { name = "typing-inspect" },
     { name = "xxhash" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a3/75/4ca92c316fae1976ff450cca32d4958f37fb7643d7c5d61276bd5e00ac69/autofit-2026.9.27.2.tar.gz", hash = "sha256:8e5ac0ee87eb252389e13fb025373702fd56bf22e6a6f71342c33e75335f94e5", size = 8468359, upload-time = "2026-09-27T21:57:32.464Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/26/ee/508b66b2370985fb396c8d128fe1f8bdb264af46e605c69d44bd85326d04/autofit-2026.10.7.1.tar.gz", hash = "sha256:e0acd75e5686defea71f46d73a9e4d83cea68b3c4dcce170d268d8af1a91deee", size = 8480949, upload-time = "2026-10-07T16:53:01.152Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/5f/68/9e77a3b212c67f971462269278132565054611a314ed4caf4e33189e4f3a/autofit-2026.9.27.2-py3-none-any.whl", hash = "sha256:e3c1d14e197724cb75e04a54010480952c76296eb841067ad23c7ac36bc97a0d", size = 8603130, upload-time = "2026-09-27T21:57:30.453Z" },
+    { url = "https://files.pythonhosted.org/packages/3f/63/868c4ce2cd12393fbe6f77366ebf1764612061b0b750abd7f658c5c27dd1/autofit-2026.10.7.1-py3-none-any.whl", hash = "sha256:8d862e9e6c3376e8e052393c6e968116bb89f5b9d9eef9f41b08c8d7e84ee4ae", size = 763699, upload-time = "2026-10-07T16:52:59.284Z" },
 ]
 
 [[package]]
 name = "autogalaxy"
-version = "2026.9.27.2"
+version = "2026.10.7.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "astropy" },
     { name = "autoarray" },
     { name = "autofit" },
+    { name = "autonerves" },
     { name = "jax-zero-contour", marker = "platform_machine == 'arm64' or sys_platform != 'darwin'" },
     { name = "nautilus-sampler" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c5/ff/0fc5e31ea2363d53069405f330e31251053c90b0d2702930f6e74ec206ed/autogalaxy-2026.9.27.2.tar.gz", hash = "sha256:bf06749c9b7828ceb91303782d3ef9ac2cd4d24658ddc85a0f3c558379018769", size = 5877253, upload-time = "2026-09-27T21:57:25.795Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/c5/a9/feccd9004363a7bbc9a3e7f31a1e74067951e11ce0153f1ffe812b820e00/autogalaxy-2026.10.7.1.tar.gz", hash = "sha256:0167525e2d0be6e0a4f88b087ee828bf101395ee94cbd5a1faaebe3bf560bdb6", size = 5897108, upload-time = "2026-10-07T17:49:57.375Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/61/12/e5db0d2836bb1c6cca74f5767e3b444de12a10ba7bc5d1f4305c858832c7/autogalaxy-2026.9.27.2-py3-none-any.whl", hash = "sha256:58c8ece0636cb077aebfd4bdef7aad65c8b0912afc87e58348572a687a9e9609", size = 6055477, upload-time = "2026-09-27T21:57:24.298Z" },
+    { url = "https://files.pythonhosted.org/packages/37/f1/e3ba35b594934b50dd425cccb92a250a64e907e76a78a311e997928c95c9/autogalaxy-2026.10.7.1-py3-none-any.whl", hash = "sha256:83d989941d0b2793c9aa6eded9c2104673bb4f26a9e93359b7677714b6961f02", size = 513706, upload-time = "2026-10-07T17:49:55.816Z" },
 ]
 
 [[package]]
 name = "autolens"
-version = "2026.9.27.2"
+version = "2026.10.7.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "autogalaxy" },
+    { name = "autonerves" },
     { name = "nautilus-sampler" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b9/86/c33a76c33a76188e85a248411c040636cd673666ce1bce24d5e635e01094/autolens-2026.9.27.2.tar.gz", hash = "sha256:c8b1abaf1a4a196551b6f6c8e15dd7e62d3fb0be07bca75619fbe77820b57b6b", size = 7859588, upload-time = "2026-09-27T21:57:31.115Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/13/13/ccef8b10d4f2d91ed5451aff45e9f31de218ff9e09e12200fa5b4f642420/autolens-2026.10.7.1.tar.gz", hash = "sha256:4a7ef1777118d510e6ff382950f20da3b6e9018a2251cd2a2352e00f8569e1f9", size = 7865411, upload-time = "2026-10-07T16:53:04.802Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c8/68/c876d263a20ddda3eab640001c3885791108102f7d120811423d88d4e1a7/autolens-2026.9.27.2-py3-none-any.whl", hash = "sha256:40db28550757f9d0afc65cc907b215f2eb4ea82355915ac9de8e3fc54cc55a60", size = 7920664, upload-time = "2026-09-27T21:57:29.312Z" },
+    { url = "https://files.pythonhosted.org/packages/94/ac/aafb8f0a7d42d97ffc0d53a5391564daf5a08f453b76e88694110235e524/autolens-2026.10.7.1-py3-none-any.whl", hash = "sha256:fa9ea3614fb2cdaad0b7989d9d1e8c78f89337541a43d47313c8f789997b40da", size = 330921, upload-time = "2026-10-07T16:53:03.289Z" },
 ]
 
 [[package]]
 name = "autonerves"
-version = "2026.9.27.2"
+version = "2026.10.7.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "jax", marker = "platform_machine == 'arm64' or sys_platform != 'darwin'" },
@@ -328,9 +330,9 @@ dependencies = [
     { name = "pyyaml" },
     { name = "typing-inspect" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5d/38/087d1e5b176c79c5d457599463b29d350d2af48208e6563454eff01d23da/autonerves-2026.9.27.2.tar.gz", hash = "sha256:11ee22d29bd2d7fb38c67e3f4d531411b9f7ad9d73c2e67c203c0237533ff716", size = 166573, upload-time = "2026-09-27T21:57:23.605Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/98/2a/c886d9d3533ef1e96a48ea89d469a5a605a9678abe8efca50a820019f6a7/autonerves-2026.10.7.1.tar.gz", hash = "sha256:e5db2e84e21fd107f1a65390544aff7b385763a7b5ab16cb89093970ba8d8424", size = 168145, upload-time = "2026-10-07T16:52:59.89Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/26/b9/fb37aca28fbf357b94ffeadcd4b263bf3c6d24ef69de616b62de345a4a4d/autonerves-2026.9.27.2-py3-none-any.whl", hash = "sha256:ec7228685a9c2e9fb52518ea9c68635ad622b0f0d31ce5583f1274cf6812b98d", size = 43818, upload-time = "2026-09-27T21:57:22.31Z" },
+    { url = "https://files.pythonhosted.org/packages/2c/56/079ac883cbac4201f4439fbdb3ad61ca41fbb6f805ae15da8cf6985f14c6/autonerves-2026.10.7.1-py3-none-any.whl", hash = "sha256:9a4a8a4d5de0ddf25200418135f468a110bc96dfd4f5347a1c23b21199013d4a", size = 44957, upload-time = "2026-10-07T16:52:58.501Z" },
 ]
 
 [[package]]
@@ -384,7 +386,7 @@ name = "cffi"
 version = "2.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pycparser", marker = "implementation_name != 'PyPy'" },
+    { name = "pycparser", marker = "implementation_name != 'PyPy' and sys_platform != 'emscripten' and sys_platform != 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/9e/ef/008a1939e372c06329a3fce4279c02f328488f3526744906eeec3da7ad5f/cffi-2.1.1.tar.gz", hash = "sha256:dd31f52ea1086513bb9df30f8fcee9b8918323ae067a3d5b78bc826a000712be", size = 530807, upload-time = "2026-08-03T21:21:18.939Z" }
 wheels = [
@@ -529,7 +531,7 @@ name = "cryptography"
 version = "50.0.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "cffi", marker = "platform_python_implementation != 'PyPy'" },
+    { name = "cffi", marker = "platform_python_implementation != 'PyPy' and sys_platform != 'emscripten' and sys_platform != 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/9d/af/182eb91b0df3fe75c4d9f26fe70684569566745f6ba7e5c9c73a862c5252/cryptography-50.0.2.tar.gz", hash = "sha256:7b46165bb56eb4704e2eaaf86f3c940d19154535d9b0ca7d6d590b04060e00d5", size = 880623, upload-time = "2026-09-30T15:30:04.884Z" }
 wheels = [
@@ -1068,7 +1070,7 @@ dependencies = [
 requires-dist = [
     { name = "astropy", specifier = ">=8.0" },
     { name = "astroquery", specifier = ">=0.4.11" },
-    { name = "autolens", specifier = ">=2026.9.27" },
+    { name = "autolens", specifier = ">=2026.10.7.1" },
     { name = "crds", specifier = ">=14.0" },
     { name = "jwst", specifier = "==3.0.0" },
     { name = "matplotlib", specifier = ">=3.10" },
@@ -1438,7 +1440,7 @@ name = "pexpect"
 version = "4.9.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "ptyprocess" },
+    { name = "ptyprocess", marker = "sys_platform != 'emscripten' and sys_platform != 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/42/92/cc564bf6381ff43ce1f4d06852fc19a2f11d180f23dc32d9588bee2f149d/pexpect-4.9.0.tar.gz", hash = "sha256:ee7d41123f3c9911050ea2c2dac107568dc43b2d3b0c7557a33212c398ead30f", size = 166450, upload-time = "2023-11-25T09:07:26.339Z" }
 wheels = [
@@ -1843,8 +1845,8 @@ name = "secretstorage"
 version = "3.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "cryptography" },
-    { name = "jeepney" },
+    { name = "cryptography", marker = "sys_platform != 'emscripten' and sys_platform != 'win32'" },
+    { name = "jeepney", marker = "sys_platform != 'emscripten' and sys_platform != 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/1c/03/e834bcd866f2f8a49a85eaff47340affa3bfa391ee9912a952a1faa68c7b/secretstorage-3.5.0.tar.gz", hash = "sha256:f04b8e4689cbce351744d5537bf6b1329c6fc68f91fa666f60a380edddcd11be", size = 19884, upload-time = "2025-11-23T19:02:53.191Z" }
 wheels = [

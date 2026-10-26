@@ -15,7 +15,7 @@ dependencies = [
     "requests",
     "crds>=14.0",
     "tqdm>=4.70",
-    "autolens>=2026.9.27",
+    "autolens>=2026.10.7.1",
 ]
 
 [tool.uv]
