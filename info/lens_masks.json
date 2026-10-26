@@ -1,0 +1,36 @@
+{
+    "b1938": {
+        "B1938+666": {
+            "F115W": {
+                "prefix": "cutout",
+                "drizzle_pass": "single",
+                "pixel_scale_arcsec": 0.03,
+                "display": "S/N, radial-subtracted + as-observed (F277W mask outlined)",
+                "variant": "standard",
+                "source": "edited_from_F277W",
+                "n_excluded_px": 27515,
+                "brush_width": 0.025862,
+                "brush_radius_px": 6,
+                "proposal_from": "F277W",
+                "proposal_px": 23342,
+                "n_added_px": 7450,
+                "n_erased_px": 0
+            },
+            "F277W": {
+                "prefix": "cutout",
+                "drizzle_pass": "single",
+                "pixel_scale_arcsec": 0.06,
+                "display": "S/N, radial-subtracted + as-observed (F115W mask outlined)",
+                "variant": "standard",
+                "source": "accepted_from_F115W",
+                "n_excluded_px": 6854,
+                "brush_width": 0.051724,
+                "brush_radius_px": 6,
+                "proposal_from": "F115W",
+                "proposal_px": 6854,
+                "n_added_px": 0,
+                "n_erased_px": 0
+            }
+        }
+    }
+}

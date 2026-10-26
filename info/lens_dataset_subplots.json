@@ -1,0 +1,26 @@
+{
+    "b1938": {
+        "B1938+666": {
+            "F115W": {
+                "prefix": "cutout",
+                "drizzle_pass": "single",
+                "stretch": "asinh",
+                "cmap": "inferno",
+                "pixel_scale_arcsec": 0.03,
+                "frac_masked": 0.511203,
+                "variant": "standard",
+                "output": "data/cutouts/b1938/B1938+666/F115W/cutout_dataset.png"
+            },
+            "F277W": {
+                "prefix": "cutout",
+                "drizzle_pass": "single",
+                "stretch": "asinh",
+                "cmap": "inferno",
+                "pixel_scale_arcsec": 0.06,
+                "frac_masked": 0.509364,
+                "variant": "standard",
+                "output": "data/cutouts/b1938/B1938+666/F277W/cutout_dataset.png"
+            }
+        }
+    }
+}
