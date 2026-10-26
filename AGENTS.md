@@ -527,9 +527,13 @@ always answers `cutout`). The semantics are unchanged and matter:
 - `make_qc_grids.py` is the HST `make_mosaics.py`, renamed because "mosaic" here means the
   Image3 product; it writes `data/qc/<sample>/`.
 
-**None of the five has been exercised on a JWST stamp yet.** Expect small breakages (header
-cards, the `--pass` plumbing) on first use; fix them in place. The native-Scribbler rewrite
-was verified headless only (`backend='Agg'`, synthetic stamps, strokes injected through
+**First JWST use: B1938+666, 2026-10-04**, with the HST-port GUIs (before the native-Scribbler
+rewrite). `make_positions.py` marked A and B on F277W and broadcast them to F115W;
+`make_masks.py` drew the contaminant masks (F115W 27 515 px, F277W 6 854 px, provenance in
+`info/lens_masks.json`); `make_dataset_subplots.py` rendered both bands. `make_arc_masks.py` and
+`make_qc_grids.py` have still never run on a JWST stamp: expect small breakages (header cards,
+the `--pass` plumbing) on first use and fix them in place. The native-Scribbler rewrite was
+verified headless only (`backend='Agg'`, synthetic stamps, strokes injected through
 `add_circle_to_scribble`); the first real TkAgg run is still to come.
 
 ## Export to the modelling project (`scripts/export_dataset.py`)
