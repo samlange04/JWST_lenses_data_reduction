@@ -29,3 +29,6 @@ __pycache__/
 .DS_Store
 .venv/
 # CRDS cache and STPSF data live under data/ (ignored above) -- see AGENTS.md, Environment.
+
+# personal venv + SSH/rsync aliases, as colibre_VDisp/activate.sh
+activate_local.sh

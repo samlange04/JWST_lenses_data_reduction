@@ -128,6 +128,19 @@ produces no error downstream.
 
 **uv-managed**, like the HST repo: `pyproject.toml` + `uv.lock` + `.python-version` are
 tracked, `.venv` is not.
+`activate_local.sh` (gitignored, personal) sources the venv. It mirrors the analysis
+project's `z_projects/b1938_jwst/activate_local.sh`, whose `stage_b19` is the only thing that
+takes this repo's B1938+666 stamps anywhere.
+
+**This repo is NIRCam reduction only.** On 2026-10-26 the B1938+666 science work moved to the
+analysis repo, `~/Code/git_repos/pyauto/z_projects/b1938_jwst`, at the same relative paths:
+the Keck follow-up `keck/` (OSIRIS, NIRC2, NIRSPEC: downloads, DRFs, scripts, cubes, the
+operational record and the COSMA `_kck` aliases), the clump diagnostics `diagnostics/b1938_clumps/`,
+and `make_rgb.py` (now `diagnostics/make_rgb.py` there). Those scripts still read this repo
+through `$JWST_REDUCTION` -- the B1938 stamps and masks, the Image3 mosaics,
+`info/lens_samples.json`, `info/lens_psf.json`, and `scripts/cutout_paths.py` (imported by
+`make_rgb.py`) -- and run in this repo's uv env (`uv run --project $JWST_REDUCTION`), so moving
+or renaming any of those breaks them. Science analysis and non-JWST work go there, not here.
 
 ```bash
 uv sync                                               # one-time, or after a .venv wipe
@@ -222,6 +235,19 @@ sits near the gap between SW detectors, so across the 21 dithers it lands on dif
 SW chips (and is simultaneously on one LW chip per module). Consequences: the SW mosaic's
 weight map is non-uniform right at the lens — check `WHTUNIF` on the F115W stamp — and the
 empirical SW PSF is averaged over detectors (fine, it is what the data carry).
+
+**Open B1938 question: the ring of clumps at r ≈ 0.9–1.4"** (outside the 0.45" Einstein ring,
+unmasked; includes Lagattuta+12's arclets A/B). They may be lensed single images or lens-plane
+structure, and that decides whether to mask them / how big `mask_radius` can be. The
+investigation lives in the analysis repo (`~/Code/git_repos/pyauto/z_projects/b1938_jwst`):
+the operational record is `keck/docs/b1938_clumps_osiris.md` there, the human-readable
+summary of the four hypotheses with figures `clumps_summary/README.md`. In short: the Keck
+spectroscopy and imaging are uninformative for the clumps (2026-10-12), no other archival data
+exist (2026-10-15), and only a redshift (JWST NIRSpec IFU) settles it, so the mask decision
+rests on the imaging. The imaging tests (`diagnostics/b1938_clumps/` there, run on this
+repo's stamps): the clumps are a 10⁻⁹ overdensity over the field (one physical system, not unrelated
+interlopers), and their tangential alignment survives every lens-light subtraction at ~1% but
+cannot separate lensing from a lens-plane ring.
 
 **SPT0418 is on B4, the detector with the strongest NIRCam wisp** (JDox scattered-light
 article). Wisps are ~10% of zodi at fixed detector position in F115W/F150W/F200W; the
