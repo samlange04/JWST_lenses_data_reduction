@@ -5,18 +5,17 @@ Drizzle correlates neighbouring output pixels but conserves noise: for white inp
 the sigma-normalised ACF has C(0) < 1, positive neighbours, and sum C = 1 over the drop
 width, so 1/sqrt(WHT) is already right for any patch >= the drop and drizzle itself needs
 no factor. What the measured sum C > 1 catches is upstream of drizzle: an ERR-array deficit
-(~10% rms in ACS/UVIS FLCs, white) plus a few percent of faint unmasked structure. See
-AGENTS.md *Drizzle correlated noise* and local/literature/drizzle_noise.md. This measures,
-per stamp, on blank sky in its own mosaic:
+plus a few percent of faint unmasked structure. This measures, per stamp, on blank sky in its
+own mosaic:
 
-  * the ACF of the sigma-normalised sky (acf_ratio) -- THE factor: sqrt(sum C) over the
-    drop window |dx|,|dy| <= round(pixfrac * native/output) px (the smallest window over
-    which drizzle's redistribution has summed back to 1), less the far floor. This is what
-    make_cutouts.py applies.
-  * the blank-sky block-sum ratio at 0.05-2" (block_ratio) -- a diagnostic only. It never
-    plateaus: past the kernel a weak, environment-dependent long-range floor (faint
-    wings, sky/flat residuals) keeps adding up, so it has no single right answer. See
-    AGENTS.md *Drizzle correlated noise* before changing which quantity is used.
+  * the ACF of the sigma-normalised sky (acf_ratio): sqrt(sum C) over the drop window
+    |dx|,|dy| <= round(pixfrac * native/output) px (the smallest window over which
+    drizzle's redistribution has summed back to 1), less the far floor. This is the HST
+    repo's factor; here it is a diagnostic, because it is blind to NIRCam's residual 1/f.
+  * the blank-sky block-sum ratio at 0.05-3" (block_ratio). It never plateaus (the 1/f is
+    coherent over ~3" along detector rows), and its value at 0.2" is the NOISECOR this repo
+    applies; the full curve goes into info/noise_corr_factors.json. See AGENTS.md *Noise*
+    before changing which quantity is used.
 
 Per stamp:
   * The stamp's own mosaic (same pass, same reduction) is checked to still reproduce the

@@ -30,5 +30,15 @@ __pycache__/
 .venv/
 # CRDS cache and STPSF data live under data/ (ignored above) -- see AGENTS.md, Environment.
 
-# personal venv + SSH/rsync aliases, as colibre_VDisp/activate.sh
+# personal shell setup (venv activation, host aliases); not needed to use the repo
 activate_local.sh
+
+# ── Machine-local records ──────────────────────────────────────────────────────
+# export_dataset.py logs each export keyed by its absolute --dest path, which only means
+# something on the machine that ran it.
+info/lens_exports.json
+
+# ── Private agent notes ────────────────────────────────────────────────────────
+# CLAUDE.md imports the tracked AGENTS.md (@AGENTS.md) and adds the maintainer's private
+# working notes. Only AGENTS.md is needed to use the repo.
+/CLAUDE.md

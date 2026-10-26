@@ -41,7 +41,7 @@ uv run python scripts/make_cutouts.py    --lens SPT2147-50 --filt F444W   # 12" 
 uv run python scripts/make_psf.py        --lens SPT2147-50 --filt F444W   # empirical ePSF (STPSF fallback)
 uv run python scripts/make_masks.py      --lens SPT2147-50                # GUI: paint contaminants to remove
 uv run python scripts/make_positions.py  --lens SPT2147-50                # GUI: mark multiple images
-uv run python scripts/export_dataset.py  --lens SPT2147-50 --dest ../../git_repos/pyauto/z_projects/SPT_rerun/hpc/data
+uv run python scripts/export_dataset.py  --lens SPT2147-50 --dest <modelling-project>/data
 ```
 
 Whole samples: `bash scripts/run_reduce_all.sh spt`, `run_cutouts_all.sh spt`,
@@ -77,4 +77,4 @@ Stamps are 12" square at 0.03"/px (SW: 400 px) or 0.06"/px (LW: 200 px), North-u
 filter of a lens sharing one tangent point at the catalogue position so the SW and LW grids
 nest 2:1. Units are MJy/sr (the jwst convention; `PHOTMJSR`/`PIXAR_SR` in the header
 convert). The noise map is the i2d `ERR` times a measured inflation factor
-(`info/noise_corr_factors.json`, 1.0 until measured), with 1e8 where there is no data.
+(`info/noise_corr_factors.json`), with 1e8 where there is no data.

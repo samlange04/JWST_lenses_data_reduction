@@ -787,7 +787,7 @@ def main():
     p.add_argument('--trim-threshold', dest='trim_threshold', type=float, default=3e-4,
                    help="amplitude fraction of peak at which the trimmed modelling kernel "
                         "(cutout_psf.fits) is cut. Default 3e-4 -- an amplitude criterion; 1e-3 kept only "
-                        "95% of the F115W flux (user's call, 2026-10-04).")
+                        "95% of the F115W flux (2026-10-04).")
     p.add_argument('--n-boot', dest='n_boot', type=int, default=None,
                    help='bootstrap resamples for the empirical PSF error map (default 100; '
                         'jackknife below %d stars).' % JACKKNIFE_MAX_STARS)

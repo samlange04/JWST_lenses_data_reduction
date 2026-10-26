@@ -1,6 +1,6 @@
 {
     "_what": "NOISECOR applied by make_cutouts.py: cutout_noise = i2d ERR x factor. Measured by measure_corr_factor.py (diagnostics/corr_factor/), 2026-10-04; see AGENTS.md *Correlated noise*.",
-    "_how": "Blank-sky block-sum ratio at scale_arcsec (the noise of an s x s patch over what ERR predicts), median over the SPT stamps per channel, thr3 source mask. Not the HST repo's drop-window ACF factor: the residual 1/f after clean_flicker_noise is correlated over ~3 arcsec along detector rows and a 1-px window never sees it. The ratio keeps growing with scale (block_ratio_curve), so the modelling project must rescale if its source pixels footprint the image plane at a coarser scale than scale_arcsec.",
+    "_how": "Blank-sky block-sum ratio at scale_arcsec (the noise of an s x s patch over what ERR predicts), median over the SPT stamps per channel, thr3 source mask. Not the HST repo's drop-window ACF factor: the residual 1/f after clean_flicker_noise is correlated over ~3 arcsec along detector rows and a 1-px window never sees it. The ratio keeps growing with scale (block_ratio_curve), so a model must rescale if its source pixels footprint the image plane at a coarser scale than scale_arcsec.",
     "scale_arcsec": 0.2,
     "factors": {
         "NIRCAM/SW": 1.3,

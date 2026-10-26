@@ -2,7 +2,7 @@
 """
 Export one lens's bands in the PyAutoLens dataset layout a modelling project consumes.
 
-    uv run python scripts/export_dataset.py --lens SPT2147-50 --dest ~/Code/git_repos/pyauto/z_projects/SPT_rerun/hpc/data
+    uv run python scripts/export_dataset.py --lens SPT2147-50 --dest <modelling-project>/data
     uv run python scripts/export_dataset.py --lens B1938+666 --dest <dir> [--filters F277W F115W]
 
 Writes <dest>/<lens>/<FILT>/:
@@ -15,13 +15,13 @@ Writes <dest>/<lens>/<FILT>/:
     info.json                 pixel_scale, mask_radius, redshift_lens, redshift_source,
                               plus provenance (i2d, variant, jwst version, noise factor)
 
-This is the contract of SPT_rerun's `slam_pipeline/dataset_util.py` (data/noise_map/psf +
+This is the layout a PyAutoLens SLaM-style dataset loader expects (data/noise_map/psf +
 info.json with pixel_scale and mask_radius; mask_extra_galaxies.fits and positions.json
 optional). `mask_radius` (arcsec) comes from --mask-radius, default 3.0 -- a modelling
 choice, so it is written here and nowhere else in this repo. Files are copied, never
 linked, so the modelling project's `*.fits` gitignore and rsync behave. The hand-drawn
 contaminant mask in this repo is True = excluded, which is exactly the "paint the pixels
-to remove" polarity dataset_util expects.
+to remove" polarity such a loader expects.
 """
 import argparse
 import json
@@ -90,7 +90,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--lens', required=True)
     p.add_argument('--sample', default=None)
-    p.add_argument('--dest', required=True, help='modelling project data root, e.g. .../SPT_rerun/hpc/data')
+    p.add_argument('--dest', required=True, help='modelling project data root, e.g. <modelling-project>/data')
     p.add_argument('--filters', nargs='*', default=None, help='default: every band with a stamp')
     p.add_argument('--mask-radius', type=float, default=3.0, help='info.json mask_radius, arcsec')
     p.add_argument('--size', type=float, default=cutout_paths.DEFAULT_SIZE)

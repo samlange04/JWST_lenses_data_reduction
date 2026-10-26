@@ -1,10 +1,13 @@
 # AGENTS.md
 
-Guidance for any coding agent (and for humans) working in this repo — agent-agnostic;
-`CLAUDE.md` is a pointer to this file. This file is the **operational** reference:
-commands, layout, decisions, and the traps that silently produce wrong products. It is the
-JWST sibling of `../HST_lenses_data_reduction/AGENTS.md`; where a decision was inherited
-from there it says so, and that file's measurements are not restated here.
+Guidance for any coding agent (and for humans) working in this repo. This file is the
+**operational** reference: commands, layout, decisions, and the traps that silently produce
+wrong products. Where a decision is stated as settled, a measurement was made and the choice
+followed from it; the result is summarised here, so don't re-derive or re-litigate it without
+new evidence. It is the JWST sibling of the AGENTS.md in
+[HST_lenses_data_reduction](https://github.com/samlange04/HST_lenses_data_reduction) ("the HST
+repo" below); where a decision was inherited from there it says so, and that file's
+measurements are not restated here.
 
 > **AGENTS.md documents intent, not always state.** Before running a batch campaign or
 > reporting what is outstanding, verify against source — argparse defaults, what the
@@ -15,11 +18,11 @@ from there it says so, and that file's measurements are not restated here.
 Repo created 2026-10-01 from the HST repo's structure, PyAutoReduce's JWST path and the
 jwst 3.0.0 docs. Program 8281 (B1938+666) became public at 03:16 UTC that day.
 
-| lens | sample | downloaded | reduced | stamps | PSF | masks |
+| lens | sample | downloaded | reduced | stamps | PSF | masks + positions |
 |---|---|---|---|---|---|---|
 | SPT2147-50 | spt | uncal, 4 filters | F200W F277W F356W F444W | all 4 | see info/lens_psf.json | – |
 | SPT0418-47 | spt | uncal, 6 filters | F115W F150W F200W F277W F356W F444W | all 6 | see info/lens_psf.json | – |
-| B1938+666 | b1938 | uncal, 210 files / 79 GB | F115W F277W (2026-10-02, 8.5 h) | both | both, see info/lens_psf.json | – |
+| B1938+666 | b1938 | uncal, 210 files / 79 GB | F115W F277W (2026-10-02, 8.5 h) | both | both, see info/lens_psf.json | both (2026-10-04) |
 
 **The whole SPT sample reduced in one `run_reduce_all.sh spt` pass (2026-10-02 02:06): 10 ok,
 0 failed.** Per band: SW (4 detectors × 2 dithers) 220–250 s, SW F200W of SPT2147 (24 frames)
@@ -96,8 +99,8 @@ noise is ~10x the sky sigma and the 1/f is irrelevant. `--destripe` stays availa
 limited uses. The rate-level pedestal removes only amplifier DIFFERENCES (the common level
 is sky and must stay for the flat field). `--flicker-by-channel` and `--destripe` route to
 their own `_bychan` / `_destriped` stage1/stage2/mosaic trees (the flag used to be a silent
-no-op on existing rate files). The measurement scripts live in the session scratchpad only;
-port the rotate-and-row-median scan into `scripts/` if the metric is needed again.
+no-op on existing rate files). The measurement scripts were not kept; port the
+rotate-and-row-median scan into `scripts/` if the metric is needed again.
 
 **First verified product — SPT2147-50 F444W (2026-10-01 23:15):** 2 uncal → Detector1
 23 s + 16 s → Image2 → Image3 21 s → `spt2147-50_f444w_i2d.fits`, 2500² px at 0.060"/px,
@@ -112,7 +115,7 @@ Empirical PSF: 281 detections → 10 PSF-grade stars, FWHM 2.83 px = 0.170" (JDo
 nominal; a resampled, 2-dither ePSF is expected broader), 41 px kernel trimmed to 25 px,
 bootstrap PSF error fraction 2.4e-2. The six-spike NIRCam pattern is visible in the log
 panel of `data/psf/spt/SPT2147-50/F444W/psf.png`. `export_dataset.py` on this band
-produced the SPT_rerun layout with `pixel_scale 0.06` and the redshifts.
+produced the PyAutoLens dataset layout with `pixel_scale 0.06` and the redshifts.
 
 **Day-one outages and the fixes they forced:** jwst-crds.stsci.edu returned 502/504 then
 timed out for ~2 h (MAST stayed up), killing the first run mid-Detector1 and leaving a
@@ -128,19 +131,12 @@ produces no error downstream.
 
 **uv-managed**, like the HST repo: `pyproject.toml` + `uv.lock` + `.python-version` are
 tracked, `.venv` is not.
-`activate_local.sh` (gitignored, personal) sources the venv. It mirrors the analysis
-project's `z_projects/b1938_jwst/activate_local.sh`, whose `stage_b19` is the only thing that
-takes this repo's B1938+666 stamps anywhere.
 
-**This repo is NIRCam reduction only.** On 2026-10-26 the B1938+666 science work moved to the
-analysis repo, `~/Code/git_repos/pyauto/z_projects/b1938_jwst`, at the same relative paths:
-the Keck follow-up `keck/` (OSIRIS, NIRC2, NIRSPEC: downloads, DRFs, scripts, cubes, the
-operational record and the COSMA `_kck` aliases), the clump diagnostics `diagnostics/b1938_clumps/`,
-and `make_rgb.py` (now `diagnostics/make_rgb.py` there). Those scripts still read this repo
-through `$JWST_REDUCTION` -- the B1938 stamps and masks, the Image3 mosaics,
-`info/lens_samples.json`, `info/lens_psf.json`, and `scripts/cutout_paths.py` (imported by
-`make_rgb.py`) -- and run in this repo's uv env (`uv run --project $JWST_REDUCTION`), so moving
-or renaming any of those breaks them. Science analysis and non-JWST work go there, not here.
+**This repo is NIRCam reduction only.** Science analysis and non-JWST data (lens modelling,
+ground-based follow-up) belong in a downstream project, not here. Downstream code may read
+the cutout tree, the Image3 mosaics and the `info/*.json` files, and import
+`scripts/cutout_paths.py`, so treat those paths and that module's API as an interface:
+don't move or rename them casually.
 
 ```bash
 uv sync                                               # one-time, or after a .venv wipe
@@ -180,16 +176,16 @@ one file at a time, no multiprocessing (`ramp_fit.maximum_cores` left at `none`)
 same reason the HST drizzles use `num_cores=1`.
 
 **Long batch runs: wait on the process, never on a file-timestamp poll** (`find -newermt`
-parses local vs UTC differently in the interactive shell and in a script on this Mac —
-HST AGENTS.md has the 10-hour story). Runners here write a final `=== ... done` line;
-chain on exit status.
+can parse the same timestamp as local time in an interactive shell and as UTC in a script,
+so a condition checked by hand may never come true where it runs). Runners here write a
+final `=== ... done` line; chain on exit status.
 
 ## What this repo does
 
 One product per lens + NIRCam filter: a North-up Image3 mosaic centred on the lens, a 12"
 stamp with a sigma map, a PSF kernel, hand-drawn masks and image positions, and an export
 in the PyAutoLens dataset layout (`data.fits / noise_map.fits / psf.fits / info.json`) that
-the modelling project (`z_projects/SPT_rerun/hpc/data`) reads.
+a modelling project reads.
 
 ```
 download_nircam.py  MAST uncal -> data/calibrated/<sample>/<lens>/pool/ -> hard-linked into <FILT>/
@@ -204,7 +200,7 @@ make_dataset_subplots.py / make_qc_grids.py              QC
 export_dataset.py   -> <dest>/<lens>/<FILT>/{data,noise_map,psf}.fits + info.json [+ mask, positions]
 ```
 
-**NIRCam only** (user's call, 2026-10-01). TEMPLATES also took MIRI imaging
+**NIRCam only.** TEMPLATES also took MIRI imaging
 (F560W–F2100W, 0.11"/px) and NIRSpec G395M + MIRI MRS IFU cubes of both SPT lenses; GO
 8281 is NIRCam only. If MIRI is ever wanted: the pool download already fetches only
 `NRC_IMAGE` exposures (`download_nircam.sort_pool` filters on `EXP_TYPE`), so a MIRI path
@@ -216,8 +212,8 @@ PyAutoReduce has no MIRI support either.
 A JWST lens is located in MAST by **proposal ID + target name** (not an `SDSS%` wildcard
 as for SLACS), so each sample block carries `proposal_id` and each lens its `mast_target`,
 catalogue `ra`/`dec` (the stamp centre and the mosaic tangent point) and `redshift_lens` /
-`redshift_source` (written into the exported `info.json`; the modelling project keeps its
-own copy in `slam_pipeline/lenses.py` — keep them equal).
+`redshift_source` (written into the exported `info.json`; a modelling project that keeps its
+own copy must keep them equal).
 
 | sample | program | lens | MAST obs | NIRCam setup |
 |---|---|---|---|---|
@@ -237,18 +233,10 @@ SW chips (and is simultaneously on one LW chip per module). Consequences: the SW
 weight map is non-uniform right at the lens — check `WHTUNIF` on the F115W stamp — and the
 empirical SW PSF is averaged over detectors (fine, it is what the data carry).
 
-**Open B1938 question: the ring of clumps at r ≈ 0.9–1.4"** (outside the 0.45" Einstein ring,
-unmasked; includes Lagattuta+12's arclets A/B). They may be lensed single images or lens-plane
-structure, and that decides whether to mask them / how big `mask_radius` can be. The
-investigation lives in the analysis repo (`~/Code/git_repos/pyauto/z_projects/b1938_jwst`):
-the operational record is `keck/docs/b1938_clumps_osiris.md` there, the human-readable
-summary of the four hypotheses with figures `clumps_summary/README.md`. In short: the Keck
-spectroscopy and imaging are uninformative for the clumps (2026-10-12), no other archival data
-exist (2026-10-15), and only a redshift (JWST NIRSpec IFU) settles it, so the mask decision
-rests on the imaging. The imaging tests (`diagnostics/b1938_clumps/` there, run on this
-repo's stamps): the clumps are a 10⁻⁹ overdensity over the field (one physical system, not unrelated
-interlopers), and their tangential alignment survives every lens-light subtraction at ~1% but
-cannot separate lensing from a lens-plane ring.
+**B1938+666: the ring of clumps at r ≈ 0.9–1.4" is deliberately left unmasked** (outside the
+0.45" Einstein ring; includes Lagattuta+12's arclets A/B). They may be lensed images or
+lens-plane structure, which is not settled, so whether to exclude them is a modelling choice
+(`mask_radius` at export, or a model-side mask), not something the contaminant mask decides.
 
 **SPT0418 is on B4, the detector with the strongest NIRCam wisp** (JDox scattered-light
 article). Wisps are ~10% of zodi at fixed detector position in F115W/F150W/F200W; the
@@ -539,15 +527,17 @@ verified headless only (`backend='Agg'`, synthetic stamps, strokes injected thro
 ## Export to the modelling project (`scripts/export_dataset.py`)
 
 ```bash
-uv run python scripts/export_dataset.py --lens SPT2147-50 --dest ~/Code/git_repos/pyauto/z_projects/SPT_rerun/hpc/data [--mask-radius 3.0]
+uv run python scripts/export_dataset.py --lens SPT2147-50 --dest <modelling-project>/data [--mask-radius 3.0]
 ```
 
 Copies each band's stamp, noise map and PSF to `<dest>/<lens>/<FILT>/{data,noise_map,psf}.fits`,
 the contaminant mask as `mask_extra_galaxies.fits` and the positions as `positions.json` when
 they exist, and writes `info.json` with `pixel_scale`, `mask_radius`, the redshifts and the
-provenance (i2d path, variant, jwst version, `NOISECOR`). This is the contract in SPT_rerun's
-`slam_pipeline/dataset_util.py`. `mask_radius` is a modelling choice and lives only here.
-`info/lens_exports.json` records what went where.
+provenance (i2d path, variant, jwst version, `NOISECOR`). This is the layout a PyAutoLens
+SLaM-style dataset loader expects (`data`/`noise_map`/`psf` + `info.json`; mask and positions
+optional). `mask_radius` is a modelling choice and lives only here.
+`info/lens_exports.json` records what went where on this machine; it holds absolute local
+paths, so it is gitignored.
 
 ## Data flow and directory layout
 

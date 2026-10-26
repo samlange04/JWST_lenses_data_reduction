@@ -18,7 +18,7 @@
         }
     },
     "spt": {
-        "description": "The two SPT lenses of Lange et al. 2025 (SPT_rerun): JWST GO 1355 TEMPLATES (PI Rigby), NIRCam module B only. SPT0418-47 has F115W F150W F200W + F277W F356W F444W; SPT2147-50 has F200W + F277W F356W F444W. Both also have MIRI imaging (F560W..F2100W) and NIRSpec/MIRI IFU in the same program, deliberately not reduced here (NIRCam only).",
+        "description": "The two SPT lenses of Lange et al. 2025: JWST GO 1355 TEMPLATES (PI Rigby), NIRCam module B only. SPT0418-47 has F115W F150W F200W + F277W F356W F444W; SPT2147-50 has F200W + F277W F356W F444W. Both also have MIRI imaging (F560W..F2100W) and NIRSpec/MIRI IFU in the same program, deliberately not reduced here (NIRCam only).",
         "proposal_id": "1355",
         "lenses": {
             "SPT0418-47": {
