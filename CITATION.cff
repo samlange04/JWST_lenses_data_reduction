@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: >-
+  If you use this repository, please credit the repository and Samuel C. Lange
+  (The Chinese University of Hong Kong), and cite the programs and papers for
+  the lenses you use (see README.md).
+type: dataset
+title: "JWST lens image reduction"
+abstract: >-
+  James Webb Space Telescope NIRCam imaging of three galaxy-scale strong
+  gravitational lenses (JVAS B1938+666 from GO 8281, and SPT0418-47 and
+  SPT2147-50 from the TEMPLATES Early Release Science program), reduced from
+  the uncalibrated MAST ramps into ready-to-model stamps: science images,
+  noise maps, PSF kernels with uncertainty maps, and hand-drawn masks and
+  hand-marked multiple-image positions, together with the pipeline that
+  produces them.
+authors:
+  - family-names: Lange
+    given-names: Samuel C.
+    affiliation: The Chinese University of Hong Kong
+    orcid: "https://orcid.org/0009-0007-0679-818X"
+repository-code: "https://github.com/samlange04/JWST_lenses_data_reduction"
+url: "https://github.com/samlange04/JWST_lenses_data_reduction"
+license:
+  - MIT
+  - CC-BY-4.0
+keywords:
+  - strong gravitational lensing
+  - James Webb Space Telescope
+  - NIRCam
+  - data reduction
+  - B1938+666
+  - TEMPLATES
+date-released: "2026-10-27"
