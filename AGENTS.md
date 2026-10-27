@@ -13,10 +13,15 @@ measurements are not restated here.
 > reporting what is outstanding, verify against source — argparse defaults, what the
 > runner actually passes, tracking JSONs vs what is on disk.
 
-## Current state (2026-10-04)
+## Current state (2026-10-27)
 
 Repo created 2026-10-01 from the HST repo's structure, PyAutoReduce's JWST path and the
-jwst 3.0.0 docs. Program 8281 (B1938+666) became public at 03:16 UTC that day.
+jwst 3.0.0 docs. Program 8281 (B1938+666) became public at 03:16 UTC that day. Public on
+GitHub since 2026-10-27, with the HST repo's dual licence (`LICENSE` MIT for code,
+`LICENSE-DATA` CC BY 4.0 for `data/` and the `info/` records) and a `CITATION.cff`.
+`README.md` is the user-facing description; keep its product facts in step with this file.
+Stamps renamed 2026-10-26 (`data/cutouts/` → `data/stamps/`, `cutout_*` → `stamp<S>_*`,
+`info/` split into `samples/`, `overrides/`, `provenance/`), the same rename as the HST repo.
 
 | lens | sample | downloaded | reduced | stamps | PSF | masks + positions |
 |---|---|---|---|---|---|---|
@@ -32,24 +37,28 @@ were 1–44 mas on every band (fit RMSE 0.10–0.19", i.e. the finder's centroid
 galaxies, not a WCS problem). Weight uniformity over every 12" stamp 0.08–0.13 (< 0.2).
 0 bad pixels in any stamp.
 
-**PSFs, all 10 bands empirical (`run_psf_all.sh spt`, 2026-10-02):**
+**PSFs, all 12 bands empirical** (first built 2026-10-02; rebuilt 2026-10-03 with 81 px SW star
+stamps so the pedestal annulus clears the wings, and 2026-10-04 with the modelling-kernel trim
+at 3e-4 of peak). Current values from `info/provenance/lens_psf.json`:
 
-| band | SPT0418-47 stars / FWHM / err frac | SPT2147-50 stars / FWHM / err frac |
-|---|---|---|
-| F115W | **3** / 0.055" / **0.25** | – |
-| F150W | 6 / 0.067" / 0.017 | – |
-| F200W | 5 / 0.073" / 0.012 | 10 / 0.075" / 0.013 |
-| F277W | 6 / 0.120" / 0.018 | **3** / 0.132" / 0.021 |
-| F356W | 6 / 0.148" / 0.012 | 8 / 0.150" / 0.019 |
-| F444W | 7 / 0.169" / 0.008 | 10 / 0.170" / 0.024 |
+| band | SPT0418-47 stars / FWHM / err frac | SPT2147-50 stars / FWHM / err frac | B1938+666 stars / FWHM / err frac |
+|---|---|---|---|
+| F115W | **3** / 0.060" / 0.029 | – | 8 / 0.055" / 0.021 |
+| F150W | 6 / 0.067" / 0.016 | – | – |
+| F200W | 5 / 0.073" / 0.011 | 9 / 0.075" / 0.010 | – |
+| F277W | 6 / 0.120" / 0.018 | **3** / 0.132" / 0.021 | 12 / 0.121" / 0.012 |
+| F356W | 6 / 0.148" / 0.012 | 8 / 0.150" / 0.019 | – |
+| F444W | 7 / 0.169" / 0.008 | 10 / 0.170" / 0.024 | – |
 
-FWHMs sit 10–35% above the JDox in-flight values (0.040/0.050/0.066/0.092/0.116/0.145"),
-as a 2-dither resampled ePSF should. **SPT0418-47 F115W is not a usable PSF**: 3 stars at
-`min_stars=3`, a bootstrap error fraction of 25%, a visibly noisy kernel. Options, in
-order: add include stars via `info/overrides/psf_stars.json` after looking at the F115W mosaic;
-`--method model` once stpsf-data is installed (and then compare the model's FWHM to the
-0.055" measured here); raise `min_stars` to 4 so the auto tier falls back by itself. The
-SPT2147-50 F277W 3-star build is borderline (err 2%) — check `psf.png` before modelling.
+FWHMs sit 11–50% above the JDox in-flight values (0.040/0.050/0.066/0.092/0.116/0.145"),
+as a 2-dither resampled ePSF should; the largest excess is SPT0418-47 F115W. **The two 3-star
+builds (SPT0418-47 F115W, SPT2147-50 F277W) are borderline**: they pass at `min_stars=3`.
+The rebuilds brought SPT0418-47 F115W's bootstrap error from 25% (the 2026-10-02 build) to
+2.9%, but a bootstrap over three stars says little about how far the kernel is from the true
+PSF, so check `psf.png` before modelling. Options, in order: add include stars via
+`info/overrides/psf_stars.json` (no such file yet) after looking at the mosaic; `--method
+model` once stpsf-data is installed (not yet) and compare the model's FWHM to the one
+measured here; raise `min_stars` to 4 so the auto tier falls back by itself.
 
 **Residual diagonal striping is visible in the SW stamps' background (F115W, F150W, F200W;
 not in LW).** Stripes run diagonally because the detector rows are rotated against the
@@ -299,7 +308,7 @@ data/calibrated/<s>/<l>/<F>/*_uncal.fits -> Detector1 -> data/stage1/<s>/<l>/<F>
 | Image2 | `resample.skip=True` | per-exposure i2d previews are dead weight |
 | Image3 | `tweakreg`: relative only by default | aligns the dithers to each other (IRAFStarFinder, `minobj=15`, `fitgeometry=rshift`). `--tweakreg gaia` adds `abs_refcat=GAIADR3`; `skip` for a field where it finds too few sources. **A failed tweakreg is not fatal**: jwst logs it and keeps the a-priori WCS, which for JWST is good to ~0.1" absolute and to mas relative within a visit — nothing like WFPC2. TEMPLATES found Gaia alignment broke SW/LW registration (jwst issue 7993) and ended up aligning SW to a Gaia-tied F277W catalogue per module |
 | Image3 | `skymatch.skymethod=global+match`, `subtract=False` | one sky level per mosaic, matched across dithers. `subtract=False` is NOT "don't subtract": stcal's resample subtracts `meta.background.level` itself when `subtracted` is False (`stcal/resample/resample.py`, checked in the installed version). The mosaic is sky-subtracted |
-| Image3 | `outlier_detection`: defaults | JWST's CR pass. There is no separate no-CR product: `jump` flags CRs on the ramp and `outlier_detection` catches the rest, so this repo has ONE pass and the stamps are `cutout_*`, never `cutout_cr_*` |
+| Image3 | `outlier_detection`: defaults | JWST's CR pass. There is no separate no-CR product: `jump` flags CRs on the ramp and `outlier_detection` catches the rest, so this repo has ONE pass and the stamp names carry none (`stamp<S>_*`; `drizzle_pass` is recorded as `single`) |
 | Image3 | `resample`: `pixfrac=1.0`, `kernel=square`, `weight_type=ivm`, `fillval=NAN`, `rotation=0`, `crval=<catalogue>`, `crpix=<centre>`, `pixel_scale` SW **0.03"** / LW **0.06"**, `output_shape` from `--field` (150" default) | North-up, one tangent point per lens, SW/LW grids nested 2:1. Scales near native (0.031/0.063) at pixfrac 1.0 follow the HST repo's finding that pixfrac cannot change the noise a fit sees and that near-native scales keep the noise model clean; COWLS (Nightingale+25) and PyAutoReduce use the same 0.03/0.06 pair. `--scale 0.02` is the finer option JDox mentions for well-dithered data (B1938's 21 dithers qualify) — a measurement question, not settled |
 | Image3 | `source_catalog.skip=True` | not needed |
 
@@ -475,7 +484,7 @@ module is `lens_samples`, `_BAND_PRIORITY = ['F444W', 'F356W', 'F277W', 'F200W',
 highest-S/N band), and the provenance JSONs record `variant` (from the stamp's `REDUCVAR`)
 instead of `bcfill`. Their docstrings and `--help` still quote HST examples (`f814W`,
 `slacs_gold`) and a `--pass` flag that is accepted and ignored (`stamp_paths.find_prefix`
-always answers `stamp`). The semantics are unchanged and matter:
+always answers `stamp<S>` for the lens's modelling size). The semantics are unchanged and matter:
 
 - Masks are `al.Mask2D` convention, **True = excluded**; `make_masks.py` paints what to
   remove, `make_arc_masks.py` paints what to keep and saves it inverted.
@@ -559,7 +568,7 @@ data/
   qc[_<S>arcsec]/<sample>/                stamp grids
   reference_files/                        CRDS cache, stpsf-data/
   run_logs/
-info/   samples/lens_samples.json (hand) · overrides/noise_corr_factors.json, psf_stars.json (hand) ·
+info/   samples/lens_samples.json (hand) · overrides/noise_corr_factors.json, psf_stars.json (hand; no psf_stars.json yet) ·
         provenance/ (the rest, written by the scripts; info_json.path() resolves a name)
 ```
 
@@ -581,7 +590,9 @@ Verified end to end on SPT2147-50 F444W (see *Current state*): `reduce_nircam.py
 `export_dataset.py`, `run_reduce_all.sh`. `make_dataset_subplots.py` runs and correctly
 refuses a band with no mask yet.
 
-Not yet exercised: the STPSF model tier of `make_psf.py` (needs stpsf-data), the three GUIs,
+Not yet exercised: the STPSF model tier of `make_psf.py` (needs stpsf-data),
 `make_arc_masks.py`, `make_qc_grids.py`, `--tweakreg gaia`. Stubs: `detect_arcs.py`.
 Exercised since: `measure_corr_factor.py` (12 stamps, 2026-10-04), `--start rate` and
-`--flicker-by-channel` (SPT0418-47 F150W, 2026-10-02), `destripe_nircam.py`.
+`--flicker-by-channel` (SPT0418-47 F150W, 2026-10-02), `destripe_nircam.py`, and
+`make_masks.py`, `make_positions.py` and `make_dataset_subplots.py` on B1938+666 (2026-10-04,
+the HST-port GUIs; the native-Scribbler rewrite is verified headless only, see *Masks*).
