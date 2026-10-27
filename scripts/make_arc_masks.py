@@ -4,8 +4,8 @@ Interactive GUI ARC mask-making: paint the arcs / multiple images, keep only tho
 
 The second of the two hand-drawn mask tools, and the OPPOSITE polarity to `make_masks.py`:
 
-    make_masks.py       paint what to REMOVE  -> cutout_[cr_]mask.fits       (contaminants)
-    make_arc_masks.py   paint the ARCS to KEEP -> cutout_[cr_]mask_arcs.fits (this script)
+    make_masks.py       paint what to REMOVE  -> stamp12_mask.fits       (contaminants)
+    make_arc_masks.py   paint the ARCS to KEEP -> stamp12_mask_arcs.fits (this script)
 
 Here you scribble ONLY the lensed source -- the arcs and the multiple images -- and
 everything you do not paint is masked out, deflector light included. The product is a mask
@@ -13,10 +13,10 @@ that isolates the source: the region a source-only fit, an arc S/N measurement, 
 source-plane analysis should look at.
 
 WHAT IS ON DISK, AND ITS POLARITY. The saved array is in `al.Mask2D`'s own convention --
-True = EXCLUDED from the fit -- exactly like `cutout_[cr_]mask.fits`, so both files load
+True = EXCLUDED from the fit -- exactly like `stamp12_mask.fits`, so both files load
 through the same reader and can never be mixed up by polarity:
 
-    mask = al.Mask2D.from_fits(file_path=".../cutout_cr_mask_arcs.fits", pixel_scales=0.05)
+    mask = al.Mask2D.from_fits(file_path=".../stamp12_mask_arcs.fits", pixel_scales=0.05)
     # mask == True  everywhere EXCEPT the arcs   -> fitting under it fits only the arcs
     # ~mask         is the arc region you painted (what MASKARC/NARCPX count)
 
@@ -33,7 +33,7 @@ quadrupole residual; an arc partly self-subtracts at its own radius). Pass
 --no-subtract-radial to draw against the raw image.
 
 ALREADY-MARKED POSITIONS ARE SHOWN. Where `make_positions.py` has recorded
-cutout_[cr_]positions.json for the band, each marked image is marked with a '+' CROSS in
+stamp12_positions.json for the band, each marked image is marked with a '+' CROSS in
 the display (al.Scribbler's `positions=`) so the arc mask can be drawn around the same
 multiple images. A cross, not a ring: the other two annotations here are closed boundaries
 (the arc proposal's contour, the contaminant mask's edge of black 'x's), and a third closed
@@ -101,15 +101,15 @@ ws_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import lens_samples as mast_target_names
 import info_json
-import cutout_paths
+import stamp_paths
 # Every display/tree/discovery/broadcast helper is make_masks'. This script contributes the
 # opposite polarity, the arc-specific display defaults, and its own product name.
 import make_masks
 import detect_arcs
 
-ARC_MASKS_JSON = os.path.join(ws_path, 'info', 'lens_arc_masks.json')
+ARC_MASKS_JSON = os.path.join(ws_path, 'info', 'provenance', 'lens_arc_masks.json')
 
-ARC_SUFFIX = 'mask_arcs'          # cutout_[cr_]mask_arcs.fits, beside cutout_[cr_]mask.fits
+ARC_SUFFIX = 'mask_arcs'          # stamp12_mask_arcs.fits, beside stamp12_mask.fits
 
 
 def _one_arc_source(filt_dirs, prefixes, display_filt, dst_wcs, dst_shape, lens, source,
@@ -139,17 +139,17 @@ def _one_arc_source(filt_dirs, prefixes, display_filt, dst_wcs, dst_shape, lens,
                 region, WCS(maps['hdr']).celestial, dst_wcs, dst_shape)
         return region, extra
 
-    cutout_dir = filt_dirs.get(source)
+    stamp_dir = filt_dirs.get(source)
     prefix = prefixes.get(source)
-    if cutout_dir is None or prefix is None:
+    if stamp_dir is None or prefix is None:
         return None, {}
-    mask_path = os.path.join(cutout_dir, f'{prefix}_{ARC_SUFFIX}.fits')
+    mask_path = os.path.join(stamp_dir, f'{prefix}_{ARC_SUFFIX}.fits')
     if not os.path.exists(mask_path):
         return None, {}
     arc_region = ~np.asarray(fits.getdata(mask_path), dtype=bool)
     if source == display_filt:
         return arc_region, {}
-    src_hdr = fits.getheader(cutout_paths.find_stamp(cutout_dir, prefix, 'sci'))
+    src_hdr = fits.getheader(stamp_paths.find_stamp(stamp_dir, prefix, 'sci'))
     return make_masks.reproject_mask_bool(arc_region, WCS(src_hdr).celestial,
                                           dst_wcs, dst_shape), {}
 
@@ -224,10 +224,10 @@ def find_arc_proposal(filt_dirs, prefixes, display_filt, display_hdr, lens, prop
     return '+'.join(used), region, extra
 
 
-def load_positions(cutout_dir, prefix):
+def load_positions(stamp_dir, prefix):
     """Return the band's marked image positions as a list of (y, x) arcsec, or [] if
     make_positions.py has not run for it. Read-only -- this tool never writes positions."""
-    path = os.path.join(cutout_dir, f'{prefix}_positions.json')
+    path = os.path.join(stamp_dir, f'{prefix}_positions.json')
     if not os.path.exists(path):
         return []
     try:
@@ -237,7 +237,7 @@ def load_positions(cutout_dir, prefix):
         return []
 
 
-def save_arc_qc_png(cutout_dir, prefix, arc_bool, pixel_scales, out_path, lens, filt):
+def save_arc_qc_png(stamp_dir, prefix, arc_bool, pixel_scales, out_path, lens, filt):
     """QC overlay: the arc region outlined over the band's own (radial-subtracted) image.
 
     Written per band, so a broadcast can be checked where it actually matters -- the f160W
@@ -245,7 +245,7 @@ def save_arc_qc_png(cutout_dir, prefix, arc_bool, pixel_scales, out_path, lens, 
     exactly as the GUI's left panel is (the Scribbler's radial_median_subtract +
     arcsinh_stretch), so the PNG shows what was drawn on.
     """
-    base, _ = make_masks.load_display_base(cutout_dir, prefix, 'snr', pixel_scales)
+    base, _ = make_masks.load_display_base(stamp_dir, prefix, 'snr', pixel_scales)
     a = arcsinh_stretch(radial_median_subtract(np.asarray(base, dtype=float)))
     hw = int(a.shape[1] / 2) * pixel_scales
     ext = [-hw, hw, -hw, hw]
@@ -292,7 +292,7 @@ def process_lens_arc_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass,
     the white (add) / black (erase) brushes, and on closing the GUI you apply, reject or skip.
     'none' restores the from-scratch draw.
 
-    `show_contaminants` passes this band's `cutout_[cr_]mask.fits` as the Scribbler's
+    `show_contaminants` passes this band's `stamp12_mask.fits` as the Scribbler's
     `mask_overlay`, whose edge it scatters as black 'x's. Why: painting arcs and painting
     contaminants are opposite jobs, and the thing most likely to be mistaken for a lensed
     image is a neighbour ALREADY judged a contaminant on this very band -- showing that
@@ -310,7 +310,7 @@ def process_lens_arc_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass,
     display_dir = filt_dirs[display_filt]
     display_prefix = make_masks.find_prefix(display_dir, drizzle_pass)
     if display_prefix is None:
-        print(f"{lens} {display_filt}: no cutout sci for --pass {drizzle_pass}, skipping")
+        print(f"{lens} {display_filt}: no stamp sci for --pass {drizzle_pass}, skipping")
         return False
 
     # Skip if the draw band already has an arc mask, unless --force.
@@ -319,7 +319,7 @@ def process_lens_arc_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass,
         print(f"{lens}: arc mask already exists ({display_filt}), skipping (--force to redraw)")
         return False
 
-    display_hdr = fits.getheader(cutout_paths.find_stamp(display_dir, display_prefix, 'sci'))
+    display_hdr = fits.getheader(stamp_paths.find_stamp(display_dir, display_prefix, 'sci'))
     positions = load_positions(display_dir, display_prefix) if show_positions else []
     if positions:
         print(f"  {len(positions)} marked position(s) crossed in the display "
@@ -411,22 +411,22 @@ def process_lens_arc_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass,
 
     targets = (filts if broadcast else [display_filt])
     for filt in targets:
-        cutout_dir = filt_dirs[filt]
-        prefix = make_masks.find_prefix(cutout_dir, drizzle_pass)
+        stamp_dir = filt_dirs[filt]
+        prefix = make_masks.find_prefix(stamp_dir, drizzle_pass)
         if prefix is None:
             continue
-        band_hdr = fits.getheader(cutout_paths.find_stamp(cutout_dir, prefix, 'sci'))
+        band_hdr = fits.getheader(stamp_paths.find_stamp(stamp_dir, prefix, 'sci'))
         band_ps = make_masks.pixel_scale_from_header(band_hdr)
-        is_draw = (cutout_dir == display_dir)
+        is_draw = (stamp_dir == display_dir)
         # Reproject the ARC REGION, never the inverted array: outside-footprint pixels then
         # default to 'not arc' (masked out), the safe side of the stamp edge.
         band_arc = arc_region if is_draw else make_masks.reproject_mask_bool(
             arc_region, src_wcs, WCS(band_hdr).celestial,
             (band_hdr['NAXIS2'], band_hdr['NAXIS1']))
-        mask_path = os.path.join(cutout_dir, f'{prefix}_{ARC_SUFFIX}.fits')
+        mask_path = os.path.join(stamp_dir, f'{prefix}_{ARC_SUFFIX}.fits')
         write_arc_mask(band_arc, band_ps, mask_path)
-        save_arc_qc_png(cutout_dir, prefix, band_arc, band_ps,
-                        os.path.join(cutout_dir, f'{prefix}_{ARC_SUFFIX}.png'), lens, filt)
+        save_arc_qc_png(stamp_dir, prefix, band_arc, band_ps,
+                        os.path.join(stamp_dir, f'{prefix}_{ARC_SUFFIX}.png'), lens, filt)
         n_arc = int(np.asarray(band_arc).sum())
         print(f"  wrote {mask_path}  ({source_tag if is_draw else f'reprojected<-{display_filt}'}, "
               f"{n_arc}px in the arc region, everything else masked out)")
@@ -435,7 +435,7 @@ def process_lens_arc_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass,
             'drizzle_pass': 'single',
             'pixel_scale_arcsec': round(band_ps, 6),
             'display': source_label,
-            # Which reduction the stamp was drawn on, from its own header (cutout_paths.py).
+            # Which reduction the stamp was drawn on, from its own header (stamp_paths.py).
             'variant': str(band_hdr.get('REDUCVAR', 'standard')),
             'source': source_tag if is_draw else f'reprojected_from_{display_filt}',
             'n_arc_px': n_arc,
@@ -463,10 +463,10 @@ def main():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--sample', default=mast_target_names.DEFAULT_SAMPLE,
-                   help=f'sample subdirectory of data/cutouts/ (default '
+                   help=f'sample subdirectory of data/stamps/ (default '
                         f'{mast_target_names.DEFAULT_SAMPLE})')
     p.add_argument('--lens', default=None,
-                   help='restrict to one lens; default every lens with cutouts in --sample')
+                   help='restrict to one lens; default every lens with stamps in --sample')
     p.add_argument('--filt', default=None,
                    help='force which band you DRAW on (e.g. f606W); default the best available '
                         'band per lens (f814W>f606W>f555W>f160W>...). Only that band gets an '
@@ -479,12 +479,12 @@ def main():
                         'not in practice band-independent')
     p.add_argument('--pass', dest='drizzle_pass', choices=['auto', 'cr', 'nocrrej'],
                    default='auto',
-                   help="which cutout pass to mask, matching make_masks.py/make_cutouts.py: "
-                        "'auto' (default) prefers cutout_cr_*, falling back to cutout_* where "
-                        "no CR pass exists (F160W)")
-    p.add_argument('--size', type=float, default=cutout_paths.DEFAULT_SIZE,
-                   help=f'cutout tree to draw arc masks for (default '
-                        f'{cutout_paths.DEFAULT_SIZE:g}", data/cutouts/ -- the git-tracked '
+                   help="which stamp pass to mask, matching make_masks.py/make_stamps.py: "
+                        "accepted for symmetry with the HST repo; JWST has a single "
+                        "drizzle pass, so it changes nothing")
+    p.add_argument('--size', type=float, default=None,
+                   help=f'stamp tree to draw arc masks for (default '
+                        f'{stamp_paths.DEFAULT_SIZE:g}", data/stamps/ -- the git-tracked '
                         'tree; like every hand-drawn product these are non-regenerable)')
     p.add_argument('--force', action='store_true', default=False,
                    help='redraw an arc mask that already exists (default: skip it)')
@@ -520,7 +520,7 @@ def main():
                    help='arm length in pixels of those position crosses (default: the '
                         "Scribbler's own, 1.5%% of the shorter stamp side, at least 3 px)")
     p.add_argument('--show-contaminants', action=argparse.BooleanOptionalAction, default=True,
-                   help="show this band's CONTAMINANT mask (cutout_[cr_]mask.fits, what "
+                   help="show this band's CONTAMINANT mask (stamp12_mask.fits, what "
                         "make_masks.py excludes) as the Scribbler's mask_overlay -- its edge "
                         "scattered as black x's -- so a neighbour already judged a contaminant "
                         'is not mistaken for a lensed image (default on; display only, '
@@ -540,7 +540,7 @@ def main():
                        type=type(val), default=val,
                        help=f'detector parameter passed through to detect_arcs (default {val})')
     p.add_argument('--include-ignored', action='store_true', default=False,
-                   help='also offer bands whose cutout directory is GITIGNORED. Off by '
+                   help='also offer bands whose stamp directory is GITIGNORED. Off by '
                         'default: such a band is not a science product (the three 420 s '
                         'SLACS SNAP f814W diagnostics are why the rule exists), and hand-drawn '
                         'work written there is non-regenerable and invisible to every clone. '
@@ -555,15 +555,16 @@ def main():
                 '--propose-from; pass --propose-from none alongside it')
     detect_kw = {k: getattr(a, f'detect_{k}') for k in detect_arcs.DEFAULTS}
 
-    root = cutout_paths.cutouts_root(ws_path, a.size)
+    make_masks.STAMP_SIZE = a.size
+    root = stamp_paths.stamps_root(ws_path)
 
     lens_filts = {}
-    for lens, filt, cutout_dir in make_masks.discover_targets(
+    for lens, filt, stamp_dir in make_masks.discover_targets(
             root, a.sample, a.lens, None, include_ignored=a.include_ignored):
-        lens_filts.setdefault(lens, {})[filt] = cutout_dir
+        lens_filts.setdefault(lens, {})[filt] = stamp_dir
 
     if not lens_filts:
-        raise SystemExit(f"no cutouts found under {root} for sample {a.sample} matching "
+        raise SystemExit(f"no stamps found under {root} for sample {a.sample} matching "
                          f"lens={a.lens!r}")
 
     print(f"{len(lens_filts)} lens(es) to process")

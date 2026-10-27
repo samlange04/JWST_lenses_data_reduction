@@ -4,7 +4,7 @@
 # Usage: run_reduce_all.sh [SAMPLE] [extra reduce_nircam.py args...]
 #          (default SAMPLE: lens_samples.DEFAULT_SAMPLE)
 #
-# Iterates the sample ROSTER (info/lens_samples.json), not a glob: a lens whose pool is
+# Iterates the sample ROSTER (info/samples/lens_samples.json), not a glob: a lens whose pool is
 # empty is downloaded first. Filters come from the lens's sorted pool
 # (data/calibrated/<sample>/<lens>/F*/), so only bands MAST actually has are tried.
 # Per-band logs in data/run_logs/<lens>_<FILT>_reduce.log; exit status is counted as

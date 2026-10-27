@@ -56,10 +56,10 @@ Without that the flag would be a silent no-op on any band whose rate files alrea
 
 Units: everything stays in MJy/sr (the jwst convention; PHOTMJSR / PIXAR_SR in the header
 convert to DN/s or Jy/pixel). PyAutoLens is unit-agnostic as long as data, noise and the
-PSF normalisation agree, which make_cutouts.py guarantees.
+PSF normalisation agree, which make_stamps.py guarantees.
 
 CRDS: reference files download themselves on first use into data/reference_files/
-(CRDS_PATH); the context used is recorded in info/lens_products.json. Pin one with
+(CRDS_PATH); the context used is recorded in info/provenance/lens_products.json. Pin one with
 CRDS_CONTEXT=jwst_XXXX.pmap in the environment for a byte-reproducible re-run.
 
 macOS: mmap_fits_write.install() runs before any pipeline stage (the HST repo's write-hang
@@ -81,7 +81,7 @@ import mmap_fits_write
 mmap_fits_write.install()
 import lens_samples
 import info_json
-import cutout_paths
+import stamp_paths
 
 ws_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -153,9 +153,9 @@ def sync_references(files, attempts=30, wait=300):
 def _stage_dir(kind, sample, lens, filt, variant=''):
     """data/<stage1|stage2|mosaics>[_<variant>]/<sample>/<lens>/<FILT> -- the variant tags
     the stage ROOT, so a variant reduction never shares a cache with the standard one."""
-    tag = cutout_paths.variant_tag(variant)
+    tag = stamp_paths.variant_tag(variant)
     root = {'stage1': f'stage1{tag}', 'stage2': f'stage2{tag}',
-            'mosaics': os.path.basename(cutout_paths.mosaics_root(ws_path, variant))}[kind]
+            'mosaics': os.path.basename(stamp_paths.mosaics_root(ws_path, variant))}[kind]
     return os.path.join(ws_path, 'data', root, sample, lens, filt)
 
 
@@ -297,7 +297,7 @@ def main():
     p.add_argument('--start', choices=['uncal', 'rate', 'cal'], default='uncal',
                    help='uncal: full reduction (default). rate/cal: start from MAST products '
                         'in data/calibrated (download_nircam.py --level rate|cal); the '
-                        'mosaic is then tagged mastrate/mastcal (cutout_paths)')
+                        'mosaic is then tagged mastrate/mastcal (stamp_paths)')
     p.add_argument('--scale', type=float, default=None,
                    help=f'output pixel scale, arcsec (default SW {DEFAULT_SCALE["SW"]}, '
                         f'LW {DEFAULT_SCALE["LW"]})')
@@ -328,12 +328,12 @@ def main():
         if a.start != 'uncal' or a.flicker_by_channel:
             p.error('--destripe applies to the standard reduction only (--start uncal, no --flicker-by-channel)')
         variant = 'destriped'
-    key = filt + cutout_paths.variant_tag(variant)   # tracking-JSON key: <FILT>[_<variant>]
+    key = filt + stamp_paths.variant_tag(variant)   # tracking-JSON key: <FILT>[_<variant>]
 
     cal_dir = os.path.join(ws_path, 'data', 'calibrated', sample, a.lens, filt)
     inputs = sorted(glob.glob(os.path.join(cal_dir, f'*_{a.start}.fits')))
     print(f'=== {sample}/{a.lens} {filt} ({ch}): {len(inputs)} {a.start} files in {cal_dir}')
-    products_json = os.path.join(ws_path, 'info', 'lens_products.json')
+    products_json = os.path.join(ws_path, 'info', 'provenance', 'lens_products.json')
     if not inputs:
         print(f'=== NO DATA: run download_nircam.py --lens {a.lens} first, or MAST has no {filt}')
         info_json.update(products_json, sample, a.lens, key, None)
@@ -400,9 +400,9 @@ def main():
         # exposure time AT THE LENS: one detector per dither, so sum EFFEXPTM once per
         # exposure (rootname minus the detector suffix), not over every detector's frame
         per_exposure = {_rootname(f).rsplit('_', 1)[0]: _exptime(f) for f in cals}
-        info_json.update(os.path.join(ws_path, 'info', 'lens_exptime.json'), sample, a.lens, key,
+        info_json.update(os.path.join(ws_path, 'info', 'provenance', 'lens_exptime.json'), sample, a.lens, key,
                          round(float(sum(per_exposure.values())), 1))
-        info_json.update(os.path.join(ws_path, 'info', 'lens_instrument.json'), sample, a.lens, key,
+        info_json.update(os.path.join(ws_path, 'info', 'provenance', 'lens_instrument.json'), sample, a.lens, key,
                          f'NIRCAM/{ch}')
     print(f'=== done: {i2d}')
     return 0

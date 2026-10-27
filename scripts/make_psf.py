@@ -12,7 +12,7 @@ ellipticity, crowding and a flux floor, builds an oversampled photutils ePSF, va
 writes:
 
     data/psf/<sample>/<lens>/<FILT>/psf_kernel.fits [+ psf_kernel_err.fits]  psf.png
-    data/cutouts/<sample>/<lens>/<FILT>/cutout_psf.fits [+ cutout_psf_err.fits]
+    data/stamps/<sample>/<lens>/<FILT>/psf.fits [+ psf_err.fits]
 
 the second being the amplitude-trimmed modelling kernel beside the science stamp. With too
 few usable stars (< --min-stars, default 3) or a poor empirical build, --method auto falls
@@ -20,12 +20,12 @@ back to the STPSF model at the lens's detector position (scripts/psf_models.py),
 North-up through a contributing _cal file's WCS and broadened by the analytic drop box --
 tagged PSFMETH='model_stpsf', PSFBROAD='analytic'. The PSF error map (bootstrap over stars,
 jackknife below 6) is the empirical tier's only. Per-lens overrides live in
-info/psf_stars.json (include/exclude stars, method, any tunable), as in the HST repo.
+info/overrides/psf_stars.json (include/exclude stars, method, any tunable), as in the HST repo.
 
 NIRCam specifics (vs HST): the SW bands at 0.03" are undersampled (FWHM 1.3-2.2 px), so the
 per-filter psf_fwhm comes from the JDox PSF table scaled to the output pixel; there is no
 mosaic-peak saturation gate (saturated cores are NaN holes in an i2d); there is one pass, so
-the kernel is simply cutout_psf.fits.
+the kernel is simply psf.fits.
 """
 
 import argparse
@@ -62,16 +62,16 @@ import lens_samples as mast_target_names
 # Reuse the canonical product locator and the coordinate resolver rather than
 # re-implementing the instrument-varying prefix/suffix globbing or the per-sample coords
 # table lookup (SLACS in slacs_coords.py, BELLS GALLERY in gallery_coords.py). Importing
-# make_cutouts is safe: its work is under __main__.
+# make_stamps is safe: its work is under __main__.
 import psf_models
 import info_json
-import cutout_paths
+import stamp_paths
 
 
 # ── Per-instrument defaults ─────────────────────────────────────────────────────
 # Keyed on a normalised instrument label (see instrument_key). WFPC2's drizzled primary
 # header records DETECTOR=PC (the aperture, not the chip -- the lens is on WF3), so WFPC2
-# is keyed on INSTRUME alone. Every value here is overridable by info/psf_stars.json and
+# is keyed on INSTRUME alone. Every value here is overridable by info/overrides/psf_stars.json and
 # then by an explicit CLI flag; the drizzled pixel scale is read from the WCS, not stored.
 _BASE = dict(
     threshold_scale=5.0,     # detection threshold = this x sigma-clipped background std
@@ -113,7 +113,7 @@ _BASE = dict(
 # oversample=2: SLACS fields yield only ~10-20 usable stars, so a 4x-oversampled ePSF
 # has too many pixels per constraining star and comes out noisy. 2x is well-matched to
 # these (near-)critically-sampled drizzled grids and much more robust; raise per lens via
-# --oversample or info/psf_stars.json where a field is unusually star-rich.
+# --oversample or info/overrides/psf_stars.json where a field is unusually star-rich.
 _INSTR = {
     # NIRCam at the repo's output scales (SW 0.03", LW 0.06"; reduce_nircam.DEFAULT_SCALE).
     # psf_fwhm is the per-filter PSF FWHM in OUTPUT pixels (JDox NIRCam point-spread
@@ -293,7 +293,7 @@ def select_stars(data, mask, params, overrides, star_size):
     streaks and cosmic rays. Survivors are ranked by flux and the brightest `max_stars`
     kept.
 
-    `overrides` (from info/psf_stars.json) is applied last: `exclude` points/boxes remove
+    `overrides` (from info/overrides/psf_stars.json) is applied last: `exclude` points/boxes remove
     detected stars, `include` points force extra positions in.
     """
     hsize = (star_size - 1) // 2
@@ -610,7 +610,7 @@ def psf_error_map(kernels, method, trim_half):
     standard error is the replicate std, sqrt(SS/(B-1)). Jackknife: the leave-one-out standard
     error sqrt((n-1)/n . SS). Returns (err_full, err_trim, err_frac, fwhm_err): err_trim is
     err_full cropped to the primary kernel's trim window (same `trim_half`, not a fresh
-    amplitude cut) so it matches cutout_[cr_]psf.fits pixel-for-pixel; err_frac =
+    amplitude cut) so it matches psf.fits pixel-for-pixel; err_frac =
     sqrt(sum(err_full**2)) (integrated relative PSF uncertainty; the kernels sum to 1).
     """
     stack = np.stack(kernels, axis=0)
@@ -766,7 +766,7 @@ def lens_products_rootnames(sample, lens, filt_key):
     Used by the ACS focus-diverse ePSF model to retrieve a focus-matched ePSF per exposure.
     Returns [] if the file or entry is absent.
     """
-    data = info_json.load(os.path.join(ws_path, 'info', 'lens_products.json'))
+    data = info_json.load(os.path.join(ws_path, 'info', 'provenance', 'lens_products.json'))
     val = data.get(sample, {}).get(lens, {}).get(filt_key)
     return list(val) if val else []
 
@@ -778,7 +778,7 @@ def main():
     p.add_argument('--lens', required=True)
     p.add_argument('--filt', required=True)
     p.add_argument('--sample', default=None)
-    p.add_argument('--variant', default='', choices=('',) + cutout_paths.VARIANT_COMPONENTS,
+    p.add_argument('--variant', default='', choices=('',) + stamp_paths.VARIANT_COMPONENTS,
                    help="which reduction's mosaic to build from (default standard)")
     p.add_argument('--method', choices=['auto', 'empirical', 'model'], default='auto',
                    help="'auto' (default) builds an empirical ePSF and falls back to the "
@@ -786,7 +786,7 @@ def main():
                         "forces the star build (fails if too few); 'model' forces STPSF.")
     p.add_argument('--trim-threshold', dest='trim_threshold', type=float, default=3e-4,
                    help="amplitude fraction of peak at which the trimmed modelling kernel "
-                        "(cutout_psf.fits) is cut. Default 3e-4 -- an amplitude criterion; 1e-3 kept only "
+                        "(psf.fits) is cut. Default 3e-4 -- an amplitude criterion; 1e-3 kept only "
                         "95% of the F115W flux (2026-10-04).")
     p.add_argument('--n-boot', dest='n_boot', type=int, default=None,
                    help='bootstrap resamples for the empirical PSF error map (default 100; '
@@ -802,16 +802,16 @@ def main():
     sample = a.sample or mast_target_names.sample_of(a.lens)
     filt = mast_target_names.canonical_filter(a.filt)
     a.filt = filt
-    mdir = cutout_paths.mosaic_dir(ws_path, sample, a.lens, filt, a.variant)
-    i2d = cutout_paths.find_i2d(mdir)
+    mdir = stamp_paths.mosaic_dir(ws_path, sample, a.lens, filt, a.variant)
+    i2d = stamp_paths.find_i2d(mdir)
     output_dir = a.output or os.path.join(ws_path, 'data', 'psf', sample, a.lens, filt)
-    psf_json = os.path.join(ws_path, 'info', 'lens_psf.json')
+    psf_json = os.path.join(ws_path, 'info', 'provenance', 'lens_psf.json')
     if i2d is None:
         print(f'=== NO DATA: {a.lens} {filt} (no i2d in {mdir})')
         info_json.update(psf_json, sample, a.lens, filt, None)
         sys.exit(0)
     os.makedirs(output_dir, exist_ok=True)
-    overrides = info_json.load(os.path.join(ws_path, 'info', 'psf_stars.json')).get(sample, {}).get(a.lens, {}).get(filt, {})
+    overrides = info_json.load(os.path.join(ws_path, 'info', 'overrides', 'psf_stars.json')).get(sample, {}).get(a.lens, {}).get(filt, {})
 
     print(f'{a.lens} {filt}  [{os.path.basename(i2d)}]')
     with fits.open(i2d) as hdul:
@@ -866,7 +866,7 @@ def main():
     if method == 'empirical' and too_few:
         raise SystemExit(f'ERROR: only {n_stars} usable stars for {a.lens} {filt} '
                          f'(need >= {params["min_stars"]}). Loosen cuts, add include stars to '
-                         f'info/psf_stars.json, or use --method model.')
+                         f'info/overrides/psf_stars.json, or use --method model.')
     star_stamps, method_used, epsf_data, model_info = [], None, None, {}
     if not use_model:
         print(f'  method: EMPIRICAL  oversample={oversample} star_size={star_size}')
@@ -950,7 +950,7 @@ def main():
     khdr['PSFFWHM'] = (round(fwhm_pix, 4) if fwhm_pix is not None else 0.0, 'fitted kernel FWHM (pixels)')
     khdr['PSFLENS'] = (a.lens, 'lens')
     khdr['PSFFILT'] = (filt, 'filter')
-    khdr['PSFKIND'] = ('full', 'full ePSF footprint (trimmed copy in the cutout dir)')
+    khdr['PSFKIND'] = ('full', 'full ePSF footprint (trimmed copy in the stamp dir)')
     khdr['PSFPED'] = (round(pedestal_frac, 6), 'ePSF-wing pedestal removed (fraction of peak)')
     khdr['PSFVAR'] = (a.variant or 'standard', 'reduction variant the PSF was built from')
     if method_used == 'model_stpsf':
@@ -962,16 +962,15 @@ def main():
     plot_psf(kernel, epsf_data, star_stamps, scale, fwhm_pix, os.path.join(output_dir, 'psf.png'),
              title=f'{a.lens}  {filt}  [{method_used}]  ({n_stars} stars)')
 
-    cutouts_dir = cutout_paths.psf_cutout_dir(ws_path, sample, a.lens, filt)
-    os.makedirs(cutouts_dir, exist_ok=True)
-    prefix = cutout_paths.PREFIX
+    stamps_dir = stamp_paths.psf_stamp_dir(ws_path, sample, a.lens, filt)
+    os.makedirs(stamps_dir, exist_ok=True)
     thdr = khdr.copy()
     thdr['PSFKIND'] = ('trimmed', 'amplitude-trimmed modelling kernel')
     thdr['PSFTRIM'] = (a.trim_threshold, 'azimuthal PSF < this x peak sets the radius')
-    write_fits(trimmed, thdr, os.path.join(cutouts_dir, f'{prefix}_psf.fits'))
+    write_fits(trimmed, thdr, os.path.join(stamps_dir, stamp_paths.psf_name('psf')))
     if err_full is not None:
         for base, kind, arr, dest in ((khdr, 'full_err', err_full, os.path.join(output_dir, 'psf_kernel_err.fits')),
-                                      (thdr, 'trimmed_err', err_trim, os.path.join(cutouts_dir, f'{prefix}_psf_err.fits'))):
+                                      (thdr, 'trimmed_err', err_trim, os.path.join(stamps_dir, stamp_paths.psf_name('psf_err')))):
             ehdr = base.copy()
             ehdr['PSFKIND'] = (kind, 'per-pixel PSF std (ensemble)')
             ehdr['PSFERR'] = (err_method, 'bootstrap or jackknife ensemble method')
@@ -984,7 +983,7 @@ def main():
         'method': method_used, 'n_stars': n_stars, 'n_crowded_rejected': qa['n_crowded_rejected'],
         'fwhm_pix': round(fwhm_pix, 4) if fwhm_pix is not None else None,
         'fwhm_arcsec': round(fwhm_pix * scale, 4) if fwhm_pix is not None else None,
-        'oversample': oversample, 'kernel_size': int(kernel.shape[0]), 'cutout_kernel_size': int(trim_size),
+        'oversample': oversample, 'kernel_size': int(kernel.shape[0]), 'trimmed_kernel_size': int(trim_size),
         'trim_threshold': a.trim_threshold, 'pedestal_frac': round(pedestal_frac, 6),
         'fwhm_pix_err': round(fwhm_err, 4) if fwhm_err is not None else None,
         'psf_err_frac': round(err_frac, 8) if err_frac is not None else None,

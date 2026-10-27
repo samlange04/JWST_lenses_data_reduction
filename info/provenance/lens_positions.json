@@ -14,7 +14,7 @@
                     ]
                 ],
                 "marked_filt": "F277W",
-                "marked_prefix": "cutout",
+                "marked_prefix": "stamp7",
                 "drizzle_pass": "single",
                 "pixel_scale_arcsec": 0.06,
                 "search_box_size": 2,
@@ -31,7 +31,7 @@
                 "broadcast_to": [
                     {
                         "filt": "F115W",
-                        "prefix": "cutout",
+                        "prefix": "stamp7",
                         "reprojection_shift_mas": 0.0,
                         "band_tie_mas": 11.3,
                         "band_tie_px": 0.376,
@@ -41,7 +41,7 @@
                     },
                     {
                         "filt": "F277W",
-                        "prefix": "cutout",
+                        "prefix": "stamp7",
                         "reprojection_shift_mas": 0.0,
                         "band_tie_mas": null,
                         "band_tie_px": null,

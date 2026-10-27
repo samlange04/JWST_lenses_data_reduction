@@ -21,7 +21,7 @@ MAST cache; the filter dirs are what ``reduce_nircam.py`` reads.
 
 Idempotent: files already in the pool are skipped by astroquery (``cache=True``) and the
 sort re-links everything, so re-running after a partial download is safe. Tracking:
-``info/lens_downloads.json`` records, per lens, the level, the obs IDs, and the per-filter
+``info/provenance/lens_downloads.json`` records, per lens, the level, the obs IDs, and the per-filter
 file counts; ``null`` for a filter means MAST had nothing.
 """
 import argparse
@@ -174,7 +174,7 @@ def main():
     lens_samples.entry(a.lens, sample)
     lens_dir = os.path.join(ws_path, 'data', 'calibrated', sample, a.lens)
     pool_dir = os.path.join(lens_dir, 'pool')
-    track = os.path.join(ws_path, 'info', 'lens_downloads.json')
+    track = os.path.join(ws_path, 'info', 'provenance', 'lens_downloads.json')
 
     obs = query_observations(sample, a.lens, a.filters)
     print(f'=== {sample}/{a.lens}: {len(obs)} NIRCam/IMAGE observations in GO {lens_samples.proposal_id(sample)}')

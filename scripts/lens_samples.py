@@ -1,4 +1,4 @@
-"""Lens samples: the one reader of ``info/lens_samples.json``.
+"""Lens samples: the one reader of ``info/samples/lens_samples.json``.
 
 Mirrors ``mast_target_names.py`` in the HST repo, simplified for JWST: a JWST lens is
 located in MAST by **proposal ID + target name**, not by a wildcard on an SDSS designation,
@@ -22,7 +22,7 @@ import json
 import os
 
 _INFO_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'info')
-SAMPLES_JSON = os.path.join(_INFO_DIR, 'lens_samples.json')
+SAMPLES_JSON = os.path.join(_INFO_DIR, 'samples', 'lens_samples.json')
 
 DEFAULT_SAMPLE = 'spt'
 
@@ -131,7 +131,7 @@ def deflector_coord(lens, sample=None):
 
     Only for a lens whose catalogue position misses the galaxy by more than a pixel or two
     (B1938+666: 0.52"). ``ra``/``dec`` stay the mosaics' CRVAL, so they are not edited to
-    match; make_cutouts cuts the stamp here instead (``--center auto``)."""
+    match; make_stamps cuts the stamp here instead (``--center auto``)."""
     from astropy.coordinates import SkyCoord
     import astropy.units as u
     e = entry(lens, sample)
@@ -140,13 +140,13 @@ def deflector_coord(lens, sample=None):
     return SkyCoord(e['deflector_ra'] * u.deg, e['deflector_dec'] * u.deg, frame='icrs')
 
 
-def cutout_size(lens, sample=None):
-    """The lens's modelling-stamp side in arcsec (``cutout_size``), or None for the default.
+def stamp_size(lens, sample=None):
+    """The lens's modelling-stamp side in arcsec (``stamp_size``), or None for the default.
 
     For a lens the default 12" stamp does not suit (B1938+666: a 0.45" ring whose 12" stamp
-    is a third bright neighbours and detector streaks). make_cutouts.py cuts it at this size
+    is a third bright neighbours and detector streaks). make_stamps.py cuts it at this size
     INTO THE DEFAULT TREE, so the tracked stamp, masks, positions and export need no --size."""
-    return entry(lens, sample).get('cutout_size')
+    return entry(lens, sample).get('stamp_size')
 
 
 def redshifts(lens, sample=None):

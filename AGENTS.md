@@ -20,9 +20,9 @@ jwst 3.0.0 docs. Program 8281 (B1938+666) became public at 03:16 UTC that day.
 
 | lens | sample | downloaded | reduced | stamps | PSF | masks + positions |
 |---|---|---|---|---|---|---|
-| SPT2147-50 | spt | uncal, 4 filters | F200W F277W F356W F444W | all 4 | see info/lens_psf.json | – |
-| SPT0418-47 | spt | uncal, 6 filters | F115W F150W F200W F277W F356W F444W | all 6 | see info/lens_psf.json | – |
-| B1938+666 | b1938 | uncal, 210 files / 79 GB | F115W F277W (2026-10-02, 8.5 h) | both | both, see info/lens_psf.json | both (2026-10-04) |
+| SPT2147-50 | spt | uncal, 4 filters | F200W F277W F356W F444W | all 4 | see info/provenance/lens_psf.json | – |
+| SPT0418-47 | spt | uncal, 6 filters | F115W F150W F200W F277W F356W F444W | all 6 | see info/provenance/lens_psf.json | – |
+| B1938+666 | b1938 | uncal, 210 files / 79 GB | F115W F277W (2026-10-02, 8.5 h) | both | both, see info/provenance/lens_psf.json | both (2026-10-04) |
 
 **The whole SPT sample reduced in one `run_reduce_all.sh spt` pass (2026-10-02 02:06): 10 ok,
 0 failed.** Per band: SW (4 detectors × 2 dithers) 220–250 s, SW F200W of SPT2147 (24 frames)
@@ -46,7 +46,7 @@ galaxies, not a WCS problem). Weight uniformity over every 12" stamp 0.08–0.13
 FWHMs sit 10–35% above the JDox in-flight values (0.040/0.050/0.066/0.092/0.116/0.145"),
 as a 2-dither resampled ePSF should. **SPT0418-47 F115W is not a usable PSF**: 3 stars at
 `min_stars=3`, a bootstrap error fraction of 25%, a visibly noisy kernel. Options, in
-order: add include stars via `info/psf_stars.json` after looking at the F115W mosaic;
+order: add include stars via `info/overrides/psf_stars.json` after looking at the F115W mosaic;
 `--method model` once stpsf-data is installed (and then compare the model's FWHM to the
 0.055" measured here); raise `min_stars` to 4 so the auto tier falls back by itself. The
 SPT2147-50 F277W 3-star build is borderline (err 2%) — check `psf.png` before modelling.
@@ -134,8 +134,8 @@ tracked, `.venv` is not.
 
 **This repo is NIRCam reduction only.** Science analysis and non-JWST data (lens modelling,
 ground-based follow-up) belong in a downstream project, not here. Downstream code may read
-the cutout tree, the Image3 mosaics and the `info/*.json` files, and import
-`scripts/cutout_paths.py`, so treat those paths and that module's API as an interface:
+the stamp tree, the Image3 mosaics and the `info/*.json` files, and import
+`scripts/stamp_paths.py`, so treat those paths and that module's API as an interface:
 don't move or rename them casually.
 
 ```bash
@@ -159,7 +159,7 @@ because the mask GUIs now rely on that release's `Scribbler` features (see *Mask
 `CRDS_SERVER_URL=https://jwst-crds.stsci.edu` (only if unset, so a shell export wins).
 References download lazily on first use — the first Detector1 run pulls the NIRCam
 reference set (tens of GB; readout-pattern-specific darks are the bulk). The context used
-is recorded per product in `info/lens_products.json` (`crds_context`, from the i2d
+is recorded per product in `info/provenance/lens_products.json` (`crds_context`, from the i2d
 `CRDS_CTX`). To pin: `export CRDS_CONTEXT=jwst_XXXX.pmap`. **Don't rely on
 `crds.get_default_context()` offline** — it raises; the scripts catch it.
 
@@ -193,8 +193,8 @@ reduce_nircam.py    uncal -> Detector1 -> rate -> Image2 -> cal -> Image3 -> <le
 destripe_nircam.py  rate-level TEMPLATES 1/f destripe (reduce_nircam.py --destripe, variant `destriped`; opt-in)
 split_noise_test.py half-dither mosaics A, B -> A-B null image -> block-sum ratio vs ERR (deep fields' NOISECOR)
 measure_corr_factor.py  blank-sky block-sum / ACF ratios on every stamp (shallow fields' NOISECOR)
-make_cutouts.py     i2d SCI/ERR/WHT -> cutout_sci.fits, cutout_noise.fits, cutout.png
-make_psf.py         i2d field stars -> ePSF -> cutout_psf.fits  (STPSF fallback)
+make_stamps.py     i2d SCI/ERR/WHT -> stamp<S>_sci.fits, stamp<S>_noise.fits, stamp<S>.png
+make_psf.py         i2d field stars -> ePSF -> psf.fits  (STPSF fallback)
 make_masks.py / make_arc_masks.py / make_positions.py   GUIs, one draw per band, broadcast by WCS
 make_dataset_subplots.py / make_qc_grids.py              QC
 export_dataset.py   -> <dest>/<lens>/<FILT>/{data,noise_map,psf}.fits + info.json [+ mask, positions]
@@ -207,7 +207,7 @@ export_dataset.py   -> <dest>/<lens>/<FILT>/{data,noise_map,psf}.fits + info.jso
 needs its own `instrument_name='MIRI/IMAGE'` query and a `mirimage` branch in the sort.
 PyAutoReduce has no MIRI support either.
 
-## Lens samples (`info/lens_samples.json`, read only by `scripts/lens_samples.py`)
+## Lens samples (`info/samples/lens_samples.json`, read only by `scripts/lens_samples.py`)
 
 A JWST lens is located in MAST by **proposal ID + target name** (not an `SDSS%` wildcard
 as for SLACS), so each sample block carries `proposal_id` and each lens its `mast_target`,
@@ -259,7 +259,7 @@ once into `data/calibrated/<sample>/<lens>/pool/` (astroquery `flat=True, cache=
 a re-run skips what is there) and each file is **hard-linked** into `<lens>/<FILT>/` by its
 header `FILTER`/`PUPIL`/`DETECTOR` (`effective_filter`: PUPIL wins when it holds a filter,
 which never happens for the wide bands here). Hard links, not copies (no second 80 GB) and
-not symlinks. `info/lens_downloads.json` records obs IDs and per-filter file counts.
+not symlinks. `info/provenance/lens_downloads.json` records obs IDs and per-filter file counts.
 
 **Starting level: `uncal` (default), reduced here from the ramps.** Decided 2026-10-01 for
 two reasons: (1) the 1/f-stripe removal that matters for a lens (`clean_flicker_noise`) is
@@ -269,7 +269,7 @@ recorded, instead of whatever MAST's ops reprocessing of the day used (MAST's 82
 were processed 2026-07-27; TEMPLATES' public rate files date from 2022–23 and have been
 reprocessed since). Cost: 79 GB uncal for B1938 instead of 18 GB rate, and Detector1 run
 time (minutes per 5-integration MEDIUM8 file). `--level rate` + `reduce_nircam.py --start
-rate` is the escape hatch; its mosaic is tagged `mastrate` end to end (`cutout_paths.py`) so
+rate` is the escape hatch; its mosaic is tagged `mastrate` end to end (`stamp_paths.py`) so
 it can never be mistaken for the full reduction.
 
 ## Reduction (`scripts/reduce_nircam.py`)
@@ -306,7 +306,7 @@ data/calibrated/<s>/<l>/<F>/*_uncal.fits -> Detector1 -> data/stage1/<s>/<l>/<F>
 `weight_type=ivm` means the i2d `WHT` is 1/VAR_RNOISE-weighted (read noise only), not the
 total inverse variance — **never build the noise map from WHT here**; the `ERR` extension
 is the propagated total sigma (see *Noise*). That is the opposite of the HST repo's
-`final_wht_type=ERR` route and is why `make_cutouts.py` reads `ERR`.
+`final_wht_type=ERR` route and is why `make_stamps.py` reads `ERR`.
 
 Units stay in **MJy/sr** (PyAutoReduce's choice too). `PHOTMJSR` (MJy/sr per DN/s) and
 `PIXAR_SR` (sr per output pixel) in the i2d header convert: Jy/pixel = SCI × PIXAR_SR × 1e6;
@@ -323,34 +323,39 @@ EFFEXPTM), `lens_instrument.json` (`NIRCAM/SW` or `NIRCAM/LW`). No data → `nul
 - **1/f verification**: `clean_flicker_noise` is on by default here on the strength of the
   JDox recommendation, not a measurement on these data. Owed: a blank-sky ACF of a stamp
   cut from `--start rate` (MAST's rate, no flicker step) vs the default.
-- **Noise inflation factors** (`info/noise_corr_factors.json`): measured 2026-10-04, SW 1.30 /
+- **Noise inflation factors** (`info/overrides/noise_corr_factors.json`): measured 2026-10-04, SW 1.30 /
   LW 1.03 at 0.2"; B1938+666 by the split-dither test, F115W 0.94 / F277W 1.12 (see *Noise*).
   Owed: a scale-matched rescale once the modelling project fixes its source-pixel scale.
 - **Model PSF broadening by injection**: the STPSF tier uses the analytic drop box; the
   HST repo's injection route (`make_psf_inject.py`) is not ported.
 - **Automatic arc detection** (`detect_arcs.py`) is a stub.
 
-## Cutouts (`scripts/make_cutouts.py`)
+## Stamps (`scripts/make_stamps.py`)
 
 ```bash
-uv run python scripts/make_cutouts.py --lens SPT2147-50 --filt F444W [--size 12] [--center auto|catalogue|deflector|peak] [--variant mastrate]
-bash scripts/run_cutouts_all.sh spt [SIZE] [--variant V]
+uv run python scripts/make_stamps.py --lens SPT2147-50 --filt F444W [--size 12] [--center auto|catalogue|deflector|peak] [--variant mastrate]
+bash scripts/run_stamps_all.sh spt [SIZE] [--variant V]
 ```
 
-Writes `data/cutouts[_<S>arcsec]/<sample>/<lens>/<FILT>/cutout[_<variant>]_{sci,noise}.fits`
-+ `.png`. Stamp = 12" (400 px SW, 200 px LW), unless the lens sets `cutout_size` in
-`info/lens_samples.json` (B1938+666: 7" → 232 / 116 px = 6.96", 2026-10-04; at 12" a third of
+Writes `data/stamps/<sample>/<lens>/<FILT>/stamp<S>[_<variant>]_{sci,noise}.fits`
++ `stamp<S>[_<variant>].png`, where S is the stamp's nominal size in arcsec (`stamp7_*` for
+B1938+666, `stamp12_*` for the SPT lenses; since 2026-10-26, before which every stamp was
+`cutout_*` and the size picked the tree). Stamp = 12" (400 px SW, 200 px LW), unless the lens sets `stamp_size` in
+`info/samples/lens_samples.json` (B1938+666: 7" → 232 / 116 px = 6.96", 2026-10-04; at 12" a third of
 its stamp was two detector streaks and a galaxy group to mask, around a 0.45" ring).
-**`cutout_size` is cut into the DEFAULT tree** when `--size` is omitted, so that lens's tracked
-stamp, masks, positions and export need no `--size` anywhere; an explicit `--size` still
-means "this size, in its own `cutouts_<S>arcsec/` tree". Every stamp side is rounded to an
+**`stamp_size` is that lens's MODELLING size**: every tool's `--size` defaults to it
+(`stamp_paths.modelling_size`), so its tracked stamp, masks, positions and export need no
+`--size` anywhere. An explicit `--size` writes `stamp<S>_*` beside the modelling stamps, in the
+same band dir, and only the modelling-size files are tracked: a lens given a new
+`stamp_size` needs its own `!data/stamps/**/stamp<S>_*` line in `.gitignore`. Every stamp side is rounded to an
 EVEN number of 0.06" LW pixels (`nested_shape`): the stamp centre sits on the pixel corner
 the mosaics share, which an odd side would move by half a pixel (15 mas SW, 30 mas LW) and
 split the bands' centres — hence 6.96", not 7.00". A re-size about the same centre is an exact
 central crop, so positions (arcsec from the centre) carry over unchanged; masks, being
-per-pixel, do not. Size and variant key the paths through
-`cutout_paths.py` exactly as in the HST repo: a non-default size writes a parallel tree, a
-variant tags the sci/noise names, masks/positions/PSFs keep the bare `cutout_` prefix, and
+per-pixel, do not. Size and variant key the names through
+`stamp_paths.py` exactly as in the HST repo: the size is in every stamp filename, a variant
+tags the sci/noise names, masks and positions keep the bare `stamp<S>_` prefix, the PSF is
+plain `psf.fits`, and
 `find_stamp` raises `AmbiguousStampError` if two reductions' stamps share a dir. One stamp per
 band; a second variant is refused without `--force`.
 
@@ -361,7 +366,7 @@ galaxy: B1938+666's APT coordinate is 0.479" E, 0.201" S of the lens core** (bot
 and field sources tie the bands to 11 mas, so it is the coordinate, not the astrometry). A
 stamp that far off breaks everything that assumes the lens is at (0, 0): the radial-profile
 display in `make_positions.py`, centred masks, `mask_radius` at export. So a lens can carry a
-measured `deflector_ra`/`deflector_dec` (+ `deflector_note`) in `info/lens_samples.json`, and
+measured `deflector_ra`/`deflector_dec` (+ `deflector_note`) in `info/samples/lens_samples.json`, and
 the default `--center auto` cuts there. `ra`/`dec` are NOT edited to match — they are the
 mosaics' CRVAL, and changing them would only take effect on an Image3 re-run. The offset from
 CRVAL is snapped to whole 0.06" LW pixels (= 2 SW pixels), so each band's stamp moves by whole
@@ -370,16 +375,16 @@ centres identical to 0 mas, pixels an exact shift of the catalogue-centred stamp
 then sits ≤ 0.03" per axis from (0, 0) (B1938: 22 mas). `--center peak` is per band, so it
 does NOT keep the bands co-registered, and where a ring outshines its lens (B1938 F277W) it
 finds the ring. Whichever is used lands in the header (`CUTCENT`, `CUTRA`, `CUTDEC` = the
-actual stamp centre) and in `info/lens_cutout_qc.json`. B1938 was re-cut this way 2026-10-04;
+actual stamp centre) and in `info/provenance/lens_stamp_qc.json`. B1938 was re-cut this way 2026-10-04;
 PSFs and NOISECOR are unaffected (neither depends on the stamp centre).
 
 ### Noise
 
-`cutout_noise.fits` = i2d `ERR` × `NOISECOR`, float64, 1e8 where SCI is NaN, ERR is non-finite
+`stamp<S>_noise.fits` = i2d `ERR` × `NOISECOR`, float64, 1e8 where SCI is NaN, ERR is non-finite
 or ≤ 0, or WHT is 0 (those pixels get sci = 0). `ERR` = sqrt(VAR_POISSON + VAR_RNOISE +
 VAR_FLAT), each variance resampled with the science weights — the total per-pixel sigma
 including source Poisson noise, "read, not constructed". `NOISECOR` comes from
-`info/noise_corr_factors.json` (`factors` keyed `NIRCAM/SW`, `NIRCAM/LW` or a filter;
+`info/overrides/noise_corr_factors.json` (`factors` keyed `NIRCAM/SW`, `NIRCAM/LW` or a filter;
 `lens_overrides[sample][lens][FILT]`), source recorded as `NOISECRS`, the block scale it was
 read at as `NOISESCL`, and the 1/f correlation length it does NOT cover as `NOISECRL`.
 
@@ -445,13 +450,13 @@ a 5% flux floor; photutils `EPSFBuilder` at oversample 2; validation; wing pedes
 subtraction; amplitude trim at 3e-4 of peak for the modelling kernel (1e-3 enclosed only 95%
 of the F115W flux and overweighted the core; 3e-4 encloses 98% at 39 px = 1.17" SW); bootstrap/jackknife
 error map. Products: `data/psf/<s>/<l>/<F>/psf_kernel.fits` (+`_err`, `psf.png`) and
-`data/cutouts/<s>/<l>/<F>/cutout_psf.fits` (+`_err`). Overrides in `info/psf_stars.json`.
+`data/stamps/<s>/<l>/<F>/psf.fits` (+`_err`). Overrides in `info/overrides/psf_stars.json`.
 
 NIRCam differences: `_INSTR` keys are `NIRCAM/SW` / `NIRCAM/LW`; the per-filter PSF FWHM
 (JDox: F115W 0.040", F150W 0.050", F200W 0.066", F277W 0.092", F356W 0.116", F444W 0.145")
 is scaled to the output pixel, so the SW bands are **undersampled** (1.3–2.2 px) and
 oversample 2 is the floor; no mosaic-peak saturation gate (a saturated core is a NaN hole,
-which the shape fit rejects); one pass, so no `cutout_cr_psf`.
+which the shape fit rejects); one pass, so no `psf`.
 
 **Model tier = STPSF** at the lens's position on a contributing `_cal` detector
 (`psf_models.model_psf`: `OVERDIST` output at 4× oversampling, measured OPD by date when the
@@ -460,7 +465,7 @@ with the HST repo's `_northup_M`, then the analytic drop-box broadening). Tagged
 `PSFMETH=model_stpsf`, `PSFBROAD=analytic`. The HST repo found model PSFs unbroadened by the
 resampling mismatched the data until injected and re-drizzled; the analytic box is its
 calibrated stand-in (0.01 px on the HST test), not the real thing. For a 2'-field lens with
-few stars this tier may be what you get for the SW bands — check `info/lens_psf.json`.
+few stars this tier may be what you get for the SW bands — check `info/provenance/lens_psf.json`.
 
 ## Masks, arc masks, positions, QC (`make_masks.py`, `make_arc_masks.py`, `make_positions.py`, `make_dataset_subplots.py`, `make_qc_grids.py`)
 
@@ -469,8 +474,8 @@ module is `lens_samples`, `_BAND_PRIORITY = ['F444W', 'F356W', 'F277W', 'F200W',
 'F115W']` (the LW bands carry the dusty sources' signal — Lange+25 modelled F444W as the
 highest-S/N band), and the provenance JSONs record `variant` (from the stamp's `REDUCVAR`)
 instead of `bcfill`. Their docstrings and `--help` still quote HST examples (`f814W`,
-`slacs_gold`) and a `--pass` flag that is accepted and ignored (`cutout_paths.find_prefix`
-always answers `cutout`). The semantics are unchanged and matter:
+`slacs_gold`) and a `--pass` flag that is accepted and ignored (`stamp_paths.find_prefix`
+always answers `stamp`). The semantics are unchanged and matter:
 
 - Masks are `al.Mask2D` convention, **True = excluded**; `make_masks.py` paints what to
   remove, `make_arc_masks.py` paints what to keep and saves it inverted.
@@ -509,7 +514,7 @@ always answers `cutout`). The semantics are unchanged and matter:
   depth, so there it falls back to the lens core, both bands iterated from the SAME sky point
   (the stamp centre), labelled `lens core (fallback)` — which is only right when the stamp is
   centred on the lens. Recorded as `band_tie_{mas,px,scatter_mas,n_sources,method}` in
-  `info/lens_positions.json`.
+  `info/provenance/lens_positions.json`.
 - GUI orientation: North down, East left on screen (row 0 at the top). Quote offsets as
   ΔRA/ΔDec or (col, row).
 - `make_qc_grids.py` is the HST `make_mosaics.py`, renamed because "mosaic" here means the
@@ -518,7 +523,7 @@ always answers `cutout`). The semantics are unchanged and matter:
 **First JWST use: B1938+666, 2026-10-04**, with the HST-port GUIs (before the native-Scribbler
 rewrite). `make_positions.py` marked A and B on F277W and broadcast them to F115W;
 `make_masks.py` drew the contaminant masks (F115W 27 515 px, F277W 6 854 px, provenance in
-`info/lens_masks.json`); `make_dataset_subplots.py` rendered both bands. `make_arc_masks.py` and
+`info/provenance/lens_masks.json`); `make_dataset_subplots.py` rendered both bands. `make_arc_masks.py` and
 `make_qc_grids.py` have still never run on a JWST stamp: expect small breakages (header cards,
 the `--pass` plumbing) on first use and fix them in place. The native-Scribbler rewrite was
 verified headless only (`backend='Agg'`, synthetic stamps, strokes injected through
@@ -536,7 +541,7 @@ they exist, and writes `info.json` with `pixel_scale`, `mask_radius`, the redshi
 provenance (i2d path, variant, jwst version, `NOISECOR`). This is the layout a PyAutoLens
 SLaM-style dataset loader expects (`data`/`noise_map`/`psf` + `info.json`; mask and positions
 optional). `mask_radius` is a modelling choice and lives only here.
-`info/lens_exports.json` records what went where on this machine; it holds absolute local
+`info/provenance/lens_exports.json` records what went where on this machine; it holds absolute local
 paths, so it is gitignored.
 
 ## Data flow and directory layout
@@ -547,16 +552,18 @@ data/
   calibrated/<sample>/<lens>/<FILT>/      hard links into pool/, by header FILTER
   stage1/  stage2/                        our rate / cal products
   mosaics[_<variant>]/<sample>/<lens>/<FILT>/   <lens>_<filt>_{asn.json,i2d.fits,i2d.png} + Image3 by-products
-  cutouts[_<S>arcsec]/<sample>/<lens>/<FILT>/   THE science tree (tracked at the default size; cutout.png and
-                                          *_positions.png are gitignored QC renders, rebuilt by the scripts)
+  stamps/<sample>/<lens>/<FILT>/          THE science tree, every size side by side (stamp<S>_*; only each
+                                          lens's modelling size is tracked; stamp<S>.png and *_positions.png
+                                          are gitignored QC renders, rebuilt by the scripts)
   psf/<sample>/<lens>/<FILT>/             archival kernels + psf.png
   qc[_<S>arcsec]/<sample>/                stamp grids
   reference_files/                        CRDS cache, stpsf-data/
   run_logs/
-info/   lens_samples.json (hand) · noise_corr_factors.json, psf_stars.json (hand) · the rest auto
+info/   samples/lens_samples.json (hand) · overrides/noise_corr_factors.json, psf_stars.json (hand) ·
+        provenance/ (the rest, written by the scripts; info_json.path() resolves a name)
 ```
 
-Everything under `data/` is gitignored except `cutouts/` and `qc/`; `diagnostics/`,
+Everything under `data/` is gitignored except `stamps/` and `qc/`; `diagnostics/`,
 `output/`, `local/` are ignored (see `.gitignore` and `diagnostics/README.md`). Tracking JSONs
 are `{sample: {lens: {FILT: ...}}}` through `info_json.py`, as in the HST repo. Product-dir
 names are the FITS spelling, `F444W` (the HST repo's `f814W` casing is not used).
@@ -569,7 +576,7 @@ specs quoted above (`ResampleStep.spec`, `TweakRegStep.spec`, `CleanFlickerNoise
 `JumpStep.spec`); stcal's sky subtraction at resample time.
 
 Verified end to end on SPT2147-50 F444W (see *Current state*): `reduce_nircam.py`
-(all three stages, with the CRDS pre-sync), `make_cutouts.py`, `make_psf.py` empirical tier
+(all three stages, with the CRDS pre-sync), `make_stamps.py`, `make_psf.py` empirical tier
 (two photutils-3.0 fixes: `x_centroid`/`y_centroid` column names, a missing import),
 `export_dataset.py`, `run_reduce_all.sh`. `make_dataset_subplots.py` runs and correctly
 refuses a band with no mask yet.
