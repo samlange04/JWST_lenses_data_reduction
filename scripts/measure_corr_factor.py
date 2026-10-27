@@ -1,5 +1,5 @@
 """
-Measure the noise-map inflation factor for every cutout -> info/noise_corr_factors.json.
+Measure the noise-map inflation factor for every stamp -> info/overrides/noise_corr_factors.json.
 
 Drizzle correlates neighbouring output pixels but conserves noise: for white input noise
 the sigma-normalised ACF has C(0) < 1, positive neighbours, and sum C = 1 over the drop
@@ -14,7 +14,7 @@ own mosaic:
     repo's factor; here it is a diagnostic, because it is blind to NIRCam's residual 1/f.
   * the blank-sky block-sum ratio at 0.05-3" (block_ratio). It never plateaus (the 1/f is
     coherent over ~3" along detector rows), and its value at 0.2" is the NOISECOR this repo
-    applies; the full curve goes into info/noise_corr_factors.json. See AGENTS.md *Noise*
+    applies; the full curve goes into info/overrides/noise_corr_factors.json. See AGENTS.md *Noise*
     before changing which quantity is used.
 
 Per stamp:
@@ -25,7 +25,7 @@ Per stamp:
     3 sigma is the one used, 1.5 sigma is the sensitivity check.
 
 Writes every measurement to diagnostics/corr_factor/ and prints the per-(instrument,
-filter) medians in the shape of info/noise_corr_factors.json (which it does NOT write --
+filter) medians in the shape of info/overrides/noise_corr_factors.json (which it does NOT write --
 copy the values in by hand after reading them).
 
     uv run python scripts/measure_corr_factor.py [--sample S ...] [--jobs 8]
@@ -48,7 +48,7 @@ from astropy.convolution import Gaussian2DKernel, convolve
 from scipy import ndimage
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import cutout_paths                                  # noqa: E402
+import stamp_paths                                  # noqa: E402
 import lens_samples                                 # noqa: E402
 
 WS = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -138,9 +138,9 @@ def measure(job):
     sample, lens, filt, stamp = job
     out = dict(sample=sample, lens=lens, filt=filt, stamp=os.path.basename(stamp))
     try:
-        variant = cutout_paths.stamp_variant(stamp)
-        mdir = cutout_paths.mosaic_dir(WS, sample, lens, filt, variant)
-        i2d = cutout_paths.find_i2d(mdir)
+        variant = stamp_paths.stamp_variant(stamp)
+        mdir = stamp_paths.mosaic_dir(WS, sample, lens, filt, variant)
+        i2d = stamp_paths.find_i2d(mdir)
         stamp_sci = fits.getdata(stamp).astype(np.float64)
         nh = fits.getheader(stamp.replace('_sci.fits', '_noise.fits'))
         k = 1.0                                   # the i2d ERR is already a sigma
@@ -213,11 +213,11 @@ def summarise(results, thr='thr3'):
 
 
 def jobs_for(samples):
-    root = cutout_paths.cutouts_root(WS)
+    root = stamp_paths.stamps_root(WS)
     for sample in samples:
         for d in sorted(glob.glob(os.path.join(root, sample, '*', '*'))):
-            for prefix in cutout_paths.PREFIXES:
-                stamps = list(cutout_paths.list_stamps(d, prefix).values())
+            for prefix in (stamp_paths.stamp_prefix(stamp_paths.resolve_size(d)),):
+                stamps = list(stamp_paths.list_stamps(d, prefix).values())
                 if stamps:
                     lens, filt = d.split(os.sep)[-2:]
                     yield sample, lens, filt, stamps[0]

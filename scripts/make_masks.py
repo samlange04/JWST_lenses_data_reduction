@@ -3,11 +3,11 @@
 Interactive GUI mask-making, ONE draw per band, seeded by a REVIEWED mask from another band.
 
 For each lens in a sample, launches PyAutoLens's `Scribbler` GUI over the lens's
-best-available cutout -- the same tool as
+best-available stamp -- the same tool as
 autolens_workspace:scripts/imaging/data_preparation/gui/mask.py -- so you can scribble the
 areas to REMOVE from the fit (painted = excluded, everything unpainted = kept; this is the
 opposite polarity to the autolens_workspace GUI, which scribbles the region to keep), then
-writes the result as cutout_[cr_]mask.fits alongside that cutout's sci/noise/psf products.
+writes the result as stamp12_mask.fits alongside that stamp's sci/noise/psf products.
 
 ONE DRAW PER BAND. Each run draws on ONE band -- the highest-S/N one available (f814W >
 f606W > f555W > f160W > ...) unless --filt forces it -- and writes the mask for THAT BAND
@@ -42,14 +42,14 @@ is nearly identity, but f160W is a genuinely different grid (0.06"/px, 200px vs 
 stamp -- a common sky point sits ~20px away by index), and only reprojection places the mask
 correctly there.
 
-Defaults to the pipeline's standard 12" cutout tree (data/cutouts/, cutout_paths.DEFAULT_SIZE)
+Defaults to the pipeline's standard 12" stamp tree (data/stamps/, stamp_paths.DEFAULT_SIZE)
 -- the tree these hand-drawn masks are meant for and the only size-variant tree tracked in
 git (see .gitignore) precisely because it carries them, which no script can regenerate.
 Pass --size 20 to mask the (untracked, regenerable) 20" tree instead.
 
-One cutout dir per band, so one mask per band, written beside the sci it was drawn on.
+One stamp dir per band, so one mask per band, written beside the sci it was drawn on.
 The bad-column-filled re-drizzle (--bcfill) supersedes the standard one in place rather
-than starting a parallel tree (cutout_paths.py), so for ACS (f814W/f555W) + WFPC2 (f606W)
+than starting a parallel tree (stamp_paths.py), so for ACS (f814W/f555W) + WFPC2 (f606W)
 you are scribbling on the bcfill image -- the same geometry with its dead-column noise
 stripes filled, i.e. a cleaner image to draw on -- and for f160W and the gallery, which
 have no bcfill, on the standard one. Either way there is nothing to choose and no second
@@ -96,9 +96,9 @@ ws_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import lens_samples as mast_target_names
 import info_json
-import cutout_paths
+import stamp_paths
 
-MASKS_JSON = os.path.join(ws_path, 'info', 'lens_masks.json')
+MASKS_JSON = os.path.join(ws_path, 'info', 'provenance', 'lens_masks.json')
 
 
 #: blank columns between al.Scribbler's two side-by-side display panels (its `panel_gap`).
@@ -158,7 +158,7 @@ def stretched_display(data_native, pixel_scales, stretch='asinh',
 def central_disc(shape, pixel_scales, radius_arcsec):
     """Bool array, True inside a disc of `radius_arcsec` at the stamp centre.
 
-    Cutouts are recentred on the deflector (`make_cutouts.py --center-band`), so the stamp
+    Stamps are recentred on the deflector (`make_stamps.py --center-band`), so the stamp
     centre IS the lens galaxy -- this is the region to hide when the central light drowns
     the arcs. Returns None for a non-positive radius (feature off).
     """
@@ -172,25 +172,30 @@ def central_disc(shape, pixel_scales, radius_arcsec):
 
 
 def pixel_scale_from_header(hdr):
-    """arcsec/pixel from a cutout FITS header's WCS -- Array2D.from_fits wants a plain
+    """arcsec/pixel from a stamp FITS header's WCS -- Array2D.from_fits wants a plain
     float, not the WCS itself."""
     return float(proj_plane_pixel_scales(WCS(hdr).celestial)[0] * 3600.0)
 
 
-def find_prefix(cutout_dir, drizzle_pass='auto'):
-    """Delegates to cutout_paths.find_prefix: 'cutout_cr' or 'cutout' for this band, whichever
-    reduction (standard / bcfill / ...) its stamp is from -- the stamp names are variant-
-    tagged, so this is the one place that knows how to find them."""
-    return cutout_paths.find_prefix(cutout_dir, drizzle_pass)
+# The stamp size the GUI tools work on; each tool's main() sets it from --size. None means
+# each lens's modelling size (stamp_paths.modelling_size): B1938+666 7", else 12".
+STAMP_SIZE = None
+
+
+def find_prefix(stamp_dir, drizzle_pass='auto'):
+    """Delegates to stamp_paths.find_prefix at STAMP_SIZE: 'stamp7' / 'stamp12' for this band,
+    whichever reduction its stamp is from -- the stamp names are variant-tagged, so this is
+    the one place that knows how to find them."""
+    return stamp_paths.find_prefix(stamp_dir, drizzle_pass, STAMP_SIZE)
 
 
 def gitignored(paths):
-    """Delegates to cutout_paths.gitignored -- see there for why it lives in that module."""
-    return cutout_paths.gitignored(paths, ws_path)
+    """Delegates to stamp_paths.gitignored -- see there for why it lives in that module."""
+    return stamp_paths.gitignored(paths, ws_path)
 
 
 def discover_targets(root, sample, lens=None, filt=None, include_ignored=False):
-    """Yield (lens, filt, cutout_dir) per band with a cutout under `root` -- the dir both
+    """Yield (lens, filt, stamp_dir) per band with a stamp under `root` -- the dir both
     scribbled on and written to -- sorted for a reproducible run order.
 
     GITIGNORED CUTOUT DIRS ARE SKIPPED (2026-09-22, and this is the guard the repo was
@@ -206,17 +211,21 @@ def discover_targets(root, sample, lens=None, filt=None, include_ignored=False):
     `include_ignored=True` opts back in, for deliberately working on a diagnostic product.
     The skip is announced, never silent, so a short target list is explicable.
     """
-    found = {}
+    found, sci_of = {}, {}
     pattern = os.path.join(root, sample, lens or '*', filt or '*')
-    for cutout_dir in sorted(glob.glob(pattern)):
-        if find_prefix(cutout_dir, 'auto') is None:
+    for stamp_dir in sorted(glob.glob(pattern)):
+        prefix = find_prefix(stamp_dir, 'auto')
+        if prefix is None:
             continue
-        this_filt = os.path.basename(cutout_dir)
-        this_lens = os.path.basename(os.path.dirname(cutout_dir))
-        found[(this_lens, this_filt)] = cutout_dir
+        this_filt = os.path.basename(stamp_dir)
+        this_lens = os.path.basename(os.path.dirname(stamp_dir))
+        found[(this_lens, this_filt)] = stamp_dir
+        sci_of[(this_lens, this_filt)] = stamp_paths.find_stamp(stamp_dir, prefix, 'sci')
     if not include_ignored:
-        ignored = gitignored(list(found.values()))
-        skipped = sorted(k for k, v in found.items() if os.path.abspath(v) in ignored)
+        # Checked on the sci STAMP, not the directory: every size shares one directory and
+        # only each lens's modelling-size files are tracked.
+        ignored = gitignored(list(sci_of.values()))
+        skipped = sorted(k for k, v in sci_of.items() if os.path.abspath(v) in ignored)
         for key in skipped:
             del found[key]
         if skipped:
@@ -238,11 +247,11 @@ def load_display_base(display_dir, prefix, display, pixel_scales):
     noise map is missing.
     """
     sci = al.Array2D.from_fits(
-        file_path=cutout_paths.find_stamp(display_dir, prefix, 'sci'),
+        file_path=stamp_paths.find_stamp(display_dir, prefix, 'sci'),
         pixel_scales=pixel_scales).native
     if display == 'sci':
         return sci, 'signal'
-    noise_path = cutout_paths.find_stamp(display_dir, prefix, 'noise')
+    noise_path = stamp_paths.find_stamp(display_dir, prefix, 'noise')
     if noise_path is None:
         print(f"  NOTE: no {prefix}[_<variant>]_noise.fits -- displaying signal instead of S/N")
         return sci, 'signal'
@@ -256,7 +265,7 @@ def load_display_base(display_dir, prefix, display, pixel_scales):
 
 # Preference order for "best band to draw the mask on" when --filt is not given. Same list
 # used by make_positions.pick_display_filt (which imports this) so the two GUIs agree on
-# which band is primary. f814W is the highest-S/N SLACS band and the cutout --center-band;
+# which band is primary. f814W is the highest-S/N SLACS band and the stamp --center-band;
 # f606W is the gallery/BELLS primary; the rest follow by typical arc S/N.
 _BAND_PRIORITY = ['F444W', 'F356W', 'F277W', 'F200W', 'F150W', 'F115W']
 
@@ -279,8 +288,8 @@ def pick_display_filt(filts, requested):
 
 
 def reproject_mask_bool(src_bool, src_wcs, dst_wcs, dst_shape):
-    """Rigorously reproject a boolean mask from the source cutout's WCS grid onto a target
-    cutout's WCS grid (nearest-neighbour), returning a bool array of shape `dst_shape`.
+    """Rigorously reproject a boolean mask from the source stamp's WCS grid onto a target
+    stamp's WCS grid (nearest-neighbour), returning a bool array of shape `dst_shape`.
 
     Each target pixel's sky position (via `dst_wcs`) is mapped back to a source pixel (via
     `src_wcs`) and the nearest source mask value taken -- so the mask lands on the SAME sky
@@ -337,12 +346,12 @@ def find_proposal_mask(filt_dirs, display_filt, display_hdr, drizzle_pass, propo
     dst_wcs = WCS(display_hdr).celestial
     dst_shape = (display_hdr['NAXIS2'], display_hdr['NAXIS1'])
     for cand in candidates:
-        cutout_dir = filt_dirs.get(cand)
-        if cutout_dir is not None:
-            prefix = find_prefix(cutout_dir, drizzle_pass)
+        stamp_dir = filt_dirs.get(cand)
+        if stamp_dir is not None:
+            prefix = find_prefix(stamp_dir, drizzle_pass)
             if prefix is None:
                 continue
-            mask_path = os.path.join(cutout_dir, f'{prefix}_mask.fits')
+            mask_path = os.path.join(stamp_dir, f'{prefix}_mask.fits')
             if not os.path.exists(mask_path):
                 continue
             src_bool = np.asarray(fits.getdata(mask_path), dtype=bool)
@@ -350,7 +359,7 @@ def find_proposal_mask(filt_dirs, display_filt, display_hdr, drizzle_pass, propo
                 return cand, src_bool                 # same grid -- no reprojection needed
             # The mask FITS is a bare array (aplt.fits_array), so its band's sci header
             # carries the WCS -- exactly as the --broadcast path resolves the target grid.
-            src_hdr = fits.getheader(cutout_paths.find_stamp(cutout_dir, prefix, 'sci'))
+            src_hdr = fits.getheader(stamp_paths.find_stamp(stamp_dir, prefix, 'sci'))
             return cand, reproject_mask_bool(src_bool, WCS(src_hdr).celestial,
                                              dst_wcs, dst_shape)
     return None, None
@@ -437,7 +446,7 @@ def draw_mask_gui(display_dir, display_prefix, lens, filt, brush_radius, brush_w
     -- al.Mask2D's own convention, so the scribbled array IS the mask, no inversion; opposite
     polarity to autolens_workspace's mask.py, which scribbles the region to keep).
     """
-    sci_path = cutout_paths.find_stamp(display_dir, display_prefix, 'sci')
+    sci_path = stamp_paths.find_stamp(display_dir, display_prefix, 'sci')
     with fits.open(sci_path) as hdul:
         sci_hdr = hdul[0].header
     pixel_scales = pixel_scale_from_header(sci_hdr)
@@ -492,9 +501,10 @@ def regenerate_dataset_subplot(lens, filt, sample, size, drizzle_pass):
     """
     try:
         import make_dataset_subplots as mds
-        root = cutout_paths.cutouts_root(ws_path, size)
-        for t_lens, t_filt, cutout_dir in mds.discover_targets(root, sample, lens, filt):
-            mds.process(t_lens, t_filt, sample, cutout_dir, drizzle_pass,
+        mds.STAMP_SIZE = size
+        root = stamp_paths.stamps_root(ws_path)
+        for t_lens, t_filt, stamp_dir in mds.discover_targets(root, sample, lens, filt):
+            mds.process(t_lens, t_filt, sample, stamp_dir, drizzle_pass,
                         force=True, check_noise_map=False)
     except Exception as exc:                    # deliberately broad -- see docstring
         print(f"  NOTE: dataset subplot not regenerated for {lens} {filt} ({exc!r}). "
@@ -506,11 +516,11 @@ def regenerate_dataset_subplot(lens, filt, sample, size, drizzle_pass):
 def process_lens_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass, force,
                       broadcast=False, brush_radius=6, brush_width=None, display='snr',
                       subtract_radial=None, side_by_side=True,
-                      size=cutout_paths.DEFAULT_SIZE, dataset_subplot=True,
+                      size=None, dataset_subplot=True,
                       propose_from='auto'):
     """Draw a mask once for one lens, on its best/forced band. By default the mask is written
     for THAT BAND ONLY; `broadcast=True` also writes it to the lens's other bands by WCS
-    reprojection. `filt_dirs` maps filt -> cutout_dir from discover_targets; the mask FITS
+    reprojection. `filt_dirs` maps filt -> stamp_dir from discover_targets; the mask FITS
     goes into that dir, beside the sci it describes. Returns True if a mask was written.
 
     `propose_from` ('auto' by default, 'none' to disable, or an explicit band) turns this into
@@ -528,10 +538,10 @@ def process_lens_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass, for
               f"(have {', '.join(filts)}), skipping")
         return False
 
-    display_dir = filt_dirs[display_filt]                # cutout dir of the draw band
+    display_dir = filt_dirs[display_filt]                # stamp dir of the draw band
     display_prefix = find_prefix(display_dir, drizzle_pass)
     if display_prefix is None:
-        print(f"{lens} {display_filt}: no cutout sci for --pass {drizzle_pass}, skipping")
+        print(f"{lens} {display_filt}: no stamp sci for --pass {drizzle_pass}, skipping")
         return False
 
     # Skip if the draw band already has a mask, unless --force.
@@ -540,7 +550,7 @@ def process_lens_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass, for
         print(f"{lens}: mask already exists ({display_filt}), skipping (--force to redraw)")
         return False
 
-    display_hdr = fits.getheader(cutout_paths.find_stamp(display_dir, display_prefix, 'sci'))
+    display_hdr = fits.getheader(stamp_paths.find_stamp(display_dir, display_prefix, 'sci'))
     proposal_from, proposal = find_proposal_mask(
         filt_dirs, display_filt, display_hdr, drizzle_pass, propose_from, force=force)
     if proposal is not None:
@@ -597,19 +607,19 @@ def process_lens_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass, for
     # optical bands, a real ~20px regrid for f160W).
     targets = (filts if broadcast else [display_filt])
     for filt in targets:
-        cutout_dir = filt_dirs[filt]
-        prefix = find_prefix(cutout_dir, drizzle_pass)
+        stamp_dir = filt_dirs[filt]
+        prefix = find_prefix(stamp_dir, drizzle_pass)
         if prefix is None:
             continue
-        band_hdr = fits.getheader(cutout_paths.find_stamp(cutout_dir, prefix, 'sci'))
+        band_hdr = fits.getheader(stamp_paths.find_stamp(stamp_dir, prefix, 'sci'))
         band_ps = pixel_scale_from_header(band_hdr)
-        is_draw = (cutout_dir == display_dir)
+        is_draw = (stamp_dir == display_dir)
         if is_draw:
             out_bool = scribbled
         else:
             out_bool = reproject_mask_bool(scribbled, src_wcs, WCS(band_hdr).celestial,
                                            (band_hdr['NAXIS2'], band_hdr['NAXIS1']))
-        mask_path = os.path.join(cutout_dir, f'{prefix}_mask.fits')
+        mask_path = os.path.join(stamp_dir, f'{prefix}_mask.fits')
         aplt.fits_array(array=al.Mask2D(mask=out_bool, pixel_scales=band_ps),
                         file_path=mask_path, overwrite=True)
         n_excl = int(np.asarray(out_bool).sum())
@@ -620,7 +630,7 @@ def process_lens_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass, for
             'drizzle_pass': 'single',
             'pixel_scale_arcsec': round(band_ps, 6),
             'display': source_label,
-            # Which reduction the stamp was drawn on, from its own header (cutout_paths.py).
+            # Which reduction the stamp was drawn on, from its own header (stamp_paths.py).
             'variant': str(band_hdr.get('REDUCVAR', 'standard')),
             'source': source_tag if is_draw else f'reprojected_from_{display_filt}',
             'n_excluded_px': n_excl,
@@ -646,10 +656,10 @@ def main():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--sample', default=mast_target_names.DEFAULT_SAMPLE,
-                   help=f'sample subdirectory of data/cutouts/ (default '
+                   help=f'sample subdirectory of data/stamps/ (default '
                         f'{mast_target_names.DEFAULT_SAMPLE})')
     p.add_argument('--lens', default=None,
-                   help='restrict to one lens; default every lens with cutouts in --sample')
+                   help='restrict to one lens; default every lens with stamps in --sample')
     p.add_argument('--filt', default=None,
                    help='force which band you DRAW on (e.g. f606W); default the best available '
                         'band per lens (f814W>f606W>f555W>f160W>...). Only that band gets a '
@@ -672,12 +682,12 @@ def main():
                         'alternative to --broadcast')
     p.add_argument('--pass', dest='drizzle_pass', choices=['auto', 'cr', 'nocrrej'],
                    default='auto',
-                   help="which cutout pass to mask, matching make_cutouts.py's --pass: "
-                        "'auto' (default) prefers cutout_cr_*, falling back to cutout_* "
-                        "where no CR pass exists (F160W)")
-    p.add_argument('--size', type=float, default=cutout_paths.DEFAULT_SIZE,
-                   help=f'cutout tree to draw masks for (default {cutout_paths.DEFAULT_SIZE:g}", '
-                        'i.e. data/cutouts/ -- the tree this tool is meant for and '
+                   help="which stamp pass to mask, matching make_stamps.py's --pass: "
+                        "accepted for symmetry with the HST repo; JWST has a single "
+                        "drizzle pass, so it changes nothing")
+    p.add_argument('--size', type=float, default=None,
+                   help=f'stamp tree to draw masks for (default {stamp_paths.DEFAULT_SIZE:g}", '
+                        'i.e. data/stamps/ -- the tree this tool is meant for and '
                         'the only size-variant tree tracked in git, see .gitignore; pass '
                         '--size 20 for the untracked, regenerable 20" tree)')
     p.add_argument('--force', action='store_true', default=False,
@@ -720,7 +730,7 @@ def main():
                         'so it shows the mask just drawn rather than the previous one '
                         '(default on; best-effort -- a failure never costs the mask)')
     p.add_argument('--include-ignored', action='store_true', default=False,
-                   help='also offer bands whose cutout directory is GITIGNORED. Off by '
+                   help='also offer bands whose stamp directory is GITIGNORED. Off by '
                         'default: such a band is not a science product (the three 420 s '
                         'SLACS SNAP f814W diagnostics are why the rule exists), and hand-drawn '
                         'work written there is non-regenerable and invisible to every clone. '
@@ -735,17 +745,19 @@ def main():
                 'to broadcast one draw to every band unseen, or drop --broadcast to review '
                 'the inherited mask per band')
 
-    root = cutout_paths.cutouts_root(ws_path, a.size)
+    global STAMP_SIZE
+    STAMP_SIZE = a.size
+    root = stamp_paths.stamps_root(ws_path)
 
-    # discover_targets yields per (lens, filt); regroup to filt -> cutout_dir per lens so we
+    # discover_targets yields per (lens, filt); regroup to filt -> stamp_dir per lens so we
     # know every band of a lens (filt=None: consider all bands; pick_display_filt picks one).
     lens_filts = {}
-    for lens, filt, cutout_dir in discover_targets(root, a.sample, a.lens, None,
+    for lens, filt, stamp_dir in discover_targets(root, a.sample, a.lens, None,
                                                    include_ignored=a.include_ignored):
-        lens_filts.setdefault(lens, {})[filt] = cutout_dir
+        lens_filts.setdefault(lens, {})[filt] = stamp_dir
 
     if not lens_filts:
-        raise SystemExit(f"no cutouts found under {root} for sample {a.sample} matching "
+        raise SystemExit(f"no stamps found under {root} for sample {a.sample} matching "
                          f"lens={a.lens!r}")
 
     print(f"{len(lens_filts)} lens(es) to process")

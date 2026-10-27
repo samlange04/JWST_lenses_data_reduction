@@ -2,7 +2,7 @@
     "b1938": {
         "B1938+666": {
             "F115W": {
-                "prefix": "cutout",
+                "prefix": "stamp7",
                 "drizzle_pass": "single",
                 "pixel_scale_arcsec": 0.03,
                 "display": "S/N, radial-subtracted + as-observed (F277W mask outlined)",
@@ -17,7 +17,7 @@
                 "n_erased_px": 0
             },
             "F277W": {
-                "prefix": "cutout",
+                "prefix": "stamp7",
                 "drizzle_pass": "single",
                 "pixel_scale_arcsec": 0.06,
                 "display": "S/N, radial-subtracted + as-observed (F115W mask outlined)",

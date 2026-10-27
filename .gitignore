@@ -1,21 +1,27 @@
 # ── Derived data ───────────────────────────────────────────────────────────────
 # Everything under data/ is reproducible: calibrated/ (uncal/rate pools) re-downloads from
 # MAST, stage1/ stage2/ mosaics/ regenerate from scripts/reduce_nircam.py. Provenance lives
-# in info/*.json. B1938+666 alone is ~80 GB of uncal, so none of it enters git history.
+# in info/provenance/*.json. B1938+666 alone is ~80 GB of uncal, so none of it enters git history.
 #
-# data/cutouts is the deliberate exception (as in the HST repo): the final science stamps
-# are small and carry the hand-drawn, non-regenerable masks and positions.
+# data/stamps is the deliberate exception (as in the HST repo): the final science stamps
+# are small and carry the hand-drawn, non-regenerable masks and positions. Every stamp size
+# shares a band dir and is named by its size (scripts/stamp_paths.py); only each lens's
+# MODELLING size is tracked -- 12" by default, 7" for B1938+666 (its stamp_size in
+# info/samples/lens_samples.json). A lens given a new stamp_size needs its own
+# !data/stamps/**/stamp<S>_* line here, or its stamps are silently ignored.
 data/*
-!data/cutouts/
+!data/stamps/
 !data/qc/
-# QC renders, as in the HST repo (2026-10-04): cutout_positions.png is a view OF the tracked
-# positions JSON (rebuilt by make_positions.py --overlays-only), and cutout.png a plain render
-# of the tracked sci stamp (rebuilt by make_cutouts.py). Neither is a product, and every
-# re-cut adds a ~0.5-1.2 MB version to history. Variant renders (cutout_<variant>.png) are not
-# covered: there are none yet, and a cutout_*.png rule would also catch future _dataset.png
-# and _mask_arcs.png, which the HST repo keeps tracked.
-data/cutouts/**/*_positions.png
-data/cutouts/**/cutout.png
+data/stamps/**/stamp*
+!data/stamps/**/stamp12_*
+!data/stamps/**/stamp7_*
+# QC renders, as in the HST repo (2026-10-04): stamp<S>_positions.png is a view OF the tracked
+# positions JSON (rebuilt by make_positions.py --overlays-only), and stamp<S>.png a plain
+# render of the tracked sci stamp (rebuilt by make_stamps.py). Neither is a product, and every
+# re-cut adds a ~0.5-1.2 MB version to history. Both are already excluded by the stamp*
+# rule above (the bare render has no underscore after the size, the overlay is re-ignored
+# here); stamp<S>_dataset.png stays tracked.
+data/stamps/**/*_positions.png
 
 # ── Generated / local ───────────────────────────────────────────────────────────
 output/
@@ -36,7 +42,7 @@ activate_local.sh
 # ── Machine-local records ──────────────────────────────────────────────────────
 # export_dataset.py logs each export keyed by its absolute --dest path, which only means
 # something on the machine that ran it.
-info/lens_exports.json
+info/provenance/lens_exports.json
 
 # ── Private agent notes ────────────────────────────────────────────────────────
 # CLAUDE.md imports the tracked AGENTS.md (@AGENTS.md) and adds the maintainer's private

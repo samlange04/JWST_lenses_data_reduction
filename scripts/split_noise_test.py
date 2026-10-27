@@ -21,7 +21,7 @@ the depth differs, which cancels in the ratio). Measured over the whole footprin
 halves cover, and separately inside the 12" stamp region (both halves cover it fully), at
 measure_corr_factor.BLOCKS_ARCSEC, plus the row-/column-direction split of the 1-D sums at
 0.2" (anisotropy from the 1/f along detector rows). Writes diagnostics/split_noise/<lens>_<FILT>.json
-and prints the numbers to copy into info/noise_corr_factors.json lens_overrides.
+and prints the numbers to copy into info/overrides/noise_corr_factors.json lens_overrides.
 """
 import argparse
 import glob
@@ -33,7 +33,7 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import lens_samples                                   # noqa: E402
-import cutout_paths                                   # noqa: E402
+import stamp_paths                                   # noqa: E402
 import reduce_nircam                                  # noqa: E402
 from measure_corr_factor import BLOCKS_ARCSEC, robust_std   # noqa: E402
 
@@ -51,7 +51,7 @@ def split_halves(cals):
 
 
 def build_half(cals, sample, lens, filt, tag, coord, scale, field):
-    out_dir = cutout_paths.mosaic_dir(WS, sample, lens, filt, tag)
+    out_dir = stamp_paths.mosaic_dir(WS, sample, lens, filt, tag)
     name = f'{lens.replace("+", "p")}_{filt}'.lower()
     i2d = os.path.join(out_dir, f'{name}_i2d.fits')
     if os.path.exists(i2d):
@@ -159,9 +159,9 @@ def main():
     i2d = {}
     for tag, cl in (('splitA', half_a), ('splitB', half_b)):
         i2d[tag] = build_half(cl, sample, a.lens, filt, tag, coord, scale, reduce_nircam.DEFAULT_FIELD) if not a.analyse_only \
-            else os.path.join(cutout_paths.mosaic_dir(WS, sample, a.lens, filt, tag), f'{a.lens.replace("+", "p")}_{filt}'.lower() + '_i2d.fits')
+            else os.path.join(stamp_paths.mosaic_dir(WS, sample, a.lens, filt, tag), f'{a.lens.replace("+", "p")}_{filt}'.lower() + '_i2d.fits')
     ang = detector_row_angle(cals[0])
-    res = analyse(i2d['splitA'], i2d['splitB'], scale, cutout_paths.DEFAULT_SIZE, ang)
+    res = analyse(i2d['splitA'], i2d['splitB'], scale, stamp_paths.DEFAULT_SIZE, ang)
     res.update(lens=a.lens, filt=filt, sample=sample, scale=scale, n_exposures=n_exp,
                n_cals=[len(half_a), len(half_b)], detector_row_angle_deg=ang, i2d=i2d)
     out_dir = os.path.join(WS, 'diagnostics', 'split_noise'); os.makedirs(out_dir, exist_ok=True)

@@ -37,14 +37,14 @@ CRDS reference files download themselves on first use into `data/reference_files
 ```bash
 uv run python scripts/download_nircam.py --lens SPT2147-50            # MAST uncal -> pool, sorted by filter
 uv run python scripts/reduce_nircam.py   --lens SPT2147-50 --filt F444W   # Detector1 -> Image2 -> Image3 mosaic
-uv run python scripts/make_cutouts.py    --lens SPT2147-50 --filt F444W   # 12" stamp + noise map + PNG
+uv run python scripts/make_stamps.py    --lens SPT2147-50 --filt F444W   # 12" stamp + noise map + PNG
 uv run python scripts/make_psf.py        --lens SPT2147-50 --filt F444W   # empirical ePSF (STPSF fallback)
 uv run python scripts/make_masks.py      --lens SPT2147-50                # GUI: paint contaminants to remove
 uv run python scripts/make_positions.py  --lens SPT2147-50                # GUI: mark multiple images
 uv run python scripts/export_dataset.py  --lens SPT2147-50 --dest <modelling-project>/data
 ```
 
-Whole samples: `bash scripts/run_reduce_all.sh spt`, `run_cutouts_all.sh spt`,
+Whole samples: `bash scripts/run_reduce_all.sh spt`, `run_stamps_all.sh spt`,
 `run_psf_all.sh spt`. Runners log to `data/run_logs/` and count ok / no data / FAILED.
 Scripts are idempotent: downloaded files, rate/cal products and a finished mosaic are all
 skipped on a re-run (`--force` rebuilds a mosaic).
@@ -58,8 +58,9 @@ data/
   stage1/<sample>/<lens>/<FILT>/        *_rate.fits   (our Detector1: snowballs + 1/f cleaned)
   stage2/<sample>/<lens>/<FILT>/        *_cal.fits    (our Image2)
   mosaics[_<variant>]/<sample>/<lens>/<FILT>/  <lens>_<filt>_i2d.fits + png  (our Image3)
-  cutouts/<sample>/<lens>/<FILT>/       THE science tree (git-tracked): cutout_{sci,noise}.fits,
-                                        cutout_psf.fits, cutout_mask.fits, cutout_positions.json, PNGs
+  stamps/<sample>/<lens>/<FILT>/        THE science tree: stamp<S>_{sci,noise,mask}.fits,
+                                        stamp<S>_positions.json, psf{,_err}.fits, PNGs; S = the
+                                        lens's stamp size (7 for B1938+666, else 12)
   psf/<sample>/<lens>/<FILT>/           archival full PSF kernel + QA plot
   qc/<sample>/                          grids tiling the stamps (make_qc_grids.py)
   reference_files/                      CRDS cache (+ stpsf-data/)
@@ -67,7 +68,7 @@ data/
 info/
   lens_samples.json       programs, lenses, coordinates, redshifts -- the single source of truth
   lens_downloads.json lens_products.json lens_exptime.json lens_instrument.json   auto-updated
-  lens_cutout_qc.json lens_psf.json lens_masks.json lens_positions.json ...        provenance
+  lens_stamp_qc.json lens_psf.json lens_masks.json lens_positions.json ...        provenance
   noise_corr_factors.json psf_stars.json                                           hand-edited
 ```
 
@@ -77,4 +78,4 @@ Stamps are 12" square at 0.03"/px (SW: 400 px) or 0.06"/px (LW: 200 px), North-u
 filter of a lens sharing one tangent point at the catalogue position so the SW and LW grids
 nest 2:1. Units are MJy/sr (the jwst convention; `PHOTMJSR`/`PIXAR_SR` in the header
 convert). The noise map is the i2d `ERR` times a measured inflation factor
-(`info/noise_corr_factors.json`), with 1e8 where there is no data.
+(`info/overrides/noise_corr_factors.json`), with 1e8 where there is no data.

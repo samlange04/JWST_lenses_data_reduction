@@ -24,9 +24,9 @@ def _order(filt):
             return (2, filt)
 
 
-def groups_for_sample(sample, cutouts_dir):
-    """{group_name: [filters]} -- one group per filter present under cutouts_dir/<lens>/."""
+def groups_for_sample(sample, stamps_dir):
+    """{group_name: [filters]} -- one group per filter present under stamps_dir/<lens>/."""
     if sample in SAMPLE_GROUPS:
         return SAMPLE_GROUPS[sample]
-    filts = {os.path.basename(d) for d in glob.glob(os.path.join(cutouts_dir, '*', '*')) if os.path.isdir(d)}
+    filts = {os.path.basename(d) for d in glob.glob(os.path.join(stamps_dir, '*', '*')) if os.path.isdir(d)}
     return {f: [f] for f in sorted(filts, key=_order)}
