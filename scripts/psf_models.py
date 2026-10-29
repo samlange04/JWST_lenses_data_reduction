@@ -16,8 +16,10 @@ module is the FALLBACK for star-poor fields, and the same two caveats apply as f
     make_psf_inject.py; the JWST `spike` package does the same); until that is ported,
     `analytic_drop_broaden` is applied and the kernel is tagged PSFBROAD='analytic'.
 
-STPSF needs its data files: STPSF_PATH is pointed at data/reference_files/stpsf-data by
-reduce_nircam.setup_crds(); download them once with `stpsf.utils.download_data()` or from
+STPSF needs its data files: STPSF_PATH is pointed at data/reference_files/stpsf-data here,
+at import (a shell export wins). Until 2026-10-30 only reduce_nircam.setup_crds() set it, which
+make_psf.py never calls, so STPSF downloaded into its own default directory, outside the repo.
+Download them once with `stpsf.utils.download_data()` or from
 https://stpsf.readthedocs.io/en/latest/installation.html (make_psf.py prints the hint).
 The measured telescope wavefront for the observation date is loaded when the OPD server is
 reachable (`load_wss_opd_by_date`), else STPSF's default OPD is used and PSFOPD says so.
@@ -32,6 +34,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import lens_samples
 
 ws_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+os.environ.setdefault('STPSF_PATH', os.path.join(ws_path, 'data', 'reference_files', 'stpsf-data'))
 
 
 def _northup_M(cd_det, out_scale, oversample, pix_per_src):

@@ -74,8 +74,8 @@ and COWLS lenses. A stamp cut at another size (`make_stamps.py --size 20`) is wr
 on the stamp size.
 
 **Masks and positions so far exist for B1938+666 only.** The SPT bands carry the image, noise
-map and PSF; their masks and positions have not been drawn yet. **The COWLS bands carry only
-the image and noise map so far**: no PSF, masks or positions yet.
+map and PSF; their masks and positions have not been drawn yet. **The COWLS bands carry the
+image, noise map and PSF**; no masks or positions yet.
 
 **Orientation.** North is towards increasing row number and West towards increasing column
 number, so with Python's usual display (row 0 at the top) **North appears at the bottom and
@@ -127,6 +127,9 @@ signal_to_noise = image / noise
 - **SPT0418-47 sits on the NIRCam detector with the strongest "wisps"** (faint scattered-light
   patterns in the SW bands). They are not subtracted, so check the SW images before trusting
   a faint SW feature.
+- **The COWLS PSFs are shared**: each filter's PSF is built from the stars of all 17 COWLS
+  fields together (32–68 stars), because a single field holds only 0–11. Every COWLS lens in a
+  filter therefore has the same `psf.fits` (`PSFMETH = empirical_pooled`).
 - **COWLS depth varies from lens to lens**, because it depends on where each lens fell in
   COSMOS-Web's dither pattern: 2–4 exposures per filter, and COSJ100028+021928 has a single
   SW exposure, so its F115W/F150W cosmic rays were caught on the ramp alone. COSJ095917+015424
@@ -157,7 +160,8 @@ non-destructive readouts (a *ramp*), takes several exposures shifted slightly be
 5. **Cuts out** the stamp around the deflector and writes the noise map from the mosaic's
    propagated error, times the measured correction above.
 6. **Measures the PSF** from stars in the same mosaic (STScI's STPSF model is the fallback
-   where there are too few stars; no band needed it).
+   where there are too few stars; no product uses it). For the COWLS lenses, whose small
+   fields hold few stars, one PSF per filter is built from the stars of all 17 fields.
 7. **Masks and marks** — the masks and image positions are drawn and clicked by hand in
    small interactive tools.
 

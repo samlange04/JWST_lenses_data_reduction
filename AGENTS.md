@@ -28,7 +28,7 @@ Stamps renamed 2026-10-26 (`data/cutouts/` → `data/stamps/`, `cutout_*` → `s
 | SPT2147-50 | spt | uncal, 4 filters | F200W F277W F356W F444W | all 4 | see info/provenance/lens_psf.json | – |
 | SPT0418-47 | spt | uncal, 6 filters | F115W F150W F200W F277W F356W F444W | all 6 | see info/provenance/lens_psf.json | – |
 | B1938+666 | b1938 | uncal, 210 files / 79 GB | F115W F277W (2026-10-02, 8.5 h) | both | both, see info/provenance/lens_psf.json | both (2026-10-04) |
-| 17 COWLS II lenses | cowls_spectacular | uncal at a 90" field, 802 files / 38 GB | F115W F150W F277W F444W, all 68 bands (2026-10-29, ~11 h incl. 43 GB of new CRDS darks) | all 68, 12" (2026-10-30) | – | – |
+| 17 COWLS II lenses | cowls_spectacular | uncal at a 90" field, 802 files / 38 GB | F115W F150W F277W F444W, all 68 bands (2026-10-29, ~11 h incl. 43 GB of new CRDS darks) | all 68, 12" (2026-10-30) | pooled per filter, 32–68 stars (2026-10-30) | – |
 
 **COWLS added 2026-10-29** (`cowls_spectacular`, the 17 COWLS II lenses, GO 1727
 COSMOS-Web): the first survey-program sample, located by position and cut by detector
@@ -192,8 +192,10 @@ is recorded per product in `info/provenance/lens_products.json` (`crds_context`,
 `crds.get_default_context()` offline** — it raises; the scripts catch it.
 
 **STPSF data** (model-PSF fallback only): `STPSF_PATH=data/reference_files/stpsf-data`
-is set by `setup_crds()`; download the tarball once per the STPSF install docs. A build
-that never needs the model tier never needs it.
+is set by `psf_models.py` at import (and by `setup_crds()`); STPSF downloads the files there on
+first use (352 MB). Before 2026-10-30 only `setup_crds()` set it, which `make_psf.py` never
+calls, so the first model build put them in STPSF's own default data directory, outside the repo. A build that never needs the
+model tier never needs them.
 
 **macOS write-hang workaround (inherited, kept).** `scripts/mmap_fits_write.py` is the HST
 repo's monkeypatch of `astropy.io.fits.file._array_to_file` (mmap+memcpy instead of
@@ -559,6 +561,31 @@ resampling mismatched the data until injected and re-drizzled; the analytic box 
 calibrated stand-in (0.01 px on the HST test), not the real thing. For a 2'-field lens with
 few stars this tier may be what you get for the SW bands — check `info/provenance/lens_psf.json`.
 
+**The model tier is too narrow on COWLS (first exercised 2026-10-30).** Built for the 33
+COWLS bands that also had an empirical PSF (3–11 stars), the STPSF + analytic-box kernel was
+narrower in every one: empirical/model FWHM median 1.05 (F115W), 1.11 (F150W), 1.10 (F277W),
+1.08 (F444W), never below 1.00. The stars behind the widest builds are genuine (clean
+six-spike PSFs, no compact galaxies), so the analytic box under-broadens, as the HST repo found
+before injection. Do not use the model tier for a modelling PSF without the injection route.
+
+**Pooled empirical PSF (`--pool --sample S --filt F`, 2026-10-30)** for a survey sample whose
+fields are each star-poor but share one PSF. COWLS: a 90" field holds 0–11 PSF stars, 35 of 68
+bands had < 3; the sample shares filter, readout, output grid, and two telescope rolls (PA_V3
+107° and 293°, 186° apart, under which the diffraction pattern nearly maps onto itself).
+`pooled_field` prepares each lens's mosaic exactly as a single build (`prepare_field`), drops
+a star already taken from a neighbouring mosaic (0.3"; K and M share a third of a field, but
+their closest stars are 15" apart, so none dropped), and tiles the background-subtracted star
+cutouts onto one synthetic image at their sub-pixel offsets, so `build_epsf`, validation and
+the bootstrap run unchanged. The kernel goes into every lens's stamp dir (`PSFMETH =
+empirical_pooled`, `PSFPOOL` = lenses), the full kernel and png into
+`data/psf/<sample>/_pooled/<FILT>/`, and each lens's record carries `pool.stars_per_lens`.
+COWLS: F115W 32 stars, 0.054"; F150W 59, 0.065"; F277W 39, 0.124"; F444W 68, 0.167"; bootstrap
+error fraction 0.4–1.8%. It averages over the lenses' different depths (2–4 exposures) and
+detector positions. The single-lens path through the refactor is bit-identical to before
+(SPT2147-50 F444W). `--output` is now a true scratch mode: until 2026-10-30 it redirected only
+`psf_kernel.fits`/`psf.png` and still overwrote the band's `psf.fits` and `lens_psf.json`
+record.
+
 ## Masks, arc masks, positions, QC (`make_masks.py`, `make_arc_masks.py`, `make_positions.py`, `make_dataset_subplots.py`, `make_qc_grids.py`)
 
 Verbatim ports of the HST scripts (2026-10-01) with three mechanical changes: the sample
@@ -677,8 +704,10 @@ Exercised 2026-10-29: the position query + footprint cut of `download_nircam.py`
 per-sample `mosaic_field`/`prune_intermediates`, neighbour hard-linking of pool files, and
 `exptime_at` (identical to the old sums on every SPT/B1938 band).
 
-Not yet exercised: the STPSF model tier of `make_psf.py` (needs stpsf-data),
-`make_arc_masks.py`, `make_qc_grids.py`, `--tweakreg gaia`. Stubs: `detect_arcs.py`.
+Exercised 2026-10-30: the STPSF model tier of `make_psf.py` (too narrow, see *PSF*) and the
+pooled empirical tier.
+
+Not yet exercised: `make_arc_masks.py`, `make_qc_grids.py`, `--tweakreg gaia`. Stubs: `detect_arcs.py`.
 Exercised since: `measure_corr_factor.py` (12 stamps, 2026-10-04), `--start rate` and
 `--flicker-by-channel` (SPT0418-47 F150W, 2026-10-02), `destripe_nircam.py`, and
 `make_masks.py`, `make_positions.py` and `make_dataset_subplots.py` on B1938+666 (2026-10-04,
