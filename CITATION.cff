@@ -6,9 +6,11 @@ message: >-
 type: dataset
 title: "JWST lens image reduction"
 abstract: >-
-  James Webb Space Telescope NIRCam imaging of three galaxy-scale strong
-  gravitational lenses (JVAS B1938+666 from GO 8281, and SPT0418-47 and
-  SPT2147-50 from the TEMPLATES Early Release Science program), reduced from
+  James Webb Space Telescope NIRCam imaging of twenty galaxy-scale strong
+  gravitational lenses (JVAS B1938+666 from GO 8281, SPT0418-47 and
+  SPT2147-50 from the TEMPLATES Early Release Science program, and the 17
+  "spectacular" COSMOS-Web Lens Survey lenses of Mahler et al. 2025 from
+  GO 1727 COSMOS-Web), reduced from
   the uncalibrated MAST ramps into ready-to-model stamps: science images,
   noise maps, PSF kernels with uncertainty maps, and hand-drawn masks and
   hand-marked multiple-image positions, together with the pipeline that
@@ -30,4 +32,6 @@ keywords:
   - data reduction
   - B1938+666
   - TEMPLATES
+  - COSMOS-Web
+  - COWLS
 date-released: "2026-10-27"

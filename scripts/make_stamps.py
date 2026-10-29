@@ -104,17 +104,31 @@ def corr_factor_meta():
 
 
 def resolve_corr_factor(cli_value, channel, filt, sample, lens):
-    """1.0 < JSON per channel ('NIRCAM/LW') < JSON per filter < JSON per-lens override < CLI."""
+    """1.0 < JSON per channel ('NIRCAM/LW') < JSON per filter < JSON per-lens override < CLI.
+
+    The JSON's `factors` were measured on the samples listed in `factors_samples` and apply
+    only to them; any other sample takes its own `sample_factors[sample]`. A sample with
+    neither (and no lens override) is refused rather than given another readout pattern's
+    factor (AGENTS.md *Noise*: do not borrow factors across samples)."""
     if cli_value is not None:
         return float(cli_value), 'cli'
     data = info_json.load(CORR_FACTORS_JSON)
     value, src = 1.0, 'default'
+    if sample in data.get('factors_samples', [sample]):
+        factors = data.get('factors', {})
+    else:
+        factors = data.get('sample_factors', {}).get(sample)
     for key, label in ((f'NIRCAM/{channel}', 'channel'), (filt, 'filter')):
-        if key in data.get('factors', {}):
-            value, src = float(data['factors'][key]), f'json:{label}'
+        if factors and key in factors:
+            value, src = float(factors[key]), f'json:{label}'
     override = data.get('lens_overrides', {}).get(sample, {}).get(lens, {}).get(filt)
     if override is not None:
         value, src = float(override), 'json:lens'
+    elif factors is None and data:
+        raise SystemExit(f'No measured noise factor for sample {sample!r} in {CORR_FACTORS_JSON} '
+                         f'(its `factors` are for {data.get("factors_samples")} only). Cut with '
+                         f'--corr-factor 1.0, measure (measure_corr_factor.py --sample {sample}, or '
+                         f'split_noise_test.py for a deep field), add `sample_factors`, re-cut.')
     return value, src
 
 

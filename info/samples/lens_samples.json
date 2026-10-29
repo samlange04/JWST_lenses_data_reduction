@@ -36,5 +36,171 @@
                 "redshift_source": 3.76
             }
         }
+    },
+    "cowls_spectacular": {
+        "description": "The 17 'spectacular' lenses of COWLS II (Mahler et al. 2025, MNRAS 544, L8, Table 1): the top tier of the COSMOS-Web Lens Survey, JWST GO 1727 COSMOS-Web (PI Kartaltepe & Casey), NIRCam F115W + F277W and F150W + F444W, 4 dithers x 258 s per filter (SHALLOW4, 5 groups) per tile, more where tiles overlap. The F770W MIRI parallels are deliberately not reduced (NIRCam only). Lens keys are the COWLS IDs; cowls_letter is the paper's A-Q. ra/dec are the COSMOS-Web catalogue positions of the lens galaxies (Shuntov+24), so they are the mosaics' CRVAL and the stamp centre. theta_e (arcsec) is from the COWLS I PyAutoLens models (Nightingale+25), for orientation only. Redshifts are COWLS II's, with their source in redshift_*_kind; null where the paper has none (P has no lens redshift; only J, K and L have source redshifts).",
+        "proposal_id": "1727",
+        "mast_query": "position",
+        "mast_query_note": "COSMOS-Web targets are survey tiles (CWEBTILE-*), not lenses, so a lens is found by position: every NIRCam/IMAGE observation of GO 1727 within the mosaic field, then only the detector files whose MAST footprint overlaps the field (download_nircam.query_position).",
+        "mosaic_field": 90.0,
+        "prune_intermediates": true,
+        "mosaic_field_note": "2026-10-29: 90\" mosaics (not the repo's 150\") and pruned intermediates, for disk. At 150\" the 17 lenses need 1487 unique detector files (75 GB uncal) and ~290 MB of rate/rateints/cal per file plus a crf per lens: ~420 GB, with 248 GB free. At 90\": 802 files, 40 GB uncal, ~130 GB kept (uncal + cal). Cost: ~2.25 arcmin^2 of field per lens for PSF stars and tweakreg. prune_intermediates: reduce_nircam deletes each rate/rateints once its cal exists and the Image3 crf files once the mosaic exists, so --destripe and --start rate re-run Detector1.",
+        "lenses": {
+            "COSJ095914+021219": {
+                "cowls_letter": "A",
+                "ra": 149.811421524,
+                "dec": 2.205440107,
+                "theta_e": 1.48,
+                "redshift_lens": 1.053,
+                "redshift_source": null,
+                "redshift_lens_kind": "spec (DESI, Dey+19)"
+            },
+            "COSJ095917+015424": {
+                "cowls_letter": "B",
+                "ra": 149.821462195,
+                "dec": 1.906873033,
+                "theta_e": 0.58,
+                "redshift_lens": 1.252,
+                "redshift_source": null,
+                "redshift_lens_kind": "photo-z (COSMOS-Web catalogue, Shuntov+24)"
+            },
+            "COSJ095920+015851": {
+                "cowls_letter": "C",
+                "ra": 149.833887486,
+                "dec": 1.980927007,
+                "theta_e": 0.45,
+                "redshift_lens": 0.974,
+                "redshift_source": null,
+                "redshift_lens_kind": "spec (DESI, Dey+19)"
+            },
+            "COSJ095921+020638": {
+                "cowls_letter": "D",
+                "ra": 149.840689409,
+                "dec": 2.110652506,
+                "theta_e": 0.71,
+                "redshift_lens": 0.469,
+                "redshift_source": null,
+                "redshift_lens_kind": "spec (DESI, Dey+19)"
+            },
+            "COSJ095950+022057": {
+                "cowls_letter": "E",
+                "ra": 149.96143032,
+                "dec": 2.349411544,
+                "theta_e": 1.04,
+                "redshift_lens": 0.939,
+                "redshift_source": null,
+                "redshift_lens_kind": "spec (DESI, Dey+19)"
+            },
+            "COSJ095953+023319": {
+                "cowls_letter": "F",
+                "ra": 149.974678146,
+                "dec": 2.555445653,
+                "theta_e": 1.44,
+                "redshift_lens": 0.731,
+                "redshift_source": null,
+                "redshift_lens_kind": "spec (DESI, Dey+19)"
+            },
+            "COSJ095955+021900": {
+                "cowls_letter": "G",
+                "ra": 149.983162054,
+                "dec": 2.31688057,
+                "theta_e": 2.11,
+                "redshift_lens": 0.577,
+                "redshift_source": null,
+                "redshift_lens_kind": "photo-z (COSMOS-Web catalogue, Shuntov+24)"
+            },
+            "COSJ100012+022015": {
+                "cowls_letter": "H",
+                "ra": 150.052588227,
+                "dec": 2.337706469,
+                "theta_e": 0.75,
+                "redshift_lens": 0.377,
+                "redshift_source": null,
+                "redshift_lens_kind": "spec (DESI, Dey+19)"
+            },
+            "COSJ100013+023424": {
+                "cowls_letter": "I",
+                "ra": 150.055775328,
+                "dec": 2.573347012,
+                "theta_e": 1.45,
+                "redshift_lens": 0.89,
+                "redshift_source": null,
+                "redshift_lens_kind": "photo-z (COSMOS-Web catalogue, Shuntov+24)"
+            },
+            "COSJ100018+022138": {
+                "cowls_letter": "J",
+                "ra": 150.076934522,
+                "dec": 2.360757128,
+                "theta_e": 0.38,
+                "redshift_lens": 1.53,
+                "redshift_source": 3.42,
+                "redshift_lens_kind": "spec (van der Wel+13)",
+                "redshift_source_kind": "spec (van der Wel+13)"
+            },
+            "COSJ100024+015334": {
+                "cowls_letter": "K",
+                "ra": 150.100467215,
+                "dec": 1.893029318,
+                "theta_e": 0.77,
+                "redshift_lens": 2.02,
+                "redshift_source": 5.1,
+                "redshift_lens_kind": "photo-z (COSMOS-Web catalogue, Shuntov+24)",
+                "redshift_source_kind": "spec (Shuntov+25)"
+            },
+            "COSJ100024+021749": {
+                "cowls_letter": "L",
+                "ra": 150.100088848,
+                "dec": 2.297132757,
+                "theta_e": 0.73,
+                "redshift_lens": 0.362,
+                "redshift_source": 2.63,
+                "redshift_lens_kind": "spec (DESI, Dey+19)",
+                "redshift_source_kind": "spec (Jin+24)"
+            },
+            "COSJ100025+015245": {
+                "cowls_letter": "M",
+                "ra": 150.1067079,
+                "dec": 1.879287103,
+                "theta_e": 0.53,
+                "redshift_lens": 2.449,
+                "redshift_source": null,
+                "redshift_lens_kind": "photo-z (COSMOS-Web catalogue, Shuntov+24)"
+            },
+            "COSJ100028+021928": {
+                "cowls_letter": "N",
+                "ra": 150.119067171,
+                "dec": 2.324503234,
+                "theta_e": 0.66,
+                "redshift_lens": 0.604,
+                "redshift_source": null,
+                "redshift_lens_kind": "spec (DESI, Dey+19)"
+            },
+            "COSJ100047+015023": {
+                "cowls_letter": "O",
+                "ra": 150.198584092,
+                "dec": 1.839784559,
+                "theta_e": 1.62,
+                "redshift_lens": 0.893,
+                "redshift_source": null,
+                "redshift_lens_kind": "spec (DESI, Dey+19)"
+            },
+            "COSJ100119+014849": {
+                "cowls_letter": "P",
+                "ra": 150.330525811,
+                "dec": 1.813616188,
+                "theta_e": 1.14,
+                "redshift_lens": null,
+                "redshift_source": null
+            },
+            "COSJ100121+022740": {
+                "cowls_letter": "Q",
+                "ra": 150.34136302,
+                "dec": 2.461297053,
+                "theta_e": 0.86,
+                "redshift_lens": 0.371,
+                "redshift_source": null,
+                "redshift_lens_kind": "spec (DESI, Dey+19)"
+            }
+        }
     }
 }

@@ -28,6 +28,25 @@ Stamps renamed 2026-10-26 (`data/cutouts/` → `data/stamps/`, `cutout_*` → `s
 | SPT2147-50 | spt | uncal, 4 filters | F200W F277W F356W F444W | all 4 | see info/provenance/lens_psf.json | – |
 | SPT0418-47 | spt | uncal, 6 filters | F115W F150W F200W F277W F356W F444W | all 6 | see info/provenance/lens_psf.json | – |
 | B1938+666 | b1938 | uncal, 210 files / 79 GB | F115W F277W (2026-10-02, 8.5 h) | both | both, see info/provenance/lens_psf.json | both (2026-10-04) |
+| 17 COWLS II lenses | cowls_spectacular | uncal at a 90" field, 802 files / 38 GB | F115W F150W F277W F444W, all 68 bands (2026-10-29, ~11 h incl. 43 GB of new CRDS darks) | all 68, 12" (2026-10-30) | – | – |
+
+**COWLS added 2026-10-29** (`cowls_spectacular`, the 17 COWLS II lenses, GO 1727
+COSMOS-Web): the first survey-program sample, located by position and cut by detector
+footprint (*Download*), reduced on 90" mosaics with pruned intermediates for disk
+(*Reduction*). Verified on COSJ100013+023424 (lens I) F444W: 7 detector files from two tiles,
+tweakreg 145–162 sources per frame, 1030.7 s at the lens (4 × 257.7 s), the lens and arc at the
+mosaic centre. The full batch then ran 12:31–23:40: 68 bands ok, every
+exposure time at the lens equal to the footprint survey (J SW 773 s, K LW 515 s, N SW 258 s),
+no rate/rateints/crf left; kept on disk 38 GB uncal + 88 GB cal + 10 GB mosaics. Two downloads
+died in a network outage at the MAST query, which had no retry; `with_retries` now wraps every
+query, and a second `run_reduce_all.sh` pass picked them up. **Disk on macOS:** Time Machine's
+hourly local snapshots keep pruned or deleted files' blocks until they are purged, so `df`
+falls faster than the kept size suggests; macOS purges them under pressure.
+Stamps cut 2026-10-30 at the default 12", with their own measured noise factors (*Noise*).
+**COSJ095917+015424 (B) sits ~2" from COSMOS-Web's southern edge:** its lens is covered,
+but 16% of each SW and 30% of each LW stamp is off the survey (noise 1e8, `n_bad` in
+`lens_stamp_qc.json`); every other COWLS stamp has 0–4 bad pixels. No PSFs, masks or
+positions yet.
 
 **The whole SPT sample reduced in one `run_reduce_all.sh spt` pass (2026-10-02 02:06): 10 ok,
 0 failed.** Per band: SW (4 detectors × 2 dithers) 220–250 s, SW F200W of SPT2147 (24 frames)
@@ -229,6 +248,20 @@ own copy must keep them equal).
 | `b1938` | 8281, PI Vegetti, Cycle 4 | B1938+666 | `jw08281-o001` | **Module ALL**, F115W+F277W, MEDIUM8 8 grp × 5 int, INTRAMODULE×3 + STANDARD×7 = 21 dithers, 87 934 s per filter, 2 visits (2025-09-20, 2025-09-29). 210 uncal / 79 GB |
 | `spt` | 1355 TEMPLATES, PI Rigby, ERS | SPT0418-47 | `jw01355-o016` | Module B, F115W+F277W (SHALLOW2, 687 s), F150W+F356W (BRIGHT2, 344 s), F200W+F444W (BRIGHT2, 429 s), 2 dithers. Lens on **B4** (Cathey+24) |
 | `spt` | 1355 | SPT2147-50 | `jw01355-o024` | Module B, F200W paired with each of F356W/F444W/F277W (F200W 1460 s total), 2 dithers per pair |
+| `cowls_spectacular` | 1727 COSMOS-Web, PI Kartaltepe & Casey, Cycle 1 | the 17 COWLS II lenses | by position, tiles `CWEBTILE-*` | F115W+F277W, F150W+F444W, SHALLOW4 5 grp × 1 int, 258 s per exposure. **Exposures over the lens: 4 per filter for C E F I L M O Q; J 3 SW / 4 LW; K 4 SW / 2 LW; 2 for A B D G H P; N 1 SW / 2 LW** (MAST footprints, 2026-10-29) |
+
+**`cowls_spectacular` (added 2026-10-29)** is COWLS II's Table 1 (Mahler et al. 2025, MNRAS
+544, L8): the 17 "spectacular" lenses, the top tier of the COSMOS-Web Lens Survey; lens keys
+are the COWLS IDs, `cowls_letter` the paper's A–Q. `ra`/`dec` are the COSMOS-Web catalogue
+positions OF THE LENS GALAXY (Shuntov+24), so unlike an APT coordinate they need no
+`deflector_ra`. `theta_e` is COWLS I's PyAutoLens value, for orientation. Redshifts carry
+their source in `redshift_*_kind` (DESI spec, COSMOS-Web photo-z, van der Wel+13); P has no
+lens redshift and only J, K, L have source redshifts, so the rest export `null`. Depth at the
+lens is set by where it falls in the COSMOS-Web dither pattern, not by the tile: lens N's SW
+stamp rests on ONE exposure, so Image3's outlier detection has nothing to compare and its
+cosmic rays are caught by `jump` alone — look at it before trusting faint SW structure.
+Every lens has all four filters. Only GO 1727 is downloaded: other JWST programs that image
+the COSMOS field are not part of this sample.
 
 Coordinates: APT fixed-target positions (B1938+666 19:38:25.28 +66:48:52.9; SPT0418-47
 04:18:39.68 −47:51:52.7; SPT2147-50 21:47:19.01 −50:35:54.5), which agree with the MAST
@@ -270,6 +303,28 @@ header `FILTER`/`PUPIL`/`DETECTOR` (`effective_filter`: PUPIL wins when it holds
 which never happens for the wide bands here). Hard links, not copies (no second 80 GB) and
 not symlinks. `info/provenance/lens_downloads.json` records obs IDs and per-filter file counts.
 
+**Survey programs: by position, cut by detector footprint** (`"mast_query": "position"` in the
+sample block; `cowls_spectacular`, 2026-10-29). COSMOS-Web's targets are tiles
+(`CWEBTILE-0-4`), and one visit is ~10 arcmin² of which a lens needs one detector or two, so
+target name is useless and "the whole visit" is 4× too much. `query_position` takes every
+NIRCam/IMAGE observation of the program within the mosaic field's half-diagonal; then
+`footprint_roots` reads each detector file's `s_region` from MAST's JWST NIRCam keyword
+service (`Mast.Jwst.Filtered.Nircam`, which lists **cal** files only — a root like
+`jw01727009001_02101_00001_nrca3` names the same exposure+detector at every level) and keeps
+the uncal files whose footprint overlaps the `--field` box (default: the sample's
+`mosaic_field`, else 150", the same default `reduce_nircam.py` takes; download at least the
+field you will reduce at). A file MAST gives no footprint for is
+kept and counted (`n_files_no_footprint`). The `MastMissions(mission='jwst')` region search is
+NOT a substitute: it returns one row per exposure with one representative detector, and drops
+exposures. Neighbouring lenses share exposures, so a file already in another lens's pool of the
+same sample is hard-linked from there, and `reduce_nircam.py` likewise links a rate or cal a
+neighbour already made (`_link_from_neighbour`; never in the `_destriped` trees, whose rates
+carry the lens's own object mask). Sizes for `cowls_spectacular` (2026-10-29): 1487 unique
+detector files / 75 GB uncal at a 150" field, 802 / 40 GB at 90". The overlap test closes
+both polygons explicitly (`_overlaps_box`): matplotlib's `intersects_path` on an open Path
+skips the last→first edge, which dropped a lens-covering F444W exposure on the first try. MAST position queries occasionally hang with no CPU for
+>10 min; kill and re-run (the download is idempotent).
+
 **Starting level: `uncal` (default), reduced here from the ramps.** Decided 2026-10-01 for
 two reasons: (1) the 1/f-stripe removal that matters for a lens (`clean_flicker_noise`) is
 a *Detector1* step on the ramp, off by default in jwst, so it is only available by
@@ -298,6 +353,22 @@ data/calibrated/<s>/<l>/<F>/*_uncal.fits -> Detector1 -> data/stage1/<s>/<l>/<F>
                                           -> Image2    -> data/stage2/<s>/<l>/<F>/*_cal.fits
                                           -> Image3    -> data/mosaics/<s>/<l>/<F>/<lens>_<filt>_i2d.fits (+png)
 ```
+
+**Per-sample field and pruning (`cowls_spectacular`, 2026-10-29).** A sample may set
+`mosaic_field` (arcsec; `--field` defaults to it, and so does `download_nircam.py`) and
+`prune_intermediates`. Why: a pipelined exposure costs ~290 MB of stage products (rate 84,
+rateints 84, cal 118 MB) against ~50 MB of 5-group uncal, plus a ~120 MB Image3 `crf` per input
+per lens, which put COWLS at 150" at ~420 GB with 248 GB free. So COWLS mosaics are 90" and,
+with pruning on, each rate/rateints is deleted once its cal exists and the `crf` files once
+the mosaic exists: the kept state is uncal + cal (~130 GB for the 17 lenses). A pruned band is
+not re-run through Detector1 when its cal is there (`run_detector1(cal_dir=...)`); `--destripe`
+re-makes the rates it needs. 90" is ~2.25 arcmin² per lens for `make_psf.py`'s stars and for
+tweakreg (`measure_corr_factor.py`'s ±30" region fits).
+
+`lens_exptime.json` is the exposure time AT THE LENS: EFFEXPTM once per exposure over the cal
+files whose `S_REGION` covers the deflector (`exptime_at`), since a survey mosaic also holds
+neighbouring tiles' exposures that never see it. Identical to the old per-exposure sum on every
+SPT and B1938 band (checked 2026-10-29).
 
 ### Non-default pipeline settings, and why
 
@@ -396,10 +467,22 @@ including source Poisson noise, "read, not constructed". `NOISECOR` comes from
 `info/overrides/noise_corr_factors.json` (`factors` keyed `NIRCAM/SW`, `NIRCAM/LW` or a filter;
 `lens_overrides[sample][lens][FILT]`), source recorded as `NOISECRS`, the block scale it was
 read at as `NOISESCL`, and the 1/f correlation length it does NOT cover as `NOISECRL`.
+**`factors` applies only to the samples in `factors_samples` (`spt`, where it was measured);**
+any other sample takes `sample_factors[sample]` (same keys) or per-lens `lens_overrides`, and
+`make_stamps.py` refuses a sample with neither (2026-10-29, when `cowls_spectacular` arrived
+with SHALLOW4 5-group ramps — see the readout-pattern warning below). For a new sample: cut
+with `--corr-factor 1.0`, measure, add `sample_factors`, re-cut. **COWLS, measured 2026-10-30
+on all 68 stamps (`measure_corr_factor.py --out ..._cowls_spectacular.json`), per FILTER:
+F115W 1.25, F150W 1.22, F277W 1.03, F444W 0.95 at 0.2"** (16–84% ranges ±0.02). Per filter
+because F277W > F444W in all 17 lenses and F115W > F150W in 16 of 17, a split larger than the
+scatter; no dependence on depth (lens N's one SW exposure measures like the 4-exposure lenses).
+Curves in `sample_factors.cowls_spectacular.block_ratio_curve`. The channel medians come from
+interpolating each stamp's block-ratio curve to the scales and taking the median, which
+reproduces the SPT `factors` to 0.01.
 
 **Correlated noise — measured 2026-10-04 (`measure_corr_factor.py`, all 12 stamps,
-`diagnostics/corr_factor/`).** Current factors: **SW 1.30, LW 1.03 at 0.2"**, plus a lens
-override **B1938+666 F277W 1.5**. How they were chosen, and why not the HST recipe:
+`diagnostics/corr_factor/`).** Current factors: **SW 1.30, LW 1.03 at 0.2"**, plus lens
+overrides **B1938+666 F115W 0.94, F277W 1.12** (the split-dither test below). How they were chosen, and why not the HST recipe:
 
 - Drizzle itself behaves: per-pixel C(0) = 0.45–0.55 in every SPT band (pixfrac 1,
   native→output 0.031→0.03 and 0.063→0.06 halve the per-pixel variance), and the
@@ -589,6 +672,10 @@ Verified end to end on SPT2147-50 F444W (see *Current state*): `reduce_nircam.py
 (two photutils-3.0 fixes: `x_centroid`/`y_centroid` column names, a missing import),
 `export_dataset.py`, `run_reduce_all.sh`. `make_dataset_subplots.py` runs and correctly
 refuses a band with no mask yet.
+
+Exercised 2026-10-29: the position query + footprint cut of `download_nircam.py`, the
+per-sample `mosaic_field`/`prune_intermediates`, neighbour hard-linking of pool files, and
+`exptime_at` (identical to the old sums on every SPT/B1938 band).
 
 Not yet exercised: the STPSF model tier of `make_psf.py` (needs stpsf-data),
 `make_arc_masks.py`, `make_qc_grids.py`, `--tweakreg gaia`. Stubs: `detect_arcs.py`.

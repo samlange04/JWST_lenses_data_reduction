@@ -15,6 +15,500 @@
             }
         }
     },
+    "cowls_spectacular": {
+        "COSJ095914+021219": {
+            "uncal": {
+                "obs_ids": [
+                    "jw01727-o079_t013_nircam_clear-f115w",
+                    "jw01727-o079_t013_nircam_clear-f150w",
+                    "jw01727-o079_t013_nircam_clear-f277w",
+                    "jw01727-o079_t013_nircam_clear-f444w",
+                    "jw01727-o080_t014_nircam_clear-f115w",
+                    "jw01727-o080_t014_nircam_clear-f150w",
+                    "jw01727-o080_t014_nircam_clear-f277w",
+                    "jw01727-o080_t014_nircam_clear-f444w",
+                    "jw01727-o082_t022_nircam_clear-f115w",
+                    "jw01727-o082_t022_nircam_clear-f277w",
+                    "jw01727-o154_t022_nircam_clear-f115w",
+                    "jw01727-o154_t022_nircam_clear-f277w",
+                    "jw01727-o167_t022_nircam_clear-f150w",
+                    "jw01727-o167_t022_nircam_clear-f444w"
+                ],
+                "n_files": 70,
+                "size_gb": 3.53,
+                "per_filter": {
+                    "F115W": 26,
+                    "F277W": 12,
+                    "F150W": 22,
+                    "F444W": 10
+                },
+                "query": "position",
+                "field_arcsec": 90.0,
+                "n_files_in_obs": 260,
+                "n_files_no_footprint": 0
+            }
+        },
+        "COSJ095917+015424": {
+            "uncal": {
+                "obs_ids": [
+                    "jw01727-o124_t040_nircam_clear-f115w",
+                    "jw01727-o124_t040_nircam_clear-f150w",
+                    "jw01727-o124_t040_nircam_clear-f277w",
+                    "jw01727-o124_t040_nircam_clear-f444w",
+                    "jw01727-o126_t048_nircam_clear-f115w",
+                    "jw01727-o126_t048_nircam_clear-f150w",
+                    "jw01727-o126_t048_nircam_clear-f277w",
+                    "jw01727-o126_t048_nircam_clear-f444w"
+                ],
+                "n_files": 20,
+                "size_gb": 1.01,
+                "per_filter": {
+                    "F115W": 6,
+                    "F277W": 4,
+                    "F150W": 6,
+                    "F444W": 4
+                },
+                "query": "position",
+                "field_arcsec": 90.0,
+                "n_files_in_obs": 160,
+                "n_files_no_footprint": 0
+            }
+        },
+        "COSJ095920+015851": {
+            "uncal": {
+                "obs_ids": [
+                    "jw01727-o122_t032_nircam_clear-f115w",
+                    "jw01727-o122_t032_nircam_clear-f150w",
+                    "jw01727-o122_t032_nircam_clear-f277w",
+                    "jw01727-o122_t032_nircam_clear-f444w",
+                    "jw01727-o124_t040_nircam_clear-f115w",
+                    "jw01727-o124_t040_nircam_clear-f150w",
+                    "jw01727-o124_t040_nircam_clear-f277w",
+                    "jw01727-o124_t040_nircam_clear-f444w"
+                ],
+                "n_files": 62,
+                "size_gb": 3.12,
+                "per_filter": {
+                    "F115W": 23,
+                    "F277W": 8,
+                    "F150W": 23,
+                    "F444W": 8
+                },
+                "query": "position",
+                "field_arcsec": 90.0,
+                "n_files_in_obs": 160,
+                "n_files_no_footprint": 0
+            }
+        },
+        "COSJ095921+020638": {
+            "uncal": {
+                "obs_ids": [
+                    "jw01727-o082_t022_nircam_clear-f115w",
+                    "jw01727-o082_t022_nircam_clear-f277w",
+                    "jw01727-o084_t030_nircam_clear-f115w",
+                    "jw01727-o084_t030_nircam_clear-f150w",
+                    "jw01727-o084_t030_nircam_clear-f277w",
+                    "jw01727-o084_t030_nircam_clear-f444w",
+                    "jw01727-o119_t023_nircam_clear-f115w",
+                    "jw01727-o119_t023_nircam_clear-f150w",
+                    "jw01727-o119_t023_nircam_clear-f277w",
+                    "jw01727-o119_t023_nircam_clear-f444w",
+                    "jw01727-o121_t031_nircam_clear-f115w",
+                    "jw01727-o121_t031_nircam_clear-f150w",
+                    "jw01727-o121_t031_nircam_clear-f277w",
+                    "jw01727-o121_t031_nircam_clear-f444w",
+                    "jw01727-o154_t022_nircam_clear-f115w",
+                    "jw01727-o154_t022_nircam_clear-f277w",
+                    "jw01727-o167_t022_nircam_clear-f150w",
+                    "jw01727-o167_t022_nircam_clear-f444w"
+                ],
+                "n_files": 64,
+                "size_gb": 3.23,
+                "per_filter": {
+                    "F115W": 20,
+                    "F277W": 14,
+                    "F150W": 18,
+                    "F444W": 12
+                },
+                "query": "position",
+                "field_arcsec": 90.0,
+                "n_files_in_obs": 340,
+                "n_files_no_footprint": 0
+            }
+        },
+        "COSJ095950+022057": {
+            "uncal": {
+                "obs_ids": [
+                    "jw01727-o045_t027_nircam_clear-f115w",
+                    "jw01727-o045_t027_nircam_clear-f150w",
+                    "jw01727-o045_t027_nircam_clear-f277w",
+                    "jw01727-o045_t027_nircam_clear-f444w",
+                    "jw01727-o046_t028_nircam_clear-f115w",
+                    "jw01727-o046_t028_nircam_clear-f150w",
+                    "jw01727-o046_t028_nircam_clear-f277w",
+                    "jw01727-o046_t028_nircam_clear-f444w",
+                    "jw01727-o048_t036_nircam_clear-f115w",
+                    "jw01727-o048_t036_nircam_clear-f150w",
+                    "jw01727-o048_t036_nircam_clear-f277w",
+                    "jw01727-o048_t036_nircam_clear-f444w"
+                ],
+                "n_files": 52,
+                "size_gb": 2.62,
+                "per_filter": {
+                    "F115W": 18,
+                    "F277W": 8,
+                    "F150W": 18,
+                    "F444W": 8
+                },
+                "query": "position",
+                "field_arcsec": 90.0,
+                "n_files_in_obs": 240,
+                "n_files_no_footprint": 0
+            }
+        },
+        "COSJ095953+023319": {
+            "uncal": {
+                "obs_ids": [
+                    "jw01727-o004_t010_nircam_clear-f115w",
+                    "jw01727-o004_t010_nircam_clear-f150w",
+                    "jw01727-o004_t010_nircam_clear-f277w",
+                    "jw01727-o004_t010_nircam_clear-f444w",
+                    "jw01727-o005_t017_nircam_clear-f115w",
+                    "jw01727-o005_t017_nircam_clear-f150w",
+                    "jw01727-o005_t017_nircam_clear-f277w",
+                    "jw01727-o005_t017_nircam_clear-f444w",
+                    "jw01727-o006_t018_nircam_clear-f115w",
+                    "jw01727-o006_t018_nircam_clear-f150w",
+                    "jw01727-o006_t018_nircam_clear-f277w",
+                    "jw01727-o006_t018_nircam_clear-f444w"
+                ],
+                "n_files": 46,
+                "size_gb": 2.32,
+                "per_filter": {
+                    "F115W": 16,
+                    "F277W": 7,
+                    "F150W": 16,
+                    "F444W": 7
+                },
+                "query": "position",
+                "field_arcsec": 90.0,
+                "n_files_in_obs": 240,
+                "n_files_no_footprint": 0
+            }
+        },
+        "COSJ095955+021900": {
+            "uncal": {
+                "obs_ids": [
+                    "jw01727-o048_t036_nircam_clear-f115w",
+                    "jw01727-o048_t036_nircam_clear-f150w",
+                    "jw01727-o048_t036_nircam_clear-f277w",
+                    "jw01727-o048_t036_nircam_clear-f444w",
+                    "jw01727-o050_t044_nircam_clear-f115w",
+                    "jw01727-o050_t044_nircam_clear-f150w",
+                    "jw01727-o050_t044_nircam_clear-f277w",
+                    "jw01727-o050_t044_nircam_clear-f444w"
+                ],
+                "n_files": 60,
+                "size_gb": 3.02,
+                "per_filter": {
+                    "F115W": 18,
+                    "F277W": 12,
+                    "F150W": 18,
+                    "F444W": 12
+                },
+                "query": "position",
+                "field_arcsec": 90.0,
+                "n_files_in_obs": 160,
+                "n_files_no_footprint": 0
+            }
+        },
+        "COSJ100012+022015": {
+            "uncal": {
+                "obs_ids": [
+                    "jw01727-o050_t044_nircam_clear-f115w",
+                    "jw01727-o050_t044_nircam_clear-f150w",
+                    "jw01727-o050_t044_nircam_clear-f277w",
+                    "jw01727-o050_t044_nircam_clear-f444w",
+                    "jw01727-o051_t051_nircam_clear-f115w",
+                    "jw01727-o051_t051_nircam_clear-f150w",
+                    "jw01727-o051_t051_nircam_clear-f277w",
+                    "jw01727-o051_t051_nircam_clear-f444w",
+                    "jw01727-o052_t052_nircam_clear-f115w",
+                    "jw01727-o052_t052_nircam_clear-f277w",
+                    "jw01727-o053_t059_nircam_clear-f115w",
+                    "jw01727-o053_t059_nircam_clear-f150w",
+                    "jw01727-o053_t059_nircam_clear-f277w",
+                    "jw01727-o053_t059_nircam_clear-f444w",
+                    "jw01727-o162_t052_nircam_clear-f115w",
+                    "jw01727-o162_t052_nircam_clear-f150w",
+                    "jw01727-o162_t052_nircam_clear-f277w",
+                    "jw01727-o162_t052_nircam_clear-f444w"
+                ],
+                "n_files": 62,
+                "size_gb": 3.12,
+                "per_filter": {
+                    "F115W": 21,
+                    "F277W": 12,
+                    "F150W": 19,
+                    "F444W": 10
+                },
+                "query": "position",
+                "field_arcsec": 90.0,
+                "n_files_in_obs": 340,
+                "n_files_no_footprint": 0
+            }
+        },
+        "COSJ100013+023424": {
+            "uncal": {
+                "obs_ids": [
+                    "jw01727-o007_t025_nircam_clear-f115w",
+                    "jw01727-o007_t025_nircam_clear-f150w",
+                    "jw01727-o007_t025_nircam_clear-f277w",
+                    "jw01727-o007_t025_nircam_clear-f444w",
+                    "jw01727-o009_t033_nircam_clear-f115w",
+                    "jw01727-o009_t033_nircam_clear-f150w",
+                    "jw01727-o009_t033_nircam_clear-f277w",
+                    "jw01727-o009_t033_nircam_clear-f444w"
+                ],
+                "n_files": 48,
+                "size_gb": 2.42,
+                "per_filter": {
+                    "F115W": 17,
+                    "F277W": 7,
+                    "F150W": 17,
+                    "F444W": 7
+                },
+                "query": "position",
+                "field_arcsec": 90.0,
+                "n_files_in_obs": 160,
+                "n_files_no_footprint": 0
+            }
+        },
+        "COSJ100018+022138": {
+            "uncal": {
+                "obs_ids": [
+                    "jw01727-o051_t051_nircam_clear-f115w",
+                    "jw01727-o051_t051_nircam_clear-f150w",
+                    "jw01727-o051_t051_nircam_clear-f277w",
+                    "jw01727-o051_t051_nircam_clear-f444w",
+                    "jw01727-o053_t059_nircam_clear-f115w",
+                    "jw01727-o053_t059_nircam_clear-f150w",
+                    "jw01727-o053_t059_nircam_clear-f277w",
+                    "jw01727-o053_t059_nircam_clear-f444w"
+                ],
+                "n_files": 44,
+                "size_gb": 2.22,
+                "per_filter": {
+                    "F115W": 14,
+                    "F277W": 8,
+                    "F150W": 14,
+                    "F444W": 8
+                },
+                "query": "position",
+                "field_arcsec": 90.0,
+                "n_files_in_obs": 160,
+                "n_files_no_footprint": 0
+            }
+        },
+        "COSJ100024+015334": {
+            "uncal": {
+                "obs_ids": [
+                    "jw01727-o137_t095_nircam_clear-f115w",
+                    "jw01727-o137_t095_nircam_clear-f150w",
+                    "jw01727-o137_t095_nircam_clear-f277w",
+                    "jw01727-o137_t095_nircam_clear-f444w",
+                    "jw01727-o138_t096_nircam_clear-f115w",
+                    "jw01727-o138_t096_nircam_clear-f150w",
+                    "jw01727-o138_t096_nircam_clear-f277w",
+                    "jw01727-o138_t096_nircam_clear-f444w",
+                    "jw01727-o139_t103_nircam_clear-f115w",
+                    "jw01727-o139_t103_nircam_clear-f150w",
+                    "jw01727-o139_t103_nircam_clear-f277w",
+                    "jw01727-o139_t103_nircam_clear-f444w",
+                    "jw01727-o140_t104_nircam_clear-f115w",
+                    "jw01727-o140_t104_nircam_clear-f150w",
+                    "jw01727-o140_t104_nircam_clear-f277w",
+                    "jw01727-o140_t104_nircam_clear-f444w"
+                ],
+                "n_files": 54,
+                "size_gb": 2.72,
+                "per_filter": {
+                    "F115W": 16,
+                    "F277W": 11,
+                    "F150W": 16,
+                    "F444W": 11
+                },
+                "query": "position",
+                "field_arcsec": 90.0,
+                "n_files_in_obs": 320,
+                "n_files_no_footprint": 0
+            }
+        },
+        "COSJ100024+021749": {
+            "uncal": {
+                "obs_ids": [
+                    "jw01727-o054_t060_nircam_clear-f115w",
+                    "jw01727-o054_t060_nircam_clear-f150w",
+                    "jw01727-o054_t060_nircam_clear-f277w",
+                    "jw01727-o054_t060_nircam_clear-f444w",
+                    "jw01727-o056_t068_nircam_clear-f115w",
+                    "jw01727-o056_t068_nircam_clear-f150w",
+                    "jw01727-o056_t068_nircam_clear-f277w",
+                    "jw01727-o056_t068_nircam_clear-f444w"
+                ],
+                "n_files": 56,
+                "size_gb": 2.82,
+                "per_filter": {
+                    "F115W": 20,
+                    "F277W": 8,
+                    "F150W": 20,
+                    "F444W": 8
+                },
+                "query": "position",
+                "field_arcsec": 90.0,
+                "n_files_in_obs": 160,
+                "n_files_no_footprint": 0
+            }
+        },
+        "COSJ100025+015245": {
+            "uncal": {
+                "obs_ids": [
+                    "jw01727-o138_t096_nircam_clear-f115w",
+                    "jw01727-o138_t096_nircam_clear-f150w",
+                    "jw01727-o138_t096_nircam_clear-f277w",
+                    "jw01727-o138_t096_nircam_clear-f444w",
+                    "jw01727-o140_t104_nircam_clear-f115w",
+                    "jw01727-o140_t104_nircam_clear-f150w",
+                    "jw01727-o140_t104_nircam_clear-f277w",
+                    "jw01727-o140_t104_nircam_clear-f444w"
+                ],
+                "n_files": 60,
+                "size_gb": 3.02,
+                "per_filter": {
+                    "F115W": 22,
+                    "F277W": 8,
+                    "F150W": 22,
+                    "F444W": 8
+                },
+                "query": "position",
+                "field_arcsec": 90.0,
+                "n_files_in_obs": 160,
+                "n_files_no_footprint": 0
+            }
+        },
+        "COSJ100028+021928": {
+            "uncal": {
+                "obs_ids": [
+                    "jw01727-o053_t059_nircam_clear-f115w",
+                    "jw01727-o053_t059_nircam_clear-f150w",
+                    "jw01727-o053_t059_nircam_clear-f277w",
+                    "jw01727-o053_t059_nircam_clear-f444w",
+                    "jw01727-o054_t060_nircam_clear-f115w",
+                    "jw01727-o054_t060_nircam_clear-f150w",
+                    "jw01727-o054_t060_nircam_clear-f277w",
+                    "jw01727-o054_t060_nircam_clear-f444w",
+                    "jw01727-o055_t067_nircam_clear-f115w",
+                    "jw01727-o055_t067_nircam_clear-f150w",
+                    "jw01727-o055_t067_nircam_clear-f277w",
+                    "jw01727-o055_t067_nircam_clear-f444w",
+                    "jw01727-o056_t068_nircam_clear-f115w",
+                    "jw01727-o056_t068_nircam_clear-f150w",
+                    "jw01727-o056_t068_nircam_clear-f277w",
+                    "jw01727-o056_t068_nircam_clear-f444w"
+                ],
+                "n_files": 50,
+                "size_gb": 2.52,
+                "per_filter": {
+                    "F115W": 17,
+                    "F277W": 8,
+                    "F150W": 17,
+                    "F444W": 8
+                },
+                "query": "position",
+                "field_arcsec": 90.0,
+                "n_files_in_obs": 320,
+                "n_files_no_footprint": 0
+            }
+        },
+        "COSJ100047+015023": {
+            "uncal": {
+                "obs_ids": [
+                    "jw01727-o144_t120_nircam_clear-f115w",
+                    "jw01727-o144_t120_nircam_clear-f150w",
+                    "jw01727-o144_t120_nircam_clear-f277w",
+                    "jw01727-o144_t120_nircam_clear-f444w",
+                    "jw01727-o146_t128_nircam_clear-f115w",
+                    "jw01727-o146_t128_nircam_clear-f150w",
+                    "jw01727-o146_t128_nircam_clear-f277w",
+                    "jw01727-o146_t128_nircam_clear-f444w"
+                ],
+                "n_files": 44,
+                "size_gb": 2.22,
+                "per_filter": {
+                    "F115W": 14,
+                    "F277W": 8,
+                    "F150W": 14,
+                    "F444W": 8
+                },
+                "query": "position",
+                "field_arcsec": 90.0,
+                "n_files_in_obs": 160,
+                "n_files_no_footprint": 0
+            }
+        },
+        "COSJ100119+014849": {
+            "uncal": {
+                "obs_ids": [
+                    "jw01727-o151_t151_nircam_clear-f115w",
+                    "jw01727-o151_t151_nircam_clear-f150w",
+                    "jw01727-o151_t151_nircam_clear-f277w",
+                    "jw01727-o151_t151_nircam_clear-f444w",
+                    "jw01727-o152_t152_nircam_clear-f115w",
+                    "jw01727-o152_t152_nircam_clear-f150w",
+                    "jw01727-o152_t152_nircam_clear-f277w",
+                    "jw01727-o152_t152_nircam_clear-f444w"
+                ],
+                "n_files": 44,
+                "size_gb": 2.22,
+                "per_filter": {
+                    "F115W": 16,
+                    "F277W": 6,
+                    "F150W": 16,
+                    "F444W": 6
+                },
+                "query": "position",
+                "field_arcsec": 90.0,
+                "n_files_in_obs": 160,
+                "n_files_no_footprint": 0
+            }
+        },
+        "COSJ100121+022740": {
+            "uncal": {
+                "obs_ids": [
+                    "jw01727-o025_t097_nircam_clear-f115w",
+                    "jw01727-o025_t097_nircam_clear-f150w",
+                    "jw01727-o025_t097_nircam_clear-f277w",
+                    "jw01727-o025_t097_nircam_clear-f444w",
+                    "jw01727-o027_t105_nircam_clear-f115w",
+                    "jw01727-o027_t105_nircam_clear-f150w",
+                    "jw01727-o027_t105_nircam_clear-f277w",
+                    "jw01727-o027_t105_nircam_clear-f444w"
+                ],
+                "n_files": 56,
+                "size_gb": 2.82,
+                "per_filter": {
+                    "F115W": 20,
+                    "F277W": 8,
+                    "F150W": 20,
+                    "F444W": 8
+                },
+                "query": "position",
+                "field_arcsec": 90.0,
+                "n_files_in_obs": 160,
+                "n_files_no_footprint": 0
+            }
+        }
+    },
     "spt": {
         "SPT0418-47": {
             "rate": {

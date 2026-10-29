@@ -15,8 +15,8 @@ of a more distant galaxy (the *source*) behind it, so the source appears as arcs
 two to four separate images around the deflector. Modelling those arcs measures how mass is
 distributed in the deflector. A model needs more than a picture, though: it needs to know how
 uncertain every pixel is, how blurred the telescope makes a point of light, which pixels to
-ignore, and roughly where the multiple images are. This repository produces all of that, for
-three lenses from two JWST programs.
+ignore, and roughly where the multiple images are. This repository produces that for 20
+lenses from three JWST programs (for the 17 COSMOS-Web lenses, so far the image and noise map).
 
 **Most people only need the finished products in `data/stamps/`** — they are in git, so a
 plain clone has them. Re-running the reduction is only needed to change how it was done.
@@ -33,8 +33,9 @@ tools drew the masks and marked the positions.
 | `b1938` | B1938+666 | GO 8281 (PI Vegetti) | F115W, F277W (21 dithers, ~24 h per filter) | 0.881 / 2.059 |
 | `spt` | SPT0418-47 | ERS 1355 TEMPLATES (PI Rigby) | F115W, F150W, F200W, F277W, F356W, F444W | 0.263 / 4.22 |
 | `spt` | SPT2147-50 | ERS 1355 TEMPLATES (PI Rigby) | F200W, F277W, F356W, F444W | 0.845 / 3.76 |
+| `cowls_spectacular` | the 17 "spectacular" COWLS lenses of Mahler et al. (2025), `COSJ095914+021219` … `COSJ100121+022740` | GO 1727 COSMOS-Web (PIs Kartaltepe & Casey) | F115W, F150W, F277W, F444W (2–4 exposures of 258 s per filter at the lens) | per lens in `lens_samples.json`; most have no source redshift |
 
-That is 12 lens-and-filter images in total. A filter name gives its approximate central
+That is 80 lens-and-filter images in total (12 + 68 COWLS). A filter name gives its approximate central
 wavelength in hundredths of a micron: F115W is centred near 1.15 μm and F444W near 4.4 μm,
 so every band here is near- to mid-infrared. Seeing the same lens in several colours helps
 tell the lensed source apart from the deflector; the two SPT sources are dusty and brightest
@@ -48,7 +49,7 @@ too:
 | Short wavelength (SW) | F115W, F150W, F200W | 0.03″ (resampled from 0.031″) | 400 × 400 (B1938+666: 232 × 232) |
 | Long wavelength (LW) | F277W, F356W, F444W | 0.06″ (resampled from 0.063″) | 200 × 200 (B1938+666: 116 × 116) |
 
-The SPT stamps cover 12″ × 12″ of sky. B1938+666's cover 6.96″ × 6.96″, because its Einstein
+The SPT and COWLS stamps cover 12″ × 12″ of sky. B1938+666's cover 6.96″ × 6.96″, because its Einstein
 ring is only ~0.9″ across and a 12″ stamp was a third detector streaks and unrelated galaxies.
 Every stamp is centred on the lens, and a lens's SW and LW pixels nest exactly 2 : 1.
 
@@ -68,12 +69,13 @@ Each lens and filter has one folder, `data/stamps/<sample>/<lens>/<filter>/`, fo
 | `stamp<S>_dataset.png` | A quick-look figure of the image, noise, PSF and mask together — the fastest way to check a lens. |
 
 `<S>` is the stamp size in arcseconds: `stamp7_*` for B1938+666, `stamp12_*` for the SPT
-lenses. A stamp cut at another size (`make_stamps.py --size 20`) is written beside these as
+and COWLS lenses. A stamp cut at another size (`make_stamps.py --size 20`) is written beside these as
 `stamp20_*` and is not kept in git. The PSF has no size in its name because it does not depend
 on the stamp size.
 
 **Masks and positions so far exist for B1938+666 only.** The SPT bands carry the image, noise
-map and PSF; their masks and positions have not been drawn yet.
+map and PSF; their masks and positions have not been drawn yet. **The COWLS bands carry only
+the image and noise map so far**: no PSF, masks or positions yet.
 
 **Orientation.** North is towards increasing row number and West towards increasing column
 number, so with Python's usual display (row 0 at the top) **North appears at the bottom and
@@ -109,7 +111,8 @@ signal_to_noise = image / noise
   describe noise that grows with the size of the patch you sum over, so each map is scaled to
   be right for patches of 0.2″, roughly the image-plane footprint of one source pixel: SW ×1.30
   and LW ×1.03 for the SPT lenses, and F115W ×0.94 and F277W ×1.12 for B1938+666, whose much
-  deeper data were measured separately by splitting its dithers in two. The full
+  deeper data were measured separately by splitting its dithers in two. The COWLS lenses have
+  their own, per filter: F115W ×1.25, F150W ×1.22, F277W ×1.03, F444W ×0.95. The full
   scale-dependence is in `info/overrides/noise_corr_factors.json` (`block_ratio_curve`). A model
   whose source pixels map onto larger patches of the image should rescale from it.
 - **B1938+666's stamp is centred on the deflector, not on its catalogue coordinate.** The
@@ -124,7 +127,13 @@ signal_to_noise = image / noise
 - **SPT0418-47 sits on the NIRCam detector with the strongest "wisps"** (faint scattered-light
   patterns in the SW bands). They are not subtracted, so check the SW images before trusting
   a faint SW feature.
-- **Redshifts** for every lens are in `info/samples/lens_samples.json`.
+- **COWLS depth varies from lens to lens**, because it depends on where each lens fell in
+  COSMOS-Web's dither pattern: 2–4 exposures per filter, and COSJ100028+021928 has a single
+  SW exposure, so its F115W/F150W cosmic rays were caught on the ramp alone. COSJ095917+015424
+  sits at the survey's southern edge: its lens is covered, but part of its stamp is not
+  (noise 10⁸ there).
+- **Redshifts** for every lens are in `info/samples/lens_samples.json`, with their source for
+  the COWLS lenses (spectroscopic or photometric); a missing value is `null`.
 
 [`AGENTS.md`](AGENTS.md) has the measurements behind each of these.
 
@@ -136,7 +145,8 @@ non-destructive readouts (a *ramp*), takes several exposures shifted slightly be
 
 1. **Downloads** the raw ramps from the JWST archive (MAST) and the matching calibration
    files. A NIRCam visit records all of its filters at once, so the whole visit is fetched
-   and sorted by filter.
+   and sorted by filter. For the COSMOS-Web survey, whose archive targets are survey tiles
+   rather than lenses, only the detector exposures that overlap each lens's field are fetched.
 2. **Fits the ramps** with STScI's `jwst` pipeline, rejecting cosmic-ray hits and their
    "snowball" splashes, and removing the 1/f stripes on the ramp itself (a step the pipeline
    leaves off by default, and the reason this repository starts from the raw ramps).
@@ -170,8 +180,8 @@ This installs the exact Python version and package versions the pipeline was run
 macOS or Linux, with nothing else to install. Run any script as `uv run python scripts/<name>.py`.
 
 **Expect large downloads.** The calibration files download themselves on first use into
-`data/reference_files/` (about 30 GB for NIRCam), and B1938+666's raw ramps alone are 79 GB.
-Reducing its two filters took 8.5 hours. The STPSF data files (needed only for the
+`data/reference_files/` (about 80 GB for the SPT and B1938 data, 45 GB more for COWLS), and B1938+666's raw ramps alone are 79 GB. Reducing its two filters took 8.5 hours;
+the 17 COWLS lenses (38 GB of ramps) took about 11. The STPSF data files (needed only for the
 model-PSF fallback) go in `data/reference_files/stpsf-data/`.
 
 **Reduce one lens in one filter**, e.g. SPT2147-50 in F444W:
@@ -218,14 +228,17 @@ in `data/`, and the JSON records in `info/` — are under [CC BY 4.0](LICENSE-DA
 share and adapt them for any purpose, as long as you give credit as above.
 
 Please also credit the programs and papers for the lenses you use: GO 8281 (PI Vegetti) for
-B1938+666, and the TEMPLATES program (Rigby et al. 2025) for the SPT lenses. The redshifts
-come from Tonry & Kochanek (2000) and Riechers (2011) for B1938+666, and Weiß et al. (2013)
-and Reuter et al. (2020) for the SPT lenses. Please acknowledge the JWST data, e.g. *"This
+B1938+666, the TEMPLATES program (Rigby et al. 2025) for the SPT lenses, and COSMOS-Web
+(Casey et al. 2023) and the COSMOS-Web Lens Survey (Nightingale et al. 2025; Mahler et al. 2025)
+for the COWLS lenses. The redshifts come from Tonry & Kochanek (2000) and Riechers (2011) for
+B1938+666, Weiß et al. (2013) and Reuter et al. (2020) for the SPT lenses, and, for the COWLS
+lenses, Mahler et al. (2025) Table 1 (from DESI, the COSMOS-Web catalogue of Shuntov et al.
+2024, Shuntov et al. 2025, van der Wel et al. 2013 and Jin et al. 2024). Please acknowledge the JWST data, e.g. *"This
 work is based on observations made with the NASA/ESA/CSA James Webb Space Telescope. The data
 were obtained from the Mikulski Archive for Space Telescopes at the Space Telescope Science
 Institute, which is operated by the Association of Universities for Research in Astronomy,
 Inc., under NASA contract NAS 5-03127 for JWST. These observations are associated with
-programs #1355 and #8281."*
+programs #1355, #1727 and #8281."*
 
 The reduction is built on STScI's [`jwst` pipeline](https://jwst-pipeline.readthedocs.io) and
 [STPSF](https://stpsf.readthedocs.io), [Astropy](https://www.astropy.org),

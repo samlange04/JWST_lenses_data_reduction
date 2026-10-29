@@ -5,6 +5,110 @@
             "F277W": "NIRCAM/LW"
         }
     },
+    "cowls_spectacular": {
+        "COSJ095914+021219": {
+            "F115W": "NIRCAM/SW",
+            "F150W": "NIRCAM/SW",
+            "F277W": "NIRCAM/LW",
+            "F444W": "NIRCAM/LW"
+        },
+        "COSJ095917+015424": {
+            "F115W": "NIRCAM/SW",
+            "F150W": "NIRCAM/SW",
+            "F277W": "NIRCAM/LW",
+            "F444W": "NIRCAM/LW"
+        },
+        "COSJ095920+015851": {
+            "F115W": "NIRCAM/SW",
+            "F150W": "NIRCAM/SW",
+            "F277W": "NIRCAM/LW",
+            "F444W": "NIRCAM/LW"
+        },
+        "COSJ095921+020638": {
+            "F115W": "NIRCAM/SW",
+            "F150W": "NIRCAM/SW",
+            "F277W": "NIRCAM/LW",
+            "F444W": "NIRCAM/LW"
+        },
+        "COSJ095950+022057": {
+            "F115W": "NIRCAM/SW",
+            "F150W": "NIRCAM/SW",
+            "F277W": "NIRCAM/LW",
+            "F444W": "NIRCAM/LW"
+        },
+        "COSJ095953+023319": {
+            "F115W": "NIRCAM/SW",
+            "F150W": "NIRCAM/SW",
+            "F277W": "NIRCAM/LW",
+            "F444W": "NIRCAM/LW"
+        },
+        "COSJ095955+021900": {
+            "F115W": "NIRCAM/SW",
+            "F150W": "NIRCAM/SW",
+            "F277W": "NIRCAM/LW",
+            "F444W": "NIRCAM/LW"
+        },
+        "COSJ100012+022015": {
+            "F115W": "NIRCAM/SW",
+            "F150W": "NIRCAM/SW",
+            "F277W": "NIRCAM/LW",
+            "F444W": "NIRCAM/LW"
+        },
+        "COSJ100013+023424": {
+            "F115W": "NIRCAM/SW",
+            "F150W": "NIRCAM/SW",
+            "F277W": "NIRCAM/LW",
+            "F444W": "NIRCAM/LW"
+        },
+        "COSJ100018+022138": {
+            "F115W": "NIRCAM/SW",
+            "F150W": "NIRCAM/SW",
+            "F277W": "NIRCAM/LW",
+            "F444W": "NIRCAM/LW"
+        },
+        "COSJ100024+015334": {
+            "F115W": "NIRCAM/SW",
+            "F150W": "NIRCAM/SW",
+            "F277W": "NIRCAM/LW",
+            "F444W": "NIRCAM/LW"
+        },
+        "COSJ100024+021749": {
+            "F115W": "NIRCAM/SW",
+            "F150W": "NIRCAM/SW",
+            "F277W": "NIRCAM/LW",
+            "F444W": "NIRCAM/LW"
+        },
+        "COSJ100025+015245": {
+            "F115W": "NIRCAM/SW",
+            "F150W": "NIRCAM/SW",
+            "F277W": "NIRCAM/LW",
+            "F444W": "NIRCAM/LW"
+        },
+        "COSJ100028+021928": {
+            "F115W": "NIRCAM/SW",
+            "F150W": "NIRCAM/SW",
+            "F277W": "NIRCAM/LW",
+            "F444W": "NIRCAM/LW"
+        },
+        "COSJ100047+015023": {
+            "F115W": "NIRCAM/SW",
+            "F150W": "NIRCAM/SW",
+            "F277W": "NIRCAM/LW",
+            "F444W": "NIRCAM/LW"
+        },
+        "COSJ100119+014849": {
+            "F115W": "NIRCAM/SW",
+            "F150W": "NIRCAM/SW",
+            "F277W": "NIRCAM/LW",
+            "F444W": "NIRCAM/LW"
+        },
+        "COSJ100121+022740": {
+            "F115W": "NIRCAM/SW",
+            "F150W": "NIRCAM/SW",
+            "F277W": "NIRCAM/LW",
+            "F444W": "NIRCAM/LW"
+        }
+    },
     "spt": {
         "SPT0418-47": {
             "F115W": "NIRCAM/SW",

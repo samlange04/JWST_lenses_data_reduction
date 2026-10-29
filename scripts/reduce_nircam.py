@@ -173,14 +173,43 @@ def _exptime(path):
     return float(h.get('EFFEXPTM', h.get('EXPTIME', 0.0)))
 
 
-def run_detector1(uncal_files, out_dir, flicker_by_channel):
-    """Detector1 on each uncal that has no rate yet. Returns the rate paths."""
+def _link_from_neighbour(path):
+    """Hard-link `path` (a rate or cal in data/<stage>/<sample>/<lens>/<FILT>/) from another
+    lens of the same sample, stage tree and filter that already made it. Survey neighbours
+    (COSMOS-Web lenses a few arcmin apart) share exposures, and neither Detector1 nor Image2
+    depends on the lens. True if linked. Never in a destriped tree: those rates carry an
+    object mask taken from the lens's own mosaic."""
+    filt_dir = os.path.dirname(path)
+    sample_dir = os.path.dirname(os.path.dirname(filt_dir))
+    if os.path.basename(os.path.dirname(sample_dir)).endswith('_destriped'):
+        return False
+    pattern = os.path.join(sample_dir, '*', os.path.basename(filt_dir), os.path.basename(path))
+    for twin in glob.glob(pattern):
+        if not os.path.samefile(os.path.dirname(twin), filt_dir):
+            os.link(twin, path)
+            print(f'      {os.path.basename(path)} linked from {os.path.relpath(twin, sample_dir)}', flush=True)
+            return True
+    return False
+
+
+def run_detector1(uncal_files, out_dir, flicker_by_channel, cal_dir=None):
+    """Detector1 on each uncal that has no rate yet. Returns the rate paths.
+
+    With `cal_dir` (a pruned sample, whose rates are deleted once calibrated), an uncal
+    whose cal is already there, or at a neighbour's, is not re-run: its rate path is
+    returned although the file is gone, and run_image2 skips it on the cal."""
     from jwst.pipeline import Detector1Pipeline
     os.makedirs(out_dir, exist_ok=True)
     rates = []
     for i, f in enumerate(uncal_files, 1):
         rate = os.path.join(out_dir, _rootname(f) + '_rate.fits')
-        if os.path.exists(rate):
+        if cal_dir is not None:
+            cal = os.path.join(cal_dir, _rootname(f) + '_cal.fits')
+            os.makedirs(cal_dir, exist_ok=True)
+            if os.path.exists(cal) or _link_from_neighbour(cal):
+                rates.append(rate)
+                continue
+        if os.path.exists(rate) or _link_from_neighbour(rate):
             rates.append(rate)
             continue
         t0 = time.time()
@@ -199,13 +228,38 @@ def run_detector1(uncal_files, out_dir, flicker_by_channel):
     return rates
 
 
+def prune_rates(rate_files, cal_dir):
+    """Delete each rate (and rateints) whose cal exists: a pruned sample keeps uncal + cal."""
+    for r in rate_files:
+        if os.path.exists(os.path.join(cal_dir, _rootname(r) + '_cal.fits')):
+            for f in (r, r.replace('_rate.fits', '_rateints.fits')):
+                if os.path.exists(f):
+                    os.remove(f)
+
+
+def exptime_at(cal_files, coord):
+    """Exposure time AT THE LENS: EFFEXPTM summed once per exposure (rootname minus the
+    detector suffix, so a lens on a detector edge is not counted twice) over the cal files
+    whose footprint (SCI S_REGION) covers `coord`. A survey mosaic also holds neighbouring
+    tiles' exposures that never see the lens; a frame with no S_REGION is counted."""
+    from astropy.io import fits
+    import download_nircam
+    per_exposure = {}
+    for f in cal_files:
+        s_region = fits.getheader(f, 'SCI').get('S_REGION')
+        if s_region and not download_nircam._overlaps_box(s_region, coord, 0.01):
+            continue
+        per_exposure[_rootname(f).rsplit('_', 1)[0]] = _exptime(f)
+    return float(sum(per_exposure.values()))
+
+
 def run_image2(rate_files, out_dir):
     from jwst.pipeline import Image2Pipeline
     os.makedirs(out_dir, exist_ok=True)
     cals = []
     for i, f in enumerate(rate_files, 1):
         cal = os.path.join(out_dir, _rootname(f) + '_cal.fits')
-        if os.path.exists(cal):
+        if os.path.exists(cal) or _link_from_neighbour(cal):
             cals.append(cal)
             continue
         t0 = time.time()
@@ -301,8 +355,8 @@ def main():
     p.add_argument('--scale', type=float, default=None,
                    help=f'output pixel scale, arcsec (default SW {DEFAULT_SCALE["SW"]}, '
                         f'LW {DEFAULT_SCALE["LW"]})')
-    p.add_argument('--field', type=float, default=DEFAULT_FIELD,
-                   help=f'output mosaic side, arcsec (default {DEFAULT_FIELD})')
+    p.add_argument('--field', type=float, default=None,
+                   help=f"output mosaic side, arcsec (default: the sample's mosaic_field, else {DEFAULT_FIELD})")
     p.add_argument('--tweakreg', choices=['relative', 'gaia', 'skip'], default='relative')
     p.add_argument('--flicker-by-channel', action='store_true', default=False,
                    help='clean_flicker_noise.fit_by_channel=True (per-amplifier 1/f fit)')
@@ -319,6 +373,9 @@ def main():
     ch = lens_samples.channel(filt)
     scale = a.scale if a.scale is not None else DEFAULT_SCALE[ch]
     coord = lens_samples.coord(a.lens, sample)
+    if a.field is None:
+        a.field = lens_samples.mosaic_field(sample) or DEFAULT_FIELD
+    prune = lens_samples.prune_intermediates(sample)
     variant = {'uncal': '', 'rate': 'mastrate', 'cal': 'mastcal'}[a.start]
     if a.flicker_by_channel:
         if a.start != 'uncal':
@@ -353,8 +410,13 @@ def main():
     sync_references(kept)
     base_variant = '' if a.destripe else variant      # the destripe starts from the standard stages
     if a.start == 'uncal':
-        rates = run_detector1(kept, _stage_dir('stage1', sample, a.lens, filt, base_variant), a.flicker_by_channel)
-        cals = run_image2(rates, _stage_dir('stage2', sample, a.lens, filt, base_variant))
+        stage2_dir = _stage_dir('stage2', sample, a.lens, filt, base_variant)
+        # a destripe needs the standard rates, so a pruned sample re-makes them for it
+        rates = run_detector1(kept, _stage_dir('stage1', sample, a.lens, filt, base_variant), a.flicker_by_channel,
+                              cal_dir=stage2_dir if prune and not a.destripe else None)
+        cals = run_image2(rates, stage2_dir)
+        if prune and not a.destripe:
+            prune_rates(rates, stage2_dir)
     elif a.start == 'rate':
         rates = kept
         cals = run_image2(kept, _stage_dir('stage2', sample, a.lens, filt, variant))
@@ -375,6 +437,9 @@ def main():
         cals = run_image2(rates, _stage_dir('stage2', sample, a.lens, filt, variant))
 
     i2d = run_image3(cals, mosaic_dir, product_name, coord, scale, a.field, a.tweakreg)
+    if prune:
+        for f in glob.glob(os.path.join(mosaic_dir, '*_crf.fits')):
+            os.remove(f)
     if a.destripe:
         from astropy.io import fits as _fits
         with _fits.open(i2d, mode='update') as h:
@@ -397,11 +462,9 @@ def main():
     }
     info_json.update(products_json, sample, a.lens, key, rec)
     if not variant:                             # exptime / instrument are band properties
-        # exposure time AT THE LENS: one detector per dither, so sum EFFEXPTM once per
-        # exposure (rootname minus the detector suffix), not over every detector's frame
-        per_exposure = {_rootname(f).rsplit('_', 1)[0]: _exptime(f) for f in cals}
+        lens_at = lens_samples.deflector_coord(a.lens, sample) or coord
         info_json.update(os.path.join(ws_path, 'info', 'provenance', 'lens_exptime.json'), sample, a.lens, key,
-                         round(float(sum(per_exposure.values())), 1))
+                         round(exptime_at(cals, lens_at), 1))
         info_json.update(os.path.join(ws_path, 'info', 'provenance', 'lens_instrument.json'), sample, a.lens, key,
                          f'NIRCAM/{ch}')
     print(f'=== done: {i2d}')

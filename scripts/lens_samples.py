@@ -2,13 +2,16 @@
 
 Mirrors ``mast_target_names.py`` in the HST repo, simplified for JWST: a JWST lens is
 located in MAST by **proposal ID + target name**, not by a wildcard on an SDSS designation,
-so there are no GAL-* quirks. Each sample block carries the program it comes from, and each
+so there are no GAL-* quirks -- except in a survey program, whose targets are tiles: a
+sample with ``"mast_query": "position"`` is located by proposal ID + position instead
+(``download_nircam.query_position``). Each sample block carries the program it comes from, and each
 lens carries what no FITS file does -- catalogue position (the mosaics' CRVAL and, unless a
 measured ``deflector_ra``/``deflector_dec`` overrides it, the stamp centre) and the
 redshifts that ``export_dataset.py`` writes into the modelling ``info.json``.
 
-    b1938   JVAS B1938+666           GO 8281 (Vegetti)   F115W F277W
-    spt     SPT0418-47, SPT2147-50   GO 1355 (TEMPLATES) F115W..F444W (SPT2147: F200W + LW)
+    b1938               JVAS B1938+666           GO 8281 (Vegetti)    F115W F277W
+    spt                 SPT0418-47, SPT2147-50   GO 1355 (TEMPLATES)  F115W..F444W (SPT2147: F200W + LW)
+    cowls_spectacular   17 COWLS II lenses       GO 1727 (COSMOS-Web) F115W F150W F277W F444W
 
 Nothing else parses that file or keeps a second copy of a lens list. Output and directory
 names always use the lens key (``B1938+666``, ``SPT0418-47``), never the MAST target name.
@@ -94,6 +97,30 @@ def proposal_id(sample):
     return str(_sample(sample)['proposal_id'])
 
 
+def mast_query(sample):
+    """How the sample's lenses are found in MAST: 'target' (proposal + target name, the
+    default) or 'position' (proposal + position, for survey programs whose targets are
+    tiles, e.g. COSMOS-Web's CWEBTILE-*)."""
+    q = _sample(sample).get('mast_query', 'target')
+    if q not in ('target', 'position'):
+        raise ValueError(f'sample {sample!r}: mast_query must be "target" or "position", not {q!r}')
+    return q
+
+
+def mosaic_field(sample):
+    """The sample's mosaic side in arcsec (``mosaic_field``), or None for reduce_nircam's
+    default. download_nircam.py fetches exactly the detector files that overlap it."""
+    v = _sample(sample).get('mosaic_field')
+    return None if v is None else float(v)
+
+
+def prune_intermediates(sample):
+    """True if reduce_nircam.py should delete rate/rateints once a cal exists and the
+    Image3 crf files once the mosaic exists (``prune_intermediates``; survey samples whose
+    stage1/stage2 trees would not fit on disk)."""
+    return bool(_sample(sample).get('prune_intermediates', False))
+
+
 def sample_of(lens):
     for name, block in _load().items():
         if lens in block['lenses']:
@@ -164,7 +191,7 @@ if __name__ == '__main__':
     a = p.parse_args()
     if a.list:
         for s in samples():
-            print(f'{s:10s} GO {proposal_id(s):6s} {len(lenses(s)):3d} lenses')
+            print(f'{s:18s} GO {proposal_id(s):6s} {len(lenses(s)):3d} lenses')
     elif a.print_sample:
         _sample(a.sample)
         print(a.sample)

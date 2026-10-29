@@ -39,6 +39,1266 @@
             }
         }
     },
+    "cowls_spectacular": {
+        "COSJ095914+021219": {
+            "F115W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095914+021219/F115W/cosj095914p021219_f115w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 149.811421524,
+                "center_dec": 2.2054401070000043,
+                "n_bad": 0,
+                "weight_uniformity": 0.5335,
+                "corr_factor": 1.25,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F150W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095914+021219/F150W/cosj095914p021219_f150w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 149.811421524,
+                "center_dec": 2.2054401070000043,
+                "n_bad": 0,
+                "weight_uniformity": 0.5298,
+                "corr_factor": 1.22,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F277W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095914+021219/F277W/cosj095914p021219_f277w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 149.811421524,
+                "center_dec": 2.2054401070000043,
+                "n_bad": 0,
+                "weight_uniformity": 0.4518,
+                "corr_factor": 1.03,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            },
+            "F444W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095914+021219/F444W/cosj095914p021219_f444w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 149.811421524,
+                "center_dec": 2.2054401070000043,
+                "n_bad": 0,
+                "weight_uniformity": 0.4397,
+                "corr_factor": 0.95,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            }
+        },
+        "COSJ095917+015424": {
+            "F115W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095917+015424/F115W/cosj095917p015424_f115w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 149.82146219499998,
+                "center_dec": 1.9068730329999877,
+                "n_bad": 26372,
+                "weight_uniformity": 0.174,
+                "corr_factor": 1.25,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F150W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095917+015424/F150W/cosj095917p015424_f150w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 149.82146219499998,
+                "center_dec": 1.9068730329999877,
+                "n_bad": 26338,
+                "weight_uniformity": 0.1755,
+                "corr_factor": 1.22,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F277W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095917+015424/F277W/cosj095917p015424_f277w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 149.82146219499998,
+                "center_dec": 1.9068730329999877,
+                "n_bad": 11839,
+                "weight_uniformity": 0.16,
+                "corr_factor": 1.03,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            },
+            "F444W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095917+015424/F444W/cosj095917p015424_f444w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 149.82146219499998,
+                "center_dec": 1.9068730329999877,
+                "n_bad": 11791,
+                "weight_uniformity": 0.1521,
+                "corr_factor": 0.95,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            }
+        },
+        "COSJ095920+015851": {
+            "F115W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095920+015851/F115W/cosj095920p015851_f115w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 149.833887486,
+                "center_dec": 1.9809270070000013,
+                "n_bad": 0,
+                "weight_uniformity": 0.0847,
+                "corr_factor": 1.25,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F150W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095920+015851/F150W/cosj095920p015851_f150w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 149.833887486,
+                "center_dec": 1.9809270070000013,
+                "n_bad": 0,
+                "weight_uniformity": 0.085,
+                "corr_factor": 1.22,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F277W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095920+015851/F277W/cosj095920p015851_f277w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 149.833887486,
+                "center_dec": 1.9809270070000013,
+                "n_bad": 0,
+                "weight_uniformity": 0.0816,
+                "corr_factor": 1.03,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            },
+            "F444W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095920+015851/F444W/cosj095920p015851_f444w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 149.833887486,
+                "center_dec": 1.9809270070000013,
+                "n_bad": 0,
+                "weight_uniformity": 0.0793,
+                "corr_factor": 0.95,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            }
+        },
+        "COSJ095921+020638": {
+            "F115W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095921+020638/F115W/cosj095921p020638_f115w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 149.840689409,
+                "center_dec": 2.110652506,
+                "n_bad": 0,
+                "weight_uniformity": 0.0854,
+                "corr_factor": 1.25,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F150W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095921+020638/F150W/cosj095921p020638_f150w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 149.840689409,
+                "center_dec": 2.110652506,
+                "n_bad": 0,
+                "weight_uniformity": 0.0842,
+                "corr_factor": 1.22,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F277W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095921+020638/F277W/cosj095921p020638_f277w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 149.840689409,
+                "center_dec": 2.110652506,
+                "n_bad": 0,
+                "weight_uniformity": 0.1461,
+                "corr_factor": 1.03,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            },
+            "F444W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095921+020638/F444W/cosj095921p020638_f444w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 149.840689409,
+                "center_dec": 2.110652506,
+                "n_bad": 0,
+                "weight_uniformity": 0.1354,
+                "corr_factor": 0.95,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            }
+        },
+        "COSJ095950+022057": {
+            "F115W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095950+022057/F115W/cosj095950p022057_f115w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 149.96143032000003,
+                "center_dec": 2.3494115439999987,
+                "n_bad": 0,
+                "weight_uniformity": 0.2137,
+                "corr_factor": 1.25,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F150W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095950+022057/F150W/cosj095950p022057_f150w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 149.96143032000003,
+                "center_dec": 2.3494115439999987,
+                "n_bad": 0,
+                "weight_uniformity": 0.2153,
+                "corr_factor": 1.22,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F277W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095950+022057/F277W/cosj095950p022057_f277w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 149.96143032000003,
+                "center_dec": 2.3494115439999987,
+                "n_bad": 0,
+                "weight_uniformity": 0.1898,
+                "corr_factor": 1.03,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            },
+            "F444W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095950+022057/F444W/cosj095950p022057_f444w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 149.96143032000003,
+                "center_dec": 2.3494115439999987,
+                "n_bad": 0,
+                "weight_uniformity": 0.1883,
+                "corr_factor": 0.95,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            }
+        },
+        "COSJ095953+023319": {
+            "F115W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095953+023319/F115W/cosj095953p023319_f115w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 149.97467814600003,
+                "center_dec": 2.5554456530000134,
+                "n_bad": 0,
+                "weight_uniformity": 0.4817,
+                "corr_factor": 1.25,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F150W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095953+023319/F150W/cosj095953p023319_f150w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 149.97467814600003,
+                "center_dec": 2.5554456530000134,
+                "n_bad": 0,
+                "weight_uniformity": 0.4809,
+                "corr_factor": 1.22,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F277W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095953+023319/F277W/cosj095953p023319_f277w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 149.97467814600003,
+                "center_dec": 2.5554456530000134,
+                "n_bad": 0,
+                "weight_uniformity": 0.3539,
+                "corr_factor": 1.03,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            },
+            "F444W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095953+023319/F444W/cosj095953p023319_f444w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 149.97467814600003,
+                "center_dec": 2.5554456530000134,
+                "n_bad": 0,
+                "weight_uniformity": 0.3346,
+                "corr_factor": 0.95,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            }
+        },
+        "COSJ095955+021900": {
+            "F115W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095955+021900/F115W/cosj095955p021900_f115w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 149.983162054,
+                "center_dec": 2.316880569999998,
+                "n_bad": 0,
+                "weight_uniformity": 0.1809,
+                "corr_factor": 1.25,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F150W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095955+021900/F150W/cosj095955p021900_f150w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 149.983162054,
+                "center_dec": 2.316880569999998,
+                "n_bad": 0,
+                "weight_uniformity": 0.1859,
+                "corr_factor": 1.22,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F277W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095955+021900/F277W/cosj095955p021900_f277w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 149.983162054,
+                "center_dec": 2.316880569999998,
+                "n_bad": 1,
+                "weight_uniformity": 0.1947,
+                "corr_factor": 1.03,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            },
+            "F444W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ095955+021900/F444W/cosj095955p021900_f444w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 149.983162054,
+                "center_dec": 2.316880569999998,
+                "n_bad": 3,
+                "weight_uniformity": 0.1888,
+                "corr_factor": 0.95,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            }
+        },
+        "COSJ100012+022015": {
+            "F115W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100012+022015/F115W/cosj100012p022015_f115w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 150.05258822699997,
+                "center_dec": 2.3377064690000005,
+                "n_bad": 0,
+                "weight_uniformity": 0.3629,
+                "corr_factor": 1.25,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F150W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100012+022015/F150W/cosj100012p022015_f150w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 150.05258822699997,
+                "center_dec": 2.3377064690000005,
+                "n_bad": 0,
+                "weight_uniformity": 0.3711,
+                "corr_factor": 1.22,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F277W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100012+022015/F277W/cosj100012p022015_f277w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 150.05258822699997,
+                "center_dec": 2.3377064690000005,
+                "n_bad": 0,
+                "weight_uniformity": 0.4141,
+                "corr_factor": 1.03,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            },
+            "F444W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100012+022015/F444W/cosj100012p022015_f444w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 150.05258822699997,
+                "center_dec": 2.3377064690000005,
+                "n_bad": 0,
+                "weight_uniformity": 0.414,
+                "corr_factor": 0.95,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            }
+        },
+        "COSJ100013+023424": {
+            "F115W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100013+023424/F115W/cosj100013p023424_f115w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 150.055775328,
+                "center_dec": 2.573347012000002,
+                "n_bad": 1,
+                "weight_uniformity": 0.5461,
+                "corr_factor": 1.25,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F150W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100013+023424/F150W/cosj100013p023424_f150w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 150.055775328,
+                "center_dec": 2.573347012000002,
+                "n_bad": 0,
+                "weight_uniformity": 0.5473,
+                "corr_factor": 1.22,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F277W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100013+023424/F277W/cosj100013p023424_f277w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 150.055775328,
+                "center_dec": 2.573347012000002,
+                "n_bad": 0,
+                "weight_uniformity": 0.1035,
+                "corr_factor": 1.03,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            },
+            "F444W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100013+023424/F444W/cosj100013p023424_f444w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 150.055775328,
+                "center_dec": 2.573347012000002,
+                "n_bad": 0,
+                "weight_uniformity": 0.0985,
+                "corr_factor": 0.95,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            }
+        },
+        "COSJ100018+022138": {
+            "F115W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100018+022138/F115W/cosj100018p022138_f115w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 150.076934522,
+                "center_dec": 2.3607571280000124,
+                "n_bad": 0,
+                "weight_uniformity": 0.4004,
+                "corr_factor": 1.25,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F150W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100018+022138/F150W/cosj100018p022138_f150w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 150.076934522,
+                "center_dec": 2.3607571280000124,
+                "n_bad": 0,
+                "weight_uniformity": 0.4013,
+                "corr_factor": 1.22,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F277W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100018+022138/F277W/cosj100018p022138_f277w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 150.076934522,
+                "center_dec": 2.3607571280000124,
+                "n_bad": 0,
+                "weight_uniformity": 0.2076,
+                "corr_factor": 1.03,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            },
+            "F444W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100018+022138/F444W/cosj100018p022138_f444w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 150.076934522,
+                "center_dec": 2.3607571280000124,
+                "n_bad": 0,
+                "weight_uniformity": 0.2023,
+                "corr_factor": 0.95,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            }
+        },
+        "COSJ100024+015334": {
+            "F115W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100024+015334/F115W/cosj100024p015334_f115w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 150.100467215,
+                "center_dec": 1.8930293180000144,
+                "n_bad": 0,
+                "weight_uniformity": 0.2493,
+                "corr_factor": 1.25,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F150W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100024+015334/F150W/cosj100024p015334_f150w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 150.100467215,
+                "center_dec": 1.8930293180000144,
+                "n_bad": 0,
+                "weight_uniformity": 0.2473,
+                "corr_factor": 1.22,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F277W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100024+015334/F277W/cosj100024p015334_f277w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 150.100467215,
+                "center_dec": 1.8930293180000144,
+                "n_bad": 0,
+                "weight_uniformity": 0.3168,
+                "corr_factor": 1.03,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            },
+            "F444W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100024+015334/F444W/cosj100024p015334_f444w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 150.100467215,
+                "center_dec": 1.8930293180000144,
+                "n_bad": 1,
+                "weight_uniformity": 0.316,
+                "corr_factor": 0.95,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            }
+        },
+        "COSJ100024+021749": {
+            "F115W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100024+021749/F115W/cosj100024p021749_f115w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 150.100088848,
+                "center_dec": 2.2971327569999995,
+                "n_bad": 0,
+                "weight_uniformity": 0.0593,
+                "corr_factor": 1.25,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F150W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100024+021749/F150W/cosj100024p021749_f150w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 150.100088848,
+                "center_dec": 2.2971327569999995,
+                "n_bad": 0,
+                "weight_uniformity": 0.0609,
+                "corr_factor": 1.22,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F277W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100024+021749/F277W/cosj100024p021749_f277w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 150.100088848,
+                "center_dec": 2.2971327569999995,
+                "n_bad": 0,
+                "weight_uniformity": 0.107,
+                "corr_factor": 1.03,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            },
+            "F444W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100024+021749/F444W/cosj100024p021749_f444w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 150.100088848,
+                "center_dec": 2.2971327569999995,
+                "n_bad": 0,
+                "weight_uniformity": 0.096,
+                "corr_factor": 0.95,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            }
+        },
+        "COSJ100025+015245": {
+            "F115W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100025+015245/F115W/cosj100025p015245_f115w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 150.10670790000003,
+                "center_dec": 1.879287102999985,
+                "n_bad": 0,
+                "weight_uniformity": 0.0617,
+                "corr_factor": 1.25,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F150W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100025+015245/F150W/cosj100025p015245_f150w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 150.10670790000003,
+                "center_dec": 1.879287102999985,
+                "n_bad": 0,
+                "weight_uniformity": 0.0657,
+                "corr_factor": 1.22,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F277W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100025+015245/F277W/cosj100025p015245_f277w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 150.10670790000003,
+                "center_dec": 1.879287102999985,
+                "n_bad": 0,
+                "weight_uniformity": 0.0928,
+                "corr_factor": 1.03,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            },
+            "F444W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100025+015245/F444W/cosj100025p015245_f444w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 150.10670790000003,
+                "center_dec": 1.879287102999985,
+                "n_bad": 0,
+                "weight_uniformity": 0.0824,
+                "corr_factor": 0.95,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            }
+        },
+        "COSJ100028+021928": {
+            "F115W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100028+021928/F115W/cosj100028p021928_f115w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 150.11906717100004,
+                "center_dec": 2.324503234000011,
+                "n_bad": 4,
+                "weight_uniformity": 0.5243,
+                "corr_factor": 1.25,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F150W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100028+021928/F150W/cosj100028p021928_f150w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 150.11906717100004,
+                "center_dec": 2.324503234000011,
+                "n_bad": 4,
+                "weight_uniformity": 0.5196,
+                "corr_factor": 1.22,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F277W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100028+021928/F277W/cosj100028p021928_f277w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 150.11906717100004,
+                "center_dec": 2.324503234000011,
+                "n_bad": 0,
+                "weight_uniformity": 0.4139,
+                "corr_factor": 1.03,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            },
+            "F444W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100028+021928/F444W/cosj100028p021928_f444w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 150.11906717100004,
+                "center_dec": 2.324503234000011,
+                "n_bad": 0,
+                "weight_uniformity": 0.4075,
+                "corr_factor": 0.95,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            }
+        },
+        "COSJ100047+015023": {
+            "F115W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100047+015023/F115W/cosj100047p015023_f115w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 150.19858409200003,
+                "center_dec": 1.839784558999998,
+                "n_bad": 0,
+                "weight_uniformity": 0.1993,
+                "corr_factor": 1.25,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F150W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100047+015023/F150W/cosj100047p015023_f150w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 150.19858409200003,
+                "center_dec": 1.839784558999998,
+                "n_bad": 0,
+                "weight_uniformity": 0.1982,
+                "corr_factor": 1.22,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F277W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100047+015023/F277W/cosj100047p015023_f277w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 150.19858409200003,
+                "center_dec": 1.839784558999998,
+                "n_bad": 0,
+                "weight_uniformity": 0.1659,
+                "corr_factor": 1.03,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            },
+            "F444W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100047+015023/F444W/cosj100047p015023_f444w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 150.19858409200003,
+                "center_dec": 1.839784558999998,
+                "n_bad": 0,
+                "weight_uniformity": 0.1659,
+                "corr_factor": 0.95,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            }
+        },
+        "COSJ100119+014849": {
+            "F115W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100119+014849/F115W/cosj100119p014849_f115w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 150.330525811,
+                "center_dec": 1.8136161879999955,
+                "n_bad": 0,
+                "weight_uniformity": 0.0922,
+                "corr_factor": 1.25,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F150W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100119+014849/F150W/cosj100119p014849_f150w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 150.330525811,
+                "center_dec": 1.8136161879999955,
+                "n_bad": 0,
+                "weight_uniformity": 0.095,
+                "corr_factor": 1.22,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F277W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100119+014849/F277W/cosj100119p014849_f277w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 150.330525811,
+                "center_dec": 1.8136161879999955,
+                "n_bad": 0,
+                "weight_uniformity": 0.1312,
+                "corr_factor": 1.03,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            },
+            "F444W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100119+014849/F444W/cosj100119p014849_f444w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 150.330525811,
+                "center_dec": 1.8136161879999955,
+                "n_bad": 0,
+                "weight_uniformity": 0.1128,
+                "corr_factor": 0.95,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            }
+        },
+        "COSJ100121+022740": {
+            "F115W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100121+022740/F115W/cosj100121p022740_f115w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 150.34136302000002,
+                "center_dec": 2.461297052999998,
+                "n_bad": 0,
+                "weight_uniformity": 0.0653,
+                "corr_factor": 1.25,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F150W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100121+022740/F150W/cosj100121p022740_f150w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    400,
+                    400
+                ],
+                "pixel_scale": 0.03,
+                "center": "catalogue",
+                "center_ra": 150.34136302000002,
+                "center_dec": 2.461297052999998,
+                "n_bad": 0,
+                "weight_uniformity": 0.067,
+                "corr_factor": 1.22,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5254
+            },
+            "F277W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100121+022740/F277W/cosj100121p022740_f277w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 150.34136302000002,
+                "center_dec": 2.461297052999998,
+                "n_bad": 0,
+                "weight_uniformity": 0.09,
+                "corr_factor": 1.03,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            },
+            "F444W": {
+                "i2d": "data/mosaics/cowls_spectacular/COSJ100121+022740/F444W/cosj100121p022740_f444w_i2d.fits",
+                "variant": "standard",
+                "size_arcsec": 12.0,
+                "shape": [
+                    200,
+                    200
+                ],
+                "pixel_scale": 0.06,
+                "center": "catalogue",
+                "center_ra": 150.34136302000002,
+                "center_dec": 2.461297052999998,
+                "n_bad": 0,
+                "weight_uniformity": 0.0826,
+                "corr_factor": 0.95,
+                "corr_source": "json:filter",
+                "casertano_r": 1.5384
+            }
+        }
+    },
     "spt": {
         "SPT0418-47": {
             "F115W": {
