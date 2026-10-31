@@ -153,25 +153,18 @@ signal_to_noise = image / noise
 - **B1938+666's ring of clumps at 0.9–1.4″ is deliberately left unmasked.** Whether they are
   further lensed images or structure in the lens plane is not settled, so excluding them is a
   modelling choice, not something the contaminant mask decides.
-- **Two PSFs rest on only three stars** (SPT0418-47 F115W and SPT2147-50 F277W). Their error
-  maps say so; look at them before relying on those bands. Every other band has 5–12 stars.
 - **SPT0418-47 sits on the NIRCam detector with the strongest "wisps"** (faint scattered-light
   patterns in the SW bands). They are not subtracted, so check the SW images before trusting
   a faint SW feature.
-- **The COWLS PSFs are shared**: each filter's PSF is built from the stars of all 17 COWLS
-  fields together (31–70 stars), because a single field holds only 0–11. Every COWLS lens in a
-  filter therefore has the same `psf.fits` (`PSFMETH = empirical_pooled`).
-- **The star-built PSFs have known biases, measured but not yet corrected.** Measured against
-  model stars injected into the same exposures:
-  - the way the kernel is binned to the image pixels broadens it by 2–6% in FWHM, and by up to
-    16% in F115W;
-  - a few faint compact galaxies pass the star selection and broaden it further (mostly COWLS
-    F444W);
-  - in the undersampled bands (F115W–F200W, F277W), the bright stars it is built from come out
-    narrower than a faint arc would, by up to 10–20%.
-
-  These partly cancel. In F356W and F444W the PSFs are good to a few per cent. Details are in
-  AGENTS.md (*PSF*).
+- **The PSFs are a calibrated model, not built from field stars** (`PSFMETH = inject_stpsf`).
+  - Each is STPSF put into the lens's own exposures and resampled as the data were.
+  - Real stars match it to 0.3–1.6% in FWHM, star by star.
+  - Its error map (`psf_err.fits`) is the measured scatter of real stars about the model, per
+    filter.
+  - Why a model: in the undersampled bands (F115W–F200W, F277W) the bright stars a PSF would be
+    built from are resampled differently from a faint arc, so a star-built PSF comes out up to
+    10–20% too narrow. Field stars are too few in the COWLS fields anyway.
+  - Details are in AGENTS.md (*PSF*).
 - **COWLS depth varies from lens to lens**, because it depends on where each lens fell in
   COSMOS-Web's dither pattern: 2–4 exposures per filter, and COSJ100028+021928 has a single
   SW exposure, so its F115W/F150W cosmic rays were caught on the ramp alone. COSJ095917+015424
@@ -201,10 +194,12 @@ non-destructive readouts (a *ramp*), takes several exposures shifted slightly be
    centred on the lens, at 0.03″ (SW) and 0.06″ (LW).
 5. **Cuts out** the stamp around the deflector and writes the noise map from the mosaic's
    propagated error, times the measured correction above.
-6. **Measures the PSF** from stars in the same mosaic. Where there are too few stars, the
-   fallback is STScI's STPSF model, put into every exposure and resampled exactly as the data
-   were; no product uses it. For the COWLS lenses, whose small
-   fields hold few stars, one PSF per filter is built from the stars of all 17 fields.
+6. **Models the PSF** at the lens.
+   - STScI's STPSF model is put into every exposure at the lens and resampled exactly as the data
+     were, so it carries the same blurring, orientation and exposure weighting.
+   - Its one free detector parameter, the charge diffusion, is calibrated on 243 real stars, each
+     compared with a model star injected at the same position.
+   - A PSF built from the field stars is made beside it as a check.
 7. **Masks and marks** — the masks and image positions are drawn and clicked by hand in
    small interactive tools.
 

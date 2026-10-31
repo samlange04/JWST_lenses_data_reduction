@@ -3,19 +3,19 @@ North-up output grid, plus the cheap analytic drizzle broadening. Port of the HS
 psf_models.py geometry (`_northup_M`, `_resample_centered`, `analytic_drop_broaden`) with
 STPSF in place of the STDPSF grids.
 
-The empirical ePSF built from the mosaic's own stars (make_psf.py) is the preferred tier,
-exactly as in the HST repo: it is already the resampled, North-up PSF the data carry. This
-module is the FALLBACK for star-poor fields, and the same two caveats apply as for HST:
+Since 2026-10-31 the shipped PSF is STPSF injected into the cal frames at the lens and resampled
+as the science (make_psf_inject.py; the HST repo's canonical route, and what the JWST `spike`
+package does), with the charge diffusion calibrated against the real stars (psf_star_check.py;
+charge_diffusion_sigma below). stpsf_detector_psf is the PSF it injects. The rest of this
+module, the analytic tier, is the fallback for a failed injection, and has two caveats:
 
   * STPSF gives a detector-frame PSF (its diffraction spikes follow the telescope roll), so
     it must be rotated through the exposure's CD matrix into the North-up grid -- done here
     from one contributing _cal file's FITS-approximated WCS (assign_wcs writes a SIP
     approximation into the cal header, good to ~0.01 px over a detector).
-  * It omits the resampling broadening (drop size pixfrac x native / output px). The honest
-    fix is injection into the cal frames and a re-run of resample: make_psf_inject.py (the
-    HST repo's route; the JWST `spike` package does the same), which make_psf.py's model tier
-    uses. `analytic_drop_broaden` is only its fallback, tagged PSFBROAD='analytic'; on COWLS
-    it came out 5-11% narrower than the empirical PSF in every band (2026-10-30).
+  * It omits the resampling broadening (drop size pixfrac x native / output px), which
+    `analytic_drop_broaden` approximates (PSFBROAD='analytic'): too narrow, SPT2147-50 F444W
+    0.154" against 0.164" injected.
 
 STPSF needs its data files: STPSF_PATH is pointed at data/reference_files/stpsf-data here,
 at import (a shell export wins). Until 2026-10-30 only reduce_nircam.setup_crds() set it, which
@@ -25,6 +25,7 @@ https://stpsf.readthedocs.io/en/latest/installation.html (make_psf.py prints the
 The measured telescope wavefront for the observation date is loaded when the OPD server is
 reachable (`load_wss_opd_by_date`), else STPSF's default OPD is used and PSFOPD says so.
 """
+import json
 import os
 import sys
 import warnings
@@ -146,18 +147,38 @@ def model_psf(sample, lens, filt, oversample, size, out_scale, fov_pad=1.5):
 
 STPSF_OVERSAMPLE = 4
 OPD_TIMEOUT = 120      # s, per network read of the measured-OPD fetch
+CALIBRATION_JSON = os.path.join(ws_path, 'info', 'overrides', 'psf_model_calibration.json')
 
 
-def stpsf_detector_psf(filt, detector, x, y, date, fov_pixels, oversample=STPSF_OVERSAMPLE):
+def charge_diffusion_sigma(filt):
+    """The calibrated STPSF charge-diffusion Gaussian sigma (arcsec) for `filt`, or None for
+    STPSF's own default (NIRCam SW 0.0062", LW 0.018", which STPSF calls placeholders).
+    Measured by psf_star_check.py --calibrate against real stars, each injected beside its
+    twin, and kept in info/overrides/psf_model_calibration.json (`charge_diffusion_sigma`)."""
+    if not os.path.exists(CALIBRATION_JSON):
+        return None
+    with open(CALIBRATION_JSON) as f:
+        cal = json.load(f).get('charge_diffusion_sigma', {})
+    v = cal.get(filt, cal.get(lens_samples.channel(filt)))
+    return None if v is None else float(v)
+
+
+def stpsf_detector_psf(filt, detector, x, y, date, fov_pixels, oversample=STPSF_OVERSAMPLE,
+                       charge_diffusion=None):
     """STPSF's OVERDIST PSF for `detector` ('NRCB1', or the header's 'NRCBLONG') at detector
     pixel (x, y): (fov_pixels*oversample)^2, unit sum, the star at the array centre
     ((n-1)/2 in each axis, the centre of the central detector pixel; DET_DIST is exactly its
     oversample-block sum). Distortion, charge diffusion and IPC are included -- IPC rightly,
-    since Detector1's ipc step is skipped for NIRCam, so the cal frames carry it. The measured
-    OPD closest to `date` is used when the server is reachable. Returns (array, info)."""
+    since Detector1's ipc step is skipped for NIRCam, so the cal frames carry it. Charge
+    diffusion is the calibrated width (charge_diffusion_sigma) unless `charge_diffusion` is
+    given ('default' for STPSF's own). The measured OPD closest to `date` is used when the
+    server is reachable. Returns (array, info)."""
     import stpsf
     nrc = stpsf.NIRCam()
     nrc.filter = filt
+    cd = charge_diffusion_sigma(filt) if charge_diffusion is None else charge_diffusion
+    if cd not in (None, 'default'):
+        nrc.options['charge_diffusion_sigma'] = float(cd)
     nrc.detector = str(detector).upper().replace('LONG', '5')
     nrc.detector_position = (x, y)
     opd = 'default'
@@ -182,5 +203,6 @@ def stpsf_detector_psf(filt, detector, x, y, date, fov_pixels, oversample=STPSF_
     psf = nrc.calc_psf(oversample=oversample, fov_pixels=fov_pixels)
     src = np.asarray(psf['OVERDIST'].data, float)
     info = dict(detector=nrc.detector, detector_position=[float(x), float(y)], opd=opd,
-                stpsf_version=stpsf.__version__, stpsf_oversample=oversample, fov_pixels=fov_pixels)
+                stpsf_version=stpsf.__version__, stpsf_oversample=oversample, fov_pixels=fov_pixels,
+                charge_diffusion_sigma=None if cd in (None, 'default') else float(cd))
     return src / src.sum(), info

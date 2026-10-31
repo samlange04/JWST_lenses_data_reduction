@@ -1,0 +1,143 @@
+{
+    "charge_diffusion_sigma": {
+        "LW": 0.0205,
+        "SW": 0.00841
+    },
+    "calibration_fit": {
+        "F115W": {
+            "n_stars": 42,
+            "sigma_extra_mas": 0.0,
+            "sigma_extra_16_84_mas": [
+                0.0,
+                4.22
+            ],
+            "sigma_extra_sem_mas": 0.44,
+            "charge_diffusion_used": 0.00836
+        },
+        "F150W": {
+            "n_stars": 47,
+            "sigma_extra_mas": 0.63,
+            "sigma_extra_16_84_mas": [
+                0.0,
+                4.42
+            ],
+            "sigma_extra_sem_mas": 0.45,
+            "charge_diffusion_used": 0.00836
+        },
+        "F200W": {
+            "n_stars": 14,
+            "sigma_extra_mas": 2.3,
+            "sigma_extra_16_84_mas": [
+                0.0,
+                5.44
+            ],
+            "sigma_extra_sem_mas": 0.79,
+            "charge_diffusion_used": 0.00836
+        },
+        "F277W": {
+            "n_stars": 63,
+            "sigma_extra_mas": 2.94,
+            "sigma_extra_16_84_mas": [
+                0.0,
+                9.78
+            ],
+            "sigma_extra_sem_mas": 0.78,
+            "charge_diffusion_used": 0.02037
+        },
+        "F356W": {
+            "n_stars": 14,
+            "sigma_extra_mas": 0.0,
+            "sigma_extra_16_84_mas": [
+                0.0,
+                4.61
+            ],
+            "sigma_extra_sem_mas": 0.84,
+            "charge_diffusion_used": 0.02037
+        },
+        "F444W": {
+            "n_stars": 63,
+            "sigma_extra_mas": 0.0,
+            "sigma_extra_16_84_mas": [
+                0.0,
+                7.05
+            ],
+            "sigma_extra_sem_mas": 0.93,
+            "charge_diffusion_used": 0.02037
+        },
+        "LW": {
+            "n_stars": 140,
+            "sigma_extra_mas": 1.74,
+            "charge_diffusion_used": 0.02037,
+            "sigma_extra_detector_px": 0.028
+        },
+        "SW": {
+            "n_stars": 103,
+            "sigma_extra_mas": 0.66,
+            "charge_diffusion_used": 0.00836,
+            "sigma_extra_detector_px": 0.021
+        }
+    },
+    "_how": "psf_star_check.py --calibrate: each real PSF star against its noiseless STPSF twin injected at the same position into the same cal frames (non-extended stars, peak S/N >= 100): per star the extra Gaussian blur of the twin that minimises the core chi^2, the median over the filter's stars added in quadrature to the charge diffusion the twins were made with.",
+    "iterations": {
+        "SW": [
+            {
+                "charge_diffusion_used": 0.0062,
+                "sigma_extra_mas": 4.27,
+                "n_stars": 102
+            },
+            {
+                "charge_diffusion_used": 0.00753,
+                "sigma_extra_mas": 2.77,
+                "n_stars": 104
+            },
+            {
+                "charge_diffusion_used": 0.00836,
+                "sigma_extra_mas": 0.66,
+                "n_stars": 103
+            }
+        ],
+        "LW": [
+            {
+                "charge_diffusion_used": 0.018,
+                "sigma_extra_mas": 7.91,
+                "n_stars": 140
+            },
+            {
+                "charge_diffusion_used": 0.01966,
+                "sigma_extra_mas": 4.43,
+                "n_stars": 140
+            },
+            {
+                "charge_diffusion_used": 0.02037,
+                "sigma_extra_mas": 1.74,
+                "n_stars": 140
+            }
+        ]
+    },
+    "model_error": {
+        "F115W": {
+            "n_stars": 42,
+            "err_frac": 0.02107
+        },
+        "F150W": {
+            "n_stars": 47,
+            "err_frac": 0.01324
+        },
+        "F200W": {
+            "n_stars": 14,
+            "err_frac": 0.01222
+        },
+        "F277W": {
+            "n_stars": 63,
+            "err_frac": 0.01285
+        },
+        "F356W": {
+            "n_stars": 14,
+            "err_frac": 0.01204
+        },
+        "F444W": {
+            "n_stars": 63,
+            "err_frac": 0.00517
+        }
+    }
+}

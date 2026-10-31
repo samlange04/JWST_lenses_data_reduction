@@ -7,8 +7,8 @@ Resample-broadened model PSF by artificial-star injection: the HST repo's make_p
 
 STPSF gives a detector-frame PSF; psf_models.model_psf rotates it into the North-up output
 grid analytically, which gets the orientation and pixel scale right but not the blur the
-resample step puts on a point source, and the analytic drop box that stands in for it is not
-enough (COWLS: empirical/model FWHM 1.05-1.11, never below 1, 2026-10-30). The fix the HST
+resample step puts on a point source, and the analytic drop box that stands in for it is too
+narrow (SPT2147-50 F444W 0.154" against 0.164" injected). The fix the HST
 repo made canonical for its model tier: put the model PSF into the individual exposures and
 resample them exactly as the science frames were, so the resampled star carries the
 broadening, the North-up orientation and the exposure weighting, all made by the real
@@ -37,8 +37,9 @@ How, per band:
   * skymatch and outlier_detection are not run: the frames hold no sky, and the injected star
     has no cosmic rays.
 
-make_psf.py's model tier calls injected_kernel() and ships its kernel (PSFMETH
-'inject_stpsf'); the analytic box is the fallback if injection fails. Run standalone, this is
+make_psf.py ships injected_kernel()'s kernel as every band's PSF (PSFMETH 'inject_stpsf'),
+with STPSF's charge diffusion calibrated against the real stars by psf_star_check.py, which
+uses injected_mosaic() to put a twin under each of them. Run standalone, this is
 the validation route: it writes psf_kernel_injected.fits + psf_injected.png into
 data/psf/<sample>/<lens>/<FILT>/, records info/provenance/lens_psf_injected.json and prints
 the comparison with the band's shipped PSF, touching neither psf.fits nor lens_psf.json.
@@ -123,6 +124,127 @@ def render_epsf(epsf, c, x, y, half, oversample=psf_models.STPSF_OVERSAMPLE):
     return stamp / stamp.sum(), iy - half, ix - half
 
 
+def aligned_library(g, filt, work_dir, name, track=None):
+    """The band's cal frames (science_grid `g`) as a ModelLibrary carrying the science WCS:
+    tweakreg re-run with the science settings, or, for a `from_lw` SW band, each frame moved
+    by its recorded LW offset. Returns (pipe, library, before): `before` is `track`'s
+    position on each frame under the a-priori WCS (None if no `track`)."""
+    from jwst.pipeline import Image3Pipeline
+    if os.path.isdir(work_dir):
+        shutil.rmtree(work_dir)
+    os.makedirs(work_dir)
+    asn = reduce_nircam.write_asn(g['cals'], name, work_dir)
+    mode = 'skip' if g['offsets'] is not None else g['tweakreg']
+    steps = reduce_nircam.image3_steps(g['coord'], g['scale'], g['field'], mode, g['lens_first'])
+    config, config_file = Image3Pipeline.build_config(asn, steps=steps)
+    config.pop('class', None)
+    pipe = Image3Pipeline.from_config_section(config, name=config.get('name'), config_file=config_file)
+    pipe.in_memory = len(g['cals']) <= IN_MEMORY_MAX
+    library = pipe._load_input_as_library(asn)
+    before = None
+    if track is not None:
+        before = {}
+        with library:
+            for i, model in enumerate(library):
+                before[model.meta.filename] = model.meta.wcs.backward_transform(track.ra.deg, track.dec.deg)
+                library.shelve(model, i, modify=False)
+    if g['offsets'] is not None:
+        # a SW band of a tweakreg_sw_from_lw sample: the science moved each frame by its
+        # exposure's LW offset instead of fitting it, so the injection does the same
+        with library:
+            for i, model in enumerate(library):
+                o = g['offsets'].get(reduce_nircam._rootname(model.meta.filename))
+                if o is not None:
+                    model.meta.wcs = reduce_nircam.shift_wcs(model.meta.wcs, o)
+                library.shelve(model, i, modify=o is not None)
+    else:
+        library = pipe.tweakreg.run(library)
+    return pipe, library, before
+
+
+def inject_stars(library, stars, filt, fov, anchor=None, before=None, charge_diffusion=None):
+    """Replace every frame's SCI by STPSF stars at `stars` (SkyCoord array; NaN pixels stay
+    NaN, ERR/DQ/variances untouched, so the ivm weights are the science ones), in place.
+
+    With `anchor` (an index into `stars`), one STPSF per frame at that star, or the on-frame
+    star nearest it: right for a grid of stars ~15" across, where the field dependence is far
+    below the phase effect. Without it, each star gets the STPSF at its own detector position
+    (cached per 256-px cell), for stars spread over a field. Returns (frames, on, cache):
+    a record per frame (of the anchor star, with `before` its a-priori position), each star's
+    flux fraction on each frame, and the STPSF cache."""
+    det_scale = lens_samples.NATIVE_SCALE[lens_samples.channel(filt)]
+    half = fov // 2
+    frames, cache = [], {}
+    on = np.zeros((len(library), len(stars)))
+    with library:
+        for i, model in enumerate(library):
+            sci = np.where(np.isfinite(model.data), 0.0, np.nan).astype(np.float32)
+            ny, nx = sci.shape
+            xs, ys = (np.asarray(v, float) for v in model.meta.wcs.backward_transform(stars.ra.deg, stars.dec.deg))
+            rec = dict(file=os.path.basename(model.meta.filename), tweakreg=model.meta.cal_step.tweakreg)
+            if anchor is not None:
+                rec.update(x=round(float(xs[anchor]), 3), y=round(float(ys[anchor]), 3))
+                if before is not None:
+                    x0, y0 = before[model.meta.filename]
+                    rec['tweak_shift_mas'] = round(float(np.hypot(xs[anchor] - x0, ys[anchor] - y0)) * det_scale * 1e3, 1)
+            near = np.isfinite(xs) & np.isfinite(ys) & (xs > -half) & (xs < nx + half) & (ys > -half) & (ys < ny + half)
+            det, date = model.meta.instrument.detector, model.meta.observation.date_beg
+            sinfo = None
+            for s in np.flatnonzero(near):
+                if anchor is not None:
+                    idx = np.flatnonzero(near)
+                    s0 = anchor if near[anchor] else int(idx[np.argmin(np.abs(idx - anchor))])
+                else:
+                    s0 = s
+                key = (det, str(date)[:10], round(xs[s0] / 256), round(ys[s0] / 256))
+                if key not in cache:
+                    # a star just off the detector still spills light onto it; STPSF wants an
+                    # on-detector position, and the PSF varies slowly there
+                    sx_, sy_ = float(np.clip(xs[s0], 0, nx - 1)), float(np.clip(ys[s0], 0, ny - 1))
+                    src, info = psf_models.stpsf_detector_psf(filt, det, sx_, sy_, date, fov,
+                                                              charge_diffusion=charge_diffusion)
+                    cache[key] = (effective_psf(src), info)
+                (epsf, c), sinfo = cache[key]
+                stamp, sy0, sx0 = render_epsf(epsf, c, xs[s], ys[s], half)
+                gy0, gx0 = max(0, sy0), max(0, sx0)
+                gy1, gx1 = min(ny, sy0 + fov), min(nx, sx0 + fov)
+                if gy1 > gy0 and gx1 > gx0:
+                    part = stamp[gy0 - sy0:gy1 - sy0, gx0 - sx0:gx1 - sx0]
+                    sci[gy0:gy1, gx0:gx1] += INJECT_FLUX * part
+                    on[i, s] = part.sum()
+            if anchor is not None and on[i, anchor] > 0 and sinfo is not None:
+                rec.update(detector=sinfo['detector'], opd=sinfo['opd'], flux_on_frame=round(float(on[i, anchor]), 4))
+            model.data = sci
+            model.meta.background.level = 0.0
+            model.meta.background.subtracted = True
+            frames.append(rec)
+            library.shelve(model, i, modify=True)
+    return frames, on, cache
+
+
+def injected_mosaic(sample, lens, filt, coords, size, variant='', work_dir=None, charge_diffusion=None):
+    """STPSF stars at `coords` (each with the PSF at its own detector position) injected into
+    the band's cal frames and resampled onto the FULL science grid, as the science was.
+    Returns (data, wcs, info): the mosaic (NaN -> 0), its gwcs, and the STPSF info of one call.
+    psf_star_check.py puts a noiseless twin under every real PSF star this way."""
+    reduce_nircam.setup_crds()
+    g = science_grid(sample, lens, filt, variant)
+    work_dir = work_dir or os.path.join(ws_path, 'data', 'psf', sample, lens, filt, '_twins_work')
+    try:
+        pipe, library, _ = aligned_library(g, filt, work_dir, f'{lens.replace("+", "p")}_{filt}_twins'.lower())
+        fov = int(np.ceil(size * g['scale'] / lens_samples.NATIVE_SCALE[lens_samples.channel(filt)] * FOV_PAD)) | 1
+        _, on, cache = inject_stars(library, coords, filt, fov, charge_diffusion=charge_diffusion)
+        r = pipe.resample
+        r.save_results = False
+        r.in_memory = True
+        result = r.run(library)
+    finally:
+        shutil.rmtree(work_dir, ignore_errors=True)
+    return np.nan_to_num(np.asarray(result.data, float)), result.meta.wcs, dict(
+        n_stpsf_calls=len(cache), stars_on_frames=[int(v) for v in (on > 0).sum(axis=0)],
+        **next(iter(cache.values()))[1])
+
+
 def injected_kernel(sample, lens, filt, size, variant='', work_dir=None, keep_work=False):
     """The resample-broadened STPSF kernel for one band: (size x size, unit sum, North-up at
     the mosaic scale, centred on the central pixel) and an info dict. Raises on failure.
@@ -133,7 +255,6 @@ def injected_kernel(sample, lens, filt, size, variant='', work_dir=None, keep_wo
     SPT0418-47 F115W, single stars a pixel or two apart ranged 0.049-0.064" (2026-10-30). Only
     stars that fall wholly on exactly the frames the lens does are used, so every star has the
     lens's depth and weights."""
-    from jwst.pipeline import Image3Pipeline
     import make_psf
     t0 = time.time()
     reduce_nircam.setup_crds()
@@ -154,80 +275,12 @@ def injected_kernel(sample, lens, filt, size, variant='', work_dir=None, keep_wo
           f'({ix}, {iy}), sub-grid {m} px, tweakreg {g["tweakreg"]}', flush=True)
 
     work_dir = work_dir or os.path.join(ws_path, 'data', 'psf', sample, lens, filt, '_inject_work')
-    if os.path.isdir(work_dir):
-        shutil.rmtree(work_dir)
-    os.makedirs(work_dir)
     lens_star = stars[centre]
     try:
-        asn = reduce_nircam.write_asn(g['cals'], f'{lens.replace("+", "p")}_{filt}_inject'.lower(), work_dir)
-        mode = 'skip' if g['offsets'] is not None else g['tweakreg']
-        steps = reduce_nircam.image3_steps(g['coord'], scale, g['field'], mode, g['lens_first'])
-        config, config_file = Image3Pipeline.build_config(asn, steps=steps)
-        config.pop('class', None)
-        pipe = Image3Pipeline.from_config_section(config, name=config.get('name'), config_file=config_file)
-        pipe.in_memory = len(g['cals']) <= IN_MEMORY_MAX
-        det_scale = lens_samples.NATIVE_SCALE[lens_samples.channel(filt)]
-        library = pipe._load_input_as_library(asn)
-        before = {}                                          # the lens on each frame, a-priori WCS
-        with library:
-            for i, model in enumerate(library):
-                before[model.meta.filename] = model.meta.wcs.backward_transform(lens_star.ra.deg, lens_star.dec.deg)
-                library.shelve(model, i, modify=False)
-        if g['offsets'] is not None:
-            # a SW band of a tweakreg_sw_from_lw sample: the science moved each frame by its
-            # exposure's LW offset instead of fitting it, so the injection does the same
-            with library:
-                for i, model in enumerate(library):
-                    o = g['offsets'].get(reduce_nircam._rootname(model.meta.filename))
-                    if o is not None:
-                        model.meta.wcs = reduce_nircam.shift_wcs(model.meta.wcs, o)
-                    library.shelve(model, i, modify=o is not None)
-        else:
-            library = pipe.tweakreg.run(library)
-
-        fov = int(np.ceil(size * scale / det_scale * FOV_PAD)) | 1
-        half = fov // 2
-        frames, cache = [], {}
-        on = np.zeros((len(g['cals']), len(grid)))             # each star's flux on each frame
-        with library:
-            for i, model in enumerate(library):
-                sci = np.where(np.isfinite(model.data), 0.0, np.nan).astype(np.float32)
-                ny, nx = sci.shape
-                xs, ys = (np.asarray(v, float) for v in model.meta.wcs.backward_transform(stars.ra.deg, stars.dec.deg))
-                x0, y0 = before[model.meta.filename]
-                rec = dict(file=os.path.basename(model.meta.filename),
-                           x=round(float(xs[centre]), 3), y=round(float(ys[centre]), 3),
-                           tweakreg=model.meta.cal_step.tweakreg,
-                           tweak_shift_mas=round(float(np.hypot(xs[centre] - x0, ys[centre] - y0)) * det_scale * 1e3, 1))
-                near = np.isfinite(xs) & np.isfinite(ys) & (xs > -half) & (xs < nx + half) & (ys > -half) & (ys < ny + half)
-                if near.any():
-                    # one STPSF per frame, at the lens (or the on-frame star nearest it): over the
-                    # grid's ~15" the field dependence is far below the phase effect
-                    s0 = centre if near[centre] else int(np.flatnonzero(near)[np.argmin(np.abs(np.flatnonzero(near) - centre))])
-                    det, date = model.meta.instrument.detector, model.meta.observation.date_beg
-                    key = (det, str(date)[:10], round(xs[s0] / 256), round(ys[s0] / 256))
-                    if key not in cache:
-                        # a grid star just off the detector still spills light onto it; STPSF
-                        # wants an on-detector position, and the PSF varies slowly there
-                        sx_, sy_ = float(np.clip(xs[s0], 0, nx - 1)), float(np.clip(ys[s0], 0, ny - 1))
-                        src, sinfo = psf_models.stpsf_detector_psf(filt, det, sx_, sy_, date, fov)
-                        cache[key] = (effective_psf(src), sinfo)
-                    (epsf, c), sinfo = cache[key]
-                    for s in np.flatnonzero(near):
-                        stamp, sy0, sx0 = render_epsf(epsf, c, xs[s], ys[s], half)
-                        gy0, gx0 = max(0, sy0), max(0, sx0)
-                        gy1, gx1 = min(ny, sy0 + fov), min(nx, sx0 + fov)
-                        if gy1 > gy0 and gx1 > gx0:
-                            part = stamp[gy0 - sy0:gy1 - sy0, gx0 - sx0:gx1 - sx0]
-                            sci[gy0:gy1, gx0:gx1] += INJECT_FLUX * part
-                            on[i, s] = part.sum()
-                    if on[i, centre] > 0:
-                        rec.update(detector=sinfo['detector'], opd=sinfo['opd'], flux_on_frame=round(float(on[i, centre]), 4))
-                model.data = sci
-                model.meta.background.level = 0.0
-                model.meta.background.subtracted = True
-                frames.append(rec)
-                library.shelve(model, i, modify=True)
+        pipe, library, before = aligned_library(g, filt, work_dir, f'{lens.replace("+", "p")}_{filt}_inject'.lower(),
+                                                track=lens_star)
+        fov = int(np.ceil(size * scale / lens_samples.NATIVE_SCALE[lens_samples.channel(filt)] * FOV_PAD)) | 1
+        frames, on, cache = inject_stars(library, stars, filt, fov, anchor=centre, before=before)
         n_inj = int((on[:, centre] > 0).sum())
         if n_inj == 0:
             raise RuntimeError('the lens falls on no frame')
@@ -276,6 +329,7 @@ def injected_kernel(sample, lens, filt, size, variant='', work_dir=None, keep_wo
                 star_fwhm_arcsec=[round(float(fw.min()), 4), round(float(np.median(fw)), 4), round(float(fw.max()), 4)],
                 centroid_offset_mas=[round((dx - 3) * scale * 1e3, 2), round((dy - 3) * scale * 1e3, 2)],
                 stpsf_version=next(iter(cache.values()))[1]['stpsf_version'], stpsf_fov_pixels=fov,
+                charge_diffusion_sigma=next(iter(cache.values()))[1]['charge_diffusion_sigma'],
                 seconds=round(time.time() - t0, 1))
     print(f'  injected kernel: mean of {len(use)} stars (single-star FWHM {fw.min():.4f}-{fw.max():.4f}", '
           f'median {np.median(fw):.4f}"), core centroid offset ({info["centroid_offset_mas"][0]:+.1f}, '
@@ -300,7 +354,6 @@ def main():
     print(f'{a.lens} {filt}  [NIRCAM/{ch}, kernel {size} px]')
     kernel, info = injected_kernel(sample, a.lens, filt, size, a.variant, keep_work=a.keep_work)
 
-    kernel, pedestal_frac = make_psf.subtract_pedestal(kernel)
     fwhm = make_psf.measure_fwhm(kernel)
     scale = science_grid(sample, a.lens, filt, a.variant)['scale']
     out_dir = os.path.join(ws_path, 'data', 'psf', sample, a.lens, filt)
@@ -320,7 +373,7 @@ def main():
 
     shipped = info_json.load(info_json.path(ws_path, 'lens_psf.json')).get(sample, {}).get(a.lens, {}).get(filt) or {}
     record = dict(info, fwhm_pix=round(fwhm, 4) if fwhm else None,
-                  fwhm_arcsec=round(fwhm * scale, 4) if fwhm else None, pedestal_frac=round(pedestal_frac, 6),
+                  fwhm_arcsec=round(fwhm * scale, 4) if fwhm else None,
                   compared_with=shipped.get('method'), compared_fwhm_arcsec=shipped.get('fwhm_arcsec'))
     info_json.update(info_json.path(ws_path, 'lens_psf_injected.json'), sample, a.lens, filt, record)
     if fwhm and shipped.get('fwhm_arcsec'):
