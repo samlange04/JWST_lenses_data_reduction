@@ -159,8 +159,10 @@ signal_to_noise = image / noise
 - **The PSFs are a calibrated model, not built from field stars** (`PSFMETH = inject_stpsf`).
   - Each is STPSF put into the lens's own exposures and resampled as the data were.
   - Real stars match it to 0.3–1.6% in FWHM, star by star.
-  - Its error map (`psf_err.fits`) is the measured scatter of real stars about the model, per
-    filter.
+  - Its error map (`psf_err.fits`) adds two measured terms: how far real stars scatter about
+    the model (per filter), and how far a compact source's PSF can sit from it depending on
+    where it lands within the pixels (per band). The second is the error a bright lens core
+    sees, and it is an over-estimate for the extended arcs.
   - Why a model: in the undersampled bands (F115W–F200W, F277W) the bright stars a PSF would be
     built from are resampled differently from a faint arc, so a star-built PSF comes out up to
     10–20% too narrow. Field stars are too few in the COWLS fields anyway.

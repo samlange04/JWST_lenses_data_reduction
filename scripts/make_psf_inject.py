@@ -69,6 +69,12 @@ SUBGRID_MARGIN = 8     # output px around the kernel in the injected resample
 INJECT_FLUX = 1.0e4    # arbitrary; the kernel is renormalised
 IN_MEMORY_MAX = 40     # more frames than this -> an on-disk ModelLibrary (B1938's 168)
 GRID = 5               # GRID x GRID injected stars, the kernel is their mean (injected_kernel)
+MIN_PHASE_STARS = 12   # fewer grid stars on the lens's frames than this -> more passes, grid shifted
+# Whole-output-pixel shifts of the grid for the extra passes. The output and detector grids differ
+# in scale and rotation, so each shift puts the star at the lens at a new sub-pixel phase on every
+# detector while keeping it on the lens's frames. At most SUBGRID_MARGIN px.
+PHASE_SHIFTS = [(1, 0), (0, 1), (1, 1), (-1, 1), (2, 0), (0, 2), (2, 1), (1, 2), (-2, 1), (1, -2),
+                (2, 2), (-2, 2), (3, 0), (0, 3), (3, 1), (1, 3), (3, 2), (2, 3)]
 
 
 def science_grid(sample, lens, filt, variant=''):
@@ -162,7 +168,7 @@ def aligned_library(g, filt, work_dir, name, track=None):
     return pipe, library, before
 
 
-def inject_stars(library, stars, filt, fov, anchor=None, before=None, charge_diffusion=None):
+def inject_stars(library, stars, filt, fov, anchor=None, before=None, charge_diffusion=None, cache=None):
     """Replace every frame's SCI by STPSF stars at `stars` (SkyCoord array; NaN pixels stay
     NaN, ERR/DQ/variances untouched, so the ivm weights are the science ones), in place.
 
@@ -174,7 +180,7 @@ def inject_stars(library, stars, filt, fov, anchor=None, before=None, charge_dif
     flux fraction on each frame, and the STPSF cache."""
     det_scale = lens_samples.NATIVE_SCALE[lens_samples.channel(filt)]
     half = fov // 2
-    frames, cache = [], {}
+    frames, cache = [], ({} if cache is None else cache)
     on = np.zeros((len(library), len(stars)))
     with library:
         for i, model in enumerate(library):
@@ -247,7 +253,9 @@ def injected_mosaic(sample, lens, filt, coords, size, variant='', work_dir=None,
 
 def injected_kernel(sample, lens, filt, size, variant='', work_dir=None, keep_work=False):
     """The resample-broadened STPSF kernel for one band: (size x size, unit sum, North-up at
-    the mosaic scale, centred on the central pixel) and an info dict. Raises on failure.
+    the mosaic scale, centred on the central pixel), an info dict, and the per-pixel std of the
+    stars about it (the sub-pixel-phase scatter; None with fewer than 3 stars). Raises on
+    failure.
 
     A GRID x GRID grid of stars around the lens, each on an output-pixel centre, so each lands
     at a different sub-pixel phase on the detectors; the kernel is their mean. One star is one
@@ -276,65 +284,83 @@ def injected_kernel(sample, lens, filt, size, variant='', work_dir=None, keep_wo
 
     work_dir = work_dir or os.path.join(ws_path, 'data', 'psf', sample, lens, filt, '_inject_work')
     lens_star = stars[centre]
+    crops, fwhms, n_passes, cache = [], [], 0, {}
     try:
         pipe, library, before = aligned_library(g, filt, work_dir, f'{lens.replace("+", "p")}_{filt}_inject'.lower(),
                                                 track=lens_star)
         fov = int(np.ceil(size * scale / lens_samples.NATIVE_SCALE[lens_samples.channel(filt)] * FOV_PAD)) | 1
-        frames, on, cache = inject_stars(library, stars, filt, fov, anchor=centre, before=before)
-        n_inj = int((on[:, centre] > 0).sum())
-        if n_inj == 0:
-            raise RuntimeError('the lens falls on no frame')
-        # a star is used when it lies wholly on exactly the frames the lens lies on
-        lens_frames = on[:, centre] > 0
-        use = [s for s in range(len(grid))
-               if np.array_equal(on[:, s] > 0, lens_frames) and np.all(on[lens_frames, s] > 0.999)]
-        if centre not in use:
-            use.append(centre)                                # the lens star itself, whatever its coverage
-        print(f'  injected into {n_inj}/{len(frames)} frames at the lens ({len(cache)} STPSF calls), '
-              f'{len(use)}/{len(grid)} stars used; tweakreg '
-              + ', '.join(f"{f['tweakreg']} {f['tweak_shift_mas']} mas" for f in frames if 'detector' in f), flush=True)
-
         r = pipe.resample
         r.output_shape = [m, m]
         r.crpix = [(n - 1) / 2.0 - ox, (n - 1) / 2.0 - oy]
         r.save_results = False
         r.in_memory = True
-        result = r.run(library)
-        data = np.nan_to_num(np.asarray(result.data, float))
-        cxs, cys = (np.asarray(v, float) for v in result.meta.wcs.backward_transform(stars.ra.deg, stars.dec.deg))
+        # Pass 1 is the grid as placed. A star is used when it lies wholly on exactly the frames
+        # the lens lies on. Near detector edges few do (one on lens K), and one star is one
+        # sub-pixel phase, so passes with the grid shifted by whole output pixels follow until
+        # MIN_PHASE_STARS stars are averaged; every pass's star at the lens stays on its frames.
+        for dx, dy in [(0, 0)] + PHASE_SHIFTS:
+            pgrid = [(x + dx, y + dy) for x, y in grid]
+            pstars = w.pixel_to_world([p[0] for p in pgrid], [p[1] for p in pgrid])
+            first = n_passes == 0
+            pframes, on, cache = inject_stars(library, pstars, filt, fov, anchor=centre,
+                                              before=before if first else None, cache=cache)
+            if first:
+                frames = pframes
+                lens_frames = on[:, centre] > 0
+                n_inj = int(lens_frames.sum())
+                if n_inj == 0:
+                    raise RuntimeError('the lens falls on no frame')
+            use = [s_ for s_ in range(len(pgrid))
+                   if np.array_equal(on[:, s_] > 0, lens_frames) and np.all(on[lens_frames, s_] > 0.999)]
+            if centre not in use and (first or np.array_equal(on[:, centre] > 0, lens_frames)):
+                use.append(centre)        # the star at the lens, whatever its coverage (it may sit near
+                                          # a detector edge, as on lens K), if on the lens's frames
+            result = r.run(library)
+            data = np.nan_to_num(np.asarray(result.data, float))
+            n_passes += 1
+            cxs, cys = (np.asarray(v, float) for v in result.meta.wcs.backward_transform(pstars.ra.deg, pstars.dec.deg))
+            for s_ in use:
+                ex, ey = pgrid[s_][0] - ox, pgrid[s_][1] - oy
+                if max(abs(cxs[s_] - ex), abs(cys[s_] - ey)) > 1e-3:
+                    raise RuntimeError(f'injected resample grid is not the science grid: star {s_} at '
+                                       f'({cxs[s_]:.4f}, {cys[s_]:.4f}), expected ({ex}, {ey})')
+                crop = make_psf._crop_centered(data, size, ex, ey)
+                if crop.sum() <= 0:
+                    raise RuntimeError(f'injected star {s_} resampled to nothing')
+                crops.append(crop / crop.sum())
+                fwhms.append(make_psf.measure_fwhm(crops[-1]))
+            if len(crops) >= MIN_PHASE_STARS:
+                break
+        print(f'  injected into {n_inj}/{len(frames)} frames at the lens ({len(cache)} STPSF calls), '
+              f'{len(crops)} stars from {n_passes} pass{"es" if n_passes > 1 else ""}; tweakreg '
+              + ', '.join(f"{f['tweakreg']} {f['tweak_shift_mas']} mas" for f in frames if 'detector' in f), flush=True)
     finally:
         if not keep_work:
             shutil.rmtree(work_dir, ignore_errors=True)
 
-    crops, fwhms = [], []
-    for s in use:
-        ex, ey = grid[s][0] - ox, grid[s][1] - oy
-        if max(abs(cxs[s] - ex), abs(cys[s] - ey)) > 1e-3:
-            raise RuntimeError(f'injected resample grid is not the science grid: star {s} at '
-                               f'({cxs[s]:.4f}, {cys[s]:.4f}), expected ({ex}, {ey})')
-        crop = make_psf._crop_centered(data, size, ex, ey)
-        if crop.sum() <= 0:
-            raise RuntimeError(f'injected star {s} resampled to nothing')
-        crops.append(crop / crop.sum())
-        fwhms.append(make_psf.measure_fwhm(crops[-1]))
     kernel = np.mean(crops, axis=0)
     kernel /= kernel.sum()
+    # the kernel a COMPACT source sees is one phase's, not the mean: a bright lens core lands at
+    # one sub-pixel position on each detector, so its PSF scatters about the mean by this much
+    # (extended emission averages it away)
+    phase_std = np.std(crops, axis=0, ddof=1) if len(crops) >= 3 else None
     from photutils.centroids import centroid_com
     h = size // 2
     dx, dy = centroid_com(kernel[h - 3:h + 4, h - 3:h + 4])
     fw = np.array([f for f in fwhms if f is not None]) * scale
-    info = dict(n_frames=len(frames), n_injected=n_inj, n_stars=len(use), star_spacing_px=sp,
+    info = dict(n_frames=len(frames), n_injected=n_inj, n_stars=len(crops), n_passes=n_passes, star_spacing_px=sp,
                 frames=frames, tweakreg=g['tweakreg'],
                 lens_star_ra=round(lens_star.ra.deg, 8), lens_star_dec=round(lens_star.dec.deg, 8),
                 star_fwhm_arcsec=[round(float(fw.min()), 4), round(float(np.median(fw)), 4), round(float(fw.max()), 4)],
                 centroid_offset_mas=[round((dx - 3) * scale * 1e3, 2), round((dy - 3) * scale * 1e3, 2)],
                 stpsf_version=next(iter(cache.values()))[1]['stpsf_version'], stpsf_fov_pixels=fov,
                 charge_diffusion_sigma=next(iter(cache.values()))[1]['charge_diffusion_sigma'],
+                phase_err_frac=round(float(np.sqrt(np.sum(phase_std ** 2))), 5) if phase_std is not None else None,
                 seconds=round(time.time() - t0, 1))
-    print(f'  injected kernel: mean of {len(use)} stars (single-star FWHM {fw.min():.4f}-{fw.max():.4f}", '
+    print(f'  injected kernel: mean of {len(crops)} stars (single-star FWHM {fw.min():.4f}-{fw.max():.4f}", '
           f'median {np.median(fw):.4f}"), core centroid offset ({info["centroid_offset_mas"][0]:+.1f}, '
           f'{info["centroid_offset_mas"][1]:+.1f}) mas, {info["seconds"]:.0f}s', flush=True)
-    return kernel, info
+    return kernel, info, phase_std
 
 
 def main():
@@ -352,7 +378,7 @@ def main():
     ch = lens_samples.channel(filt)
     size = int(make_psf._INSTR[f'NIRCAM/{ch}']['star_size']) | 1
     print(f'{a.lens} {filt}  [NIRCAM/{ch}, kernel {size} px]')
-    kernel, info = injected_kernel(sample, a.lens, filt, size, a.variant, keep_work=a.keep_work)
+    kernel, info, _ = injected_kernel(sample, a.lens, filt, size, a.variant, keep_work=a.keep_work)
 
     fwhm = make_psf.measure_fwhm(kernel)
     scale = science_grid(sample, a.lens, filt, a.variant)['scale']

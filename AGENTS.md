@@ -71,8 +71,8 @@ stars. Model FWHM / PSF stars / the empirical check's FWHM, from `info/provenanc
 | F444W | 0.166" / 7 / 0.166" | 0.166" / 8 / 0.164" | – |
 
 The checks run narrower than the model in the undersampled bands for the reason the model ships
-(*PSF*, finding 4); in F444W they agree to 1%. Error maps are the model-vs-star residual per filter
-(error fraction 0.005 F444W to 0.021 F115W). The old "two PSFs rest on three stars" caveat is
+(*PSF*, finding 4); in F444W they agree to 1%. Error maps combine the model-vs-star residual per
+filter with the band's sub-pixel-phase scatter (error fraction 0.008–0.037). The old "two PSFs rest on three stars" caveat is
 gone: no shipped PSF rests on its field's stars.
 
 **Residual diagonal striping is visible in the SW stamps' background (F115W, F150W, F200W;
@@ -695,12 +695,13 @@ Overrides go in `info/overrides/psf_stars.json`. The trim threshold is unchanged
 sizes grew (SW 33–43 px, LW 31–41 px; F444W keeps its full 41 px): the noiseless model keeps the
 real wings that the old pedestal subtraction cut off.
 
-Rebuilt 2026-10-31. FWHM ranges by filter (lenses differ by their dithers and depth):
+Rebuilt 2026-10-31, and on 2026-11-01 with the phase-scatter error term and the 20 short-grid
+bands re-done (*Model tier*). FWHM ranges by filter (lenses differ by their dithers and depth):
 
 | filter | bands | FWHM | | filter | bands | FWHM |
 |---|---|---|---|---|---|---|
-| F115W | 19 | 0.057–0.061" | | F277W | 20 | 0.126–0.135" |
-| F150W | 18 | 0.065–0.067" | | F356W | 2 | 0.147" |
+| F115W | 19 | 0.058–0.062" | | F277W | 20 | 0.129–0.135" |
+| F150W | 18 | 0.065–0.068" | | F356W | 2 | 0.147" |
 | F200W | 2 | 0.076" | | F444W | 19 | 0.164–0.167" |
 
 Against the previous shipped PSFs (empirical, or COWLS pooled), new/old FWHM:
@@ -723,6 +724,14 @@ Against the previous shipped PSFs (empirical, or COWLS pooled), new/old FWHM:
   centre. It is resampled with the science parameters onto a sub-grid of the science grid (same
   crval/scale/rotation, crpix moved by whole pixels; checked to 1e-3 px for every star). The kernel
   is the MEAN of the stars that lie wholly on exactly the frames the lens does.
+- **At least 12 stars (`MIN_PHASE_STARS`).** Near detector edges few grid stars share the lens's
+  frames: before 2026-11-01, 20 of 80 kernels averaged 1–11 stars, and 7 of them (lenses E, J and K
+  in SW, and all of K) were a SINGLE star, i.e. one phase. Now passes follow with the whole grid
+  shifted by 1–3 output pixels (`PHASE_SHIFTS`) until 12 stars are averaged. Each pass puts the star
+  at the lens at a new phase on every detector while keeping it on the lens's frames; it is accepted
+  whatever its coverage, as the lens star always was, since the lens itself can sit near a detector
+  edge (lens K: 12 passes). `n_stars`/`n_passes` are recorded per band. The bands that already had
+  12 stars are bit-identical.
 - Why a grid: with 2–4 dithers an undersampled star's resampled shape depends on its sub-pixel
   phase on the detectors. Single injected stars a pixel or two apart on SPT0418-47 F115W gave
   Gaussian FWHMs of 0.049–0.064", so one star is one random phase. LW F444W varies by only ±1.5%.
@@ -770,15 +779,57 @@ The trap that cost one wrong answer: scipy's `gaussian_filter` truncates its ker
 does nothing below σ ≈ 0.13 px and is crude below ≈ 0.5 px. The first calibration therefore "found"
 0.33 px, the first σ that moved anything. `psf_star_check.blur` is an exact Fourier-space Gaussian.
 
-**Error map: model vs stars.** `--error-maps` computes, per filter, the per-pixel rms of the
-flux-normalised real star about its twin, beyond its own ERR (sigma-clipped mean of r² − e², the
-same stars). It goes to `data/psf/_model_error/<FILT>.fits` and ships as the injected kernel's
-`psf_kernel_err.fits` / `psf_err.fits`: `err_method` `model_vs_stars`, the same map for every lens
-of a filter.
+**Error map: two terms, in quadrature (`err_method` `model_vs_stars+phase`).**
+- **Model vs stars** (`psf_star_check.py --error-maps`): per filter, the per-pixel rms of the
+  flux-normalised real star about its twin, beyond its own ERR (sigma-clipped mean of r² − e², the
+  calibration's stars), in `data/psf/_model_error/<FILT>.fits`. Integrated: F115W 0.021, F150W
+  0.013, F200W 0.012, F277W 0.013, F356W 0.012, F444W 0.005. It is the same map for every lens of a
+  filter, at the stars' sub-pixel phases, 41 px SW / 31 px LW and zero beyond.
+- **Sub-pixel phase** (since 2026-11-01): per band, the per-pixel std of the injected stars about
+  the kernel. The kernel is their mean, the PSF of extended emission. A COMPACT source, a bright lens
+  core, sees one phase's PSF, which scatters about the mean by this much. The term is
+  largest where a lens has the fewest dithers. Integrated, median per filter (range):
+  F115W 0.022 (0.006–0.031), F150W 0.015 (0.007–0.020), F200W 0.009, F277W 0.017 (0.007–0.028),
+  F356W 0.013, F444W 0.008 (0.006–0.013). The total error fraction is 0.008–0.037. For the arcs it is an over-estimate, since they average it away.
+- `err_terms_frac` in `lens_psf.json` records each term's integrated fraction.
 
-Integrated error fraction: F115W 0.021, F150W 0.013, F200W 0.012, F277W 0.013, F356W 0.012, F444W
-0.005. The map is at the stars' sub-pixel phases, not the kernel's. It is 41 px SW / 31 px LW and
-zero beyond.
+**Lens light vs arcs: one kernel (2026-11-01, `diagnostics/psf_closure/lens_light_test.py`).**
+The question: does a bright, compact lens core need a different PSF from the faint, extended arcs?
+- Two effects could make it so: the ivm weights (finding 4), and the sub-pixel phase.
+- **The weights do not.** Across all 80 bands the WHT at the lens peak is a median 0.99 of the
+  1–3" annulus around it, so lens cores are not in the saturating-star regime and are resampled
+  as the arcs are. A few LW bands dip to 0.23–0.7 (SPT0418-47 F277W 0.23, SPT2147-50 LW ~0.7,
+  lens K LW 0.6, lens A F277W 0.7), where one frame's core pixels look flagged by jump or
+  outlier detection.
+- **The test, for the phase.** A Sérsic lens galaxy (n = 4, R_e = 0.5", q = 0.8) is injected into
+  the real frames at the 3×3 central grid positions: rendered on a 4× detector grid, convolved with
+  STPSF's pixel-integrated ePSF, and resampled as the science. It is then fitted as PyAutoLens
+  would (the Sérsic on the output pixels, 8× oversampled, convolved with a kernel; amplitude, R_e
+  and n free), with noise at the real lens core's peak S/N. The score is the central 5×5 max
+  |residual|, median over the 9 positions:
+
+  | band | core S/N | shipped kernel | the point star at that exact position | empirical |
+  |---|---|---|---|---|
+  | SPT2147-50 F200W | 58 | 1.2σ | 0.9σ | 1.3σ |
+  | SPT0418-47 F115W | 129 | 5.0σ | 3.1σ | 12.7σ |
+  | SPT0418-47 F444W | 180 | 4.6σ | 3.2σ | 8.1σ |
+  | COSJ100121+022740 F150W | 181 | 3.5σ | 2.8σ | 13.0σ |
+  | COSJ100121+022740 F444W | 251 | 5.6σ | 4.0σ | 6.3σ |
+  | B1938+666 F277W | 1393 | 16.9σ | 14.9σ | 94σ |
+
+What the test shows:
+- **The star-built PSF is worse for the lens light too.** Its χ² within 0.5" is 3–80× the model's;
+  its narrowing in the undersampled bands hurts the core as well.
+- **A position-specific kernel helps the core only by 10–40%**, and it would be wrong for the arcs.
+- **No single kernel removes the floor at high S/N** (15σ on B1938+666 F277W even at the exact
+  position). An undersampled, resampled image is not a convolution: each point of the core has its
+  own phase on each detector. The exact fix is the modelling side's, fitting the individual
+  exposures each with its detector PSF (STPSF, calibrated here). More dithers would also help.
+- **So one kernel, the model's**, plus the phase term in its error map, which tells a modelling
+  code how far a compact component's PSF can sit from it.
+
+The truth in this test is STPSF-made, so the empirical column also pays for the model-vs-star gap
+(1–2% in FWHM).
 
 **Empirical tier (the check, and `--method empirical`).** The HST repo's ePSF machinery:
 - stars from the full mosaic (lens masked to 5", no-coverage and edge masked), gated on peak
@@ -859,7 +910,7 @@ COWLS's PSFs from 2026-10-30 to 2026-10-31; it now writes only
   from a neighbouring mosaic (0.3"). It tiles the background-subtracted cutouts onto one synthetic
   image at their sub-pixel offsets, so `build_epsf` runs unchanged.
 - COWLS on 2026-10-31: F115W 0.051", F150W 0.064", F277W 0.126", F444W 0.162" (F444W 61 stars, 9
-  fewer than before the galaxy gate). Per-lens models: 0.057–0.061, 0.065–0.067, 0.126–0.135 and
+  fewer than before the galaxy gate). Per-lens models: 0.058–0.062, 0.065–0.068, 0.129–0.135 and
   0.164–0.167". The undersampled-band gap is finding 4 again.
 - `--output` is a true scratch mode (until 2026-10-30 it still overwrote the band's `psf.fits` and
   `lens_psf.json` record).

@@ -1075,11 +1075,11 @@ def main():
     # (make_psf_inject.py). It is the canonical PSF (--method auto/model): a kernel built from
     # bright field stars is not the PSF a faint arc sees in the undersampled bands, whose
     # resampled cores carry frame-dependent ivm weights (AGENTS.md *PSF*, finding 4).
-    model_kernel, model_info = None, {}
+    model_kernel, model_info, phase_std = None, {}, None
     if not a.pool and method != 'empirical':
         try:
             import make_psf_inject
-            model_kernel, inject_info = make_psf_inject.injected_kernel(sample, a.lens, filt, star_size, a.variant)
+            model_kernel, inject_info, phase_std = make_psf_inject.injected_kernel(sample, a.lens, filt, star_size, a.variant)
             model_info = dict(injection=inject_info)
         except Exception as exc:
             model_info = dict(injection_error=f'{exc.__class__.__name__}: {exc}')
@@ -1156,7 +1156,7 @@ def main():
         print(f'  check: empirical ({n_stars} stars) FWHM {validation["fwhm_arcsec"]:.4f}" vs model '
               f'{fwhm_pix * scale:.4f}", core L1 {validation["l1_core"]:.3f}')
 
-    err_full = err_trim = err_frac = fwhm_err = err_method = n_boot_valid = err_source = None
+    err_full = err_trim = err_frac = fwhm_err = err_method = n_boot_valid = err_source = err_terms = None
     do_psf_err = not a.no_psf_err and overrides.get('psf_err', True)
     trim_half = (trim_size - 1) // 2
     if do_psf_err and method_used.startswith('empirical') and n_stars >= 2:
@@ -1174,16 +1174,28 @@ def main():
             print(f'    WARNING: only {n_boot_valid} valid ensemble member(s); no PSF error map written')
             err_method = err_source = None
     elif do_psf_err and method_used == 'inject_stpsf':
+        # Two terms, added in quadrature. The model-vs-star residual for the filter (how far real
+        # stars sit from the model at their own positions), and the sub-pixel-phase scatter of the
+        # injected stars about the kernel (how far a COMPACT source's PSF sits from it: a bright
+        # lens core sees one phase, while the kernel is the mean over 6-25; extended arcs average it
+        # away, so for them this term is an over-estimate).
         em = model_error_map(filt, kernel.shape[0])
+        terms = {}
         if em is not None:
-            err_full = em
-            err_trim = em[em.shape[0] // 2 - trim_half:em.shape[0] // 2 + trim_half + 1,
-                          em.shape[1] // 2 - trim_half:em.shape[1] // 2 + trim_half + 1]
-            err_frac = float(np.sqrt(np.sum(em ** 2)))
-            err_method, err_source = 'model_vs_stars', 'stars'
-            print(f'  PSF uncertainty: the model-vs-star error map for {filt}, error fraction {err_frac:.2e}')
-        else:
-            print(f'  WARNING: no model error map for {filt} (psf_star_check.py --error-maps); none written')
+            terms['model_vs_stars'] = em
+        if phase_std is not None:
+            terms['phase'] = phase_std
+        if terms:
+            err_full = np.sqrt(sum(t ** 2 for t in terms.values()))
+            c = err_full.shape[0] // 2
+            err_trim = err_full[c - trim_half:c + trim_half + 1, c - trim_half:c + trim_half + 1]
+            err_frac = float(np.sqrt(np.sum(err_full ** 2)))
+            err_method, err_source = '+'.join(terms), 'stars' if 'model_vs_stars' in terms else 'injection'
+            err_terms = {k: round(float(np.sqrt(np.sum(t ** 2))), 5) for k, t in terms.items()}
+            print(f'  PSF uncertainty: {err_method}, error fraction {err_frac:.2e} '
+                  + ', '.join(f'{k} {v:.2e}' for k, v in err_terms.items()))
+        if em is None:
+            print(f'  WARNING: no model error map for {filt} (psf_star_check.py --error-maps); phase scatter only')
 
     khdr = fits.Header()
     khdr['PSFMETH'] = (method_used, 'STPSF injected (canonical), empirical, analytic')
@@ -1223,6 +1235,7 @@ def main():
         'fwhm_pix_err': round(fwhm_err, 4) if fwhm_err is not None else None,
         'psf_err_frac': round(err_frac, 8) if err_frac is not None else None,
         'err_method': err_method, 'err_source': err_source, 'n_boot_valid': n_boot_valid,
+        'err_terms_frac': err_terms,
         'variant': a.variant or 'standard',
         'broadening': {'model_stpsf': 'analytic', 'inject_stpsf': 'injection'}.get(method_used),
         'empirical_check': validation,
@@ -1260,7 +1273,7 @@ def write_band(a, sample, lens, filt, kernel, khdr, trimmed, trim_size, err_full
                                       (thdr, 'trimmed_err', err_trim, os.path.join(stamps_dir, stamp_paths.psf_name('psf_err')))):
             ehdr = base.copy()
             ehdr['PSFKIND'] = (kind, 'per-pixel PSF std')
-            ehdr['PSFERR'] = (err_method, 'bootstrap, jackknife or model_vs_stars')
+            ehdr['PSFERR'] = (err_method, 'bootstrap/jackknife, or model_vs_stars+phase')
             ehdr['PSFESRC'] = (err_source, 'error source')
             ehdr['PSFNVALD'] = (n_boot_valid, 'valid ensemble members')
             ehdr['PSFEFRAC'] = (round(err_frac, 8), 'integrated PSF error fraction')
