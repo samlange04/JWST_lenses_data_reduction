@@ -30,7 +30,10 @@
                 "theta_e": 1.207,
                 "theta_e_ref": "Cathey+24",
                 "redshift_lens": 0.263,
-                "redshift_source": 4.22
+                "redshift_source": 4.22,
+                "deflector_ra": 64.66533624,
+                "deflector_dec": -47.8646396,
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F200W, F277W, F356W, F444W, which agree to 20 mas; +17 mas E, -23 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
             },
             "SPT2147-50": {
                 "mast_target": "SPT2147-50",
@@ -39,7 +42,10 @@
                 "theta_e": 1.195,
                 "theta_e_ref": "Spilker+16",
                 "redshift_lens": 0.845,
-                "redshift_source": 3.76
+                "redshift_source": 3.76,
+                "deflector_ra": 326.82905952,
+                "deflector_dec": -50.5985216,
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F200W, F277W, F356W, F444W, which agree to 8 mas; -359 mas E, -178 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
             }
         }
     },
@@ -62,7 +68,10 @@
                 "theta_e": 1.48,
                 "redshift_lens": 1.053,
                 "redshift_source": null,
-                "redshift_lens_kind": "spec (DESI, Dey+19)"
+                "redshift_lens_kind": "spec (DESI, Dey+19)",
+                "deflector_ra": 149.8114099,
+                "deflector_dec": 2.2054348,
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 8 mas; -42 mas E, -19 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
             },
             "COSJ095917+015424": {
                 "cowls_letter": "B",
@@ -71,7 +80,10 @@
                 "theta_e": 0.58,
                 "redshift_lens": 1.252,
                 "redshift_source": null,
-                "redshift_lens_kind": "photo-z (COSMOS-Web catalogue, Shuntov+24)"
+                "redshift_lens_kind": "photo-z (COSMOS-Web catalogue, Shuntov+24)",
+                "deflector_ra": 149.82151092,
+                "deflector_dec": 1.90696739,
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 10 mas; +175 mas E, +340 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
             },
             "COSJ095920+015851": {
                 "cowls_letter": "C",
@@ -80,7 +92,10 @@
                 "theta_e": 0.45,
                 "redshift_lens": 0.974,
                 "redshift_source": null,
-                "redshift_lens_kind": "spec (DESI, Dey+19)"
+                "redshift_lens_kind": "spec (DESI, Dey+19)",
+                "deflector_ra": 149.83391364,
+                "deflector_dec": 1.98102928,
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 20 mas; +94 mas E, +368 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
             },
             "COSJ095921+020638": {
                 "cowls_letter": "D",
@@ -89,7 +104,10 @@
                 "theta_e": 0.71,
                 "redshift_lens": 0.469,
                 "redshift_source": null,
-                "redshift_lens_kind": "spec (DESI, Dey+19)"
+                "redshift_lens_kind": "spec (DESI, Dey+19)",
+                "deflector_ra": 149.84068897,
+                "deflector_dec": 2.11063987,
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 5 mas; -2 mas E, -46 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
             },
             "COSJ095950+022057": {
                 "cowls_letter": "E",
@@ -98,7 +116,10 @@
                 "theta_e": 1.04,
                 "redshift_lens": 0.939,
                 "redshift_source": null,
-                "redshift_lens_kind": "spec (DESI, Dey+19)"
+                "redshift_lens_kind": "spec (DESI, Dey+19)",
+                "deflector_ra": 149.9614242,
+                "deflector_dec": 2.34941578,
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 10 mas; -22 mas E, +15 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
             },
             "COSJ095953+023319": {
                 "cowls_letter": "F",
@@ -107,7 +128,10 @@
                 "theta_e": 1.44,
                 "redshift_lens": 0.731,
                 "redshift_source": null,
-                "redshift_lens_kind": "spec (DESI, Dey+19)"
+                "redshift_lens_kind": "spec (DESI, Dey+19)",
+                "deflector_ra": 149.97466917,
+                "deflector_dec": 2.55548519,
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 7 mas; -32 mas E, +142 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
             },
             "COSJ095955+021900": {
                 "cowls_letter": "G",
@@ -116,7 +140,10 @@
                 "theta_e": 2.11,
                 "redshift_lens": 0.577,
                 "redshift_source": null,
-                "redshift_lens_kind": "photo-z (COSMOS-Web catalogue, Shuntov+24)"
+                "redshift_lens_kind": "photo-z (COSMOS-Web catalogue, Shuntov+24)",
+                "deflector_ra": 149.98314395,
+                "deflector_dec": 2.31691592,
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 20 mas; -65 mas E, +127 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
             },
             "COSJ100012+022015": {
                 "cowls_letter": "H",
@@ -125,7 +152,10 @@
                 "theta_e": 0.75,
                 "redshift_lens": 0.377,
                 "redshift_source": null,
-                "redshift_lens_kind": "spec (DESI, Dey+19)"
+                "redshift_lens_kind": "spec (DESI, Dey+19)",
+                "deflector_ra": 150.05259202,
+                "deflector_dec": 2.33771659,
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 6 mas; +14 mas E, +36 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
             },
             "COSJ100013+023424": {
                 "cowls_letter": "I",
@@ -134,7 +164,10 @@
                 "theta_e": 1.45,
                 "redshift_lens": 0.89,
                 "redshift_source": null,
-                "redshift_lens_kind": "photo-z (COSMOS-Web catalogue, Shuntov+24)"
+                "redshift_lens_kind": "photo-z (COSMOS-Web catalogue, Shuntov+24)",
+                "deflector_ra": 150.05578787,
+                "deflector_dec": 2.57330667,
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 17 mas; +45 mas E, -145 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
             },
             "COSJ100018+022138": {
                 "cowls_letter": "J",
@@ -144,7 +177,10 @@
                 "redshift_lens": 1.53,
                 "redshift_source": 3.42,
                 "redshift_lens_kind": "spec (van der Wel+13)",
-                "redshift_source_kind": "spec (van der Wel+13)"
+                "redshift_source_kind": "spec (van der Wel+13)",
+                "deflector_ra": 150.07694066,
+                "deflector_dec": 2.36075858,
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 16 mas; +22 mas E, +5 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
             },
             "COSJ100024+015334": {
                 "cowls_letter": "K",
@@ -154,7 +190,10 @@
                 "redshift_lens": 2.02,
                 "redshift_source": 5.1,
                 "redshift_lens_kind": "photo-z (COSMOS-Web catalogue, Shuntov+24)",
-                "redshift_source_kind": "spec (Shuntov+25)"
+                "redshift_source_kind": "spec (Shuntov+25)",
+                "deflector_ra": 150.10047491,
+                "deflector_dec": 1.89302463,
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 10 mas; +28 mas E, -17 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
             },
             "COSJ100024+021749": {
                 "cowls_letter": "L",
@@ -164,7 +203,10 @@
                 "redshift_lens": 0.362,
                 "redshift_source": 2.63,
                 "redshift_lens_kind": "spec (DESI, Dey+19)",
-                "redshift_source_kind": "spec (Jin+24)"
+                "redshift_source_kind": "spec (Jin+24)",
+                "deflector_ra": 150.10009446,
+                "deflector_dec": 2.29712812,
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 10 mas; +20 mas E, -17 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
             },
             "COSJ100025+015245": {
                 "cowls_letter": "M",
@@ -173,7 +215,10 @@
                 "theta_e": 0.53,
                 "redshift_lens": 2.449,
                 "redshift_source": null,
-                "redshift_lens_kind": "photo-z (COSMOS-Web catalogue, Shuntov+24)"
+                "redshift_lens_kind": "photo-z (COSMOS-Web catalogue, Shuntov+24)",
+                "deflector_ra": 150.10671646,
+                "deflector_dec": 1.87929449,
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F277W, F444W, which agree to 6 mas (F115W, F150W left out, >60 mas from the LW peak); +31 mas E, +27 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
             },
             "COSJ100028+021928": {
                 "cowls_letter": "N",
@@ -182,7 +227,10 @@
                 "theta_e": 0.66,
                 "redshift_lens": 0.604,
                 "redshift_source": null,
-                "redshift_lens_kind": "spec (DESI, Dey+19)"
+                "redshift_lens_kind": "spec (DESI, Dey+19)",
+                "deflector_ra": 150.11905587,
+                "deflector_dec": 2.32450052,
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 10 mas; -41 mas E, -10 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
             },
             "COSJ100047+015023": {
                 "cowls_letter": "O",
@@ -191,7 +239,10 @@
                 "theta_e": 1.62,
                 "redshift_lens": 0.893,
                 "redshift_source": null,
-                "redshift_lens_kind": "spec (DESI, Dey+19)"
+                "redshift_lens_kind": "spec (DESI, Dey+19)",
+                "deflector_ra": 150.1985754,
+                "deflector_dec": 1.83980081,
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 8 mas; -31 mas E, +59 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
             },
             "COSJ100119+014849": {
                 "cowls_letter": "P",
@@ -199,7 +250,10 @@
                 "dec": 1.813616188,
                 "theta_e": 1.14,
                 "redshift_lens": null,
-                "redshift_source": null
+                "redshift_source": null,
+                "deflector_ra": 150.33053627,
+                "deflector_dec": 1.81361115,
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F277W, F444W, which agree to 9 mas (F115W, F150W left out, >60 mas from the LW peak); +38 mas E, -18 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
             },
             "COSJ100121+022740": {
                 "cowls_letter": "Q",
@@ -208,7 +262,10 @@
                 "theta_e": 0.86,
                 "redshift_lens": 0.371,
                 "redshift_source": null,
-                "redshift_lens_kind": "spec (DESI, Dey+19)"
+                "redshift_lens_kind": "spec (DESI, Dey+19)",
+                "deflector_ra": 150.34136726,
+                "deflector_dec": 2.46130398,
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 5 mas; +15 mas E, +25 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
             }
         }
     }

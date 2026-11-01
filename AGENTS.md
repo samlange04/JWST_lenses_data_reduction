@@ -225,6 +225,7 @@ split_noise_test.py half-dither mosaics A, B -> A-B null image -> block-sum rati
 measure_corr_factor.py  blank-sky block-sum / ACF ratios on every stamp (shallow fields' NOISECOR)
 make_stamps.py     i2d SCI/ERR/WHT -> stamp<S>_sci.fits, stamp<S>_noise.fits, stamp<S>.png
 make_psf.py         i2d field stars -> ePSF -> psf.fits  (STPSF fallback)
+measure_lens_centres.py the lens core per band (LW-anchored) -> deflector_ra/dec, which make_stamps centres on
 choose_primary_band.py  arc S/N per band, discounted below 5 PSF widths across theta_E -> each lens's primary band
 make_masks.py / make_arc_masks.py / make_positions.py   GUIs, one draw per band (primary first), broadcast by WCS
 make_dataset_subplots.py / make_qc_grids.py              QC
@@ -497,6 +498,32 @@ finds the ring. Whichever is used lands in the header (`CUTCENT`, `CUTRA`, `CUTD
 actual stamp centre) and in `info/provenance/lens_stamp_qc.json`. B1938 was re-cut this way 2026-10-04;
 PSFs and NOISECOR are unaffected (neither depends on the stamp centre).
 
+**Every lens has a measured centre since 2026-11-01 (`measure_lens_centres.py`).** The other
+catalogue positions miss the lens too, by 20–50 mas typically and by ~0.4" for SPT2147-50 (its
+APT coordinate: 359 mas W, 178 mas S of the core), COSJ095917+015424 and COSJ095920+015851, then
+0.15" for COSJ095953+023319 and COSJ100013+023424. The miss is the catalogue's error plus our
+mosaics' absolute astrometry (relative alignment only).
+- **How it is measured.** Per band, the core is the brightest 1-px-smoothed pixel within 0.5",
+  parabola-refined. The LW bands, where the lens's old stars dominate, anchor it; every band
+  within 60 mas of the LW median votes, and the deflector is the median of the voters.
+- **Why the LW anchor.** In COSJ100025+015245's SW bands the lensed images peak 0.46" from the
+  lens, and COSJ100119+014849's SW peaks sit 60–100 mas off, so both use LW alone.
+- **Why not a centroid.** A 0.15" flux-weighted centroid iterated from the stamp centre creeps
+  toward asymmetric light and stops short of a core 0.4" away (SPT2147-50: −194 mas against −359).
+- **The result.** The voting bands agree to 5–20 mas. B1938+666 keeps its hand-measured centre.
+  `deflector_ra/dec/note` are written for the 19 others, and all 78 SPT and COWLS stamps were
+  re-cut; each lens now sits within 39 mas of its stamp centre (the LW snap).
+- **Masks moved with the stamps.** The COWLS F444W masks drawn by then were moved by the grid's
+  whole-pixel shift (0 to (−3, +6) LW px), with newly exposed edge pixels copying the edge. Every
+  masked sky position was checked to stay masked, and `lens_masks.json` records the shift
+  (`recut_2026_11_01`).
+- **Do not use `reproject_mask_bool` for this.** Its nearest-neighbour WCS map drops masked
+  pixels on the stamp border (a 0-px shift lost 45–160 px).
+- **The primary bands were re-measured** on the centred stamps. Four changed: SPT2147-50 and
+  COSJ095917+015424 to F444W, COSJ100047+015023 to F277W, and COSJ100028+021928 became
+  measurable (F444W). The old stamps and masks are in
+  `diagnostics/recut_backup_20261101/` (gitignored).
+
 ### Noise
 
 `stamp<S>_noise.fits` = i2d `ERR` × `NOISECOR`, float64, 1e8 where SCI is NaN, ERR is non-finite
@@ -682,12 +709,10 @@ always answers `stamp<S>` for the lens's modelling size). The semantics are unch
   stamp, a zoom on the lens, and the zoom with the lens light removed (the radial median, as the
   mask GUI's left panel). Each panel has its own arcsinh stretch, North up, East left. Overlaid:
   the contaminant mask outline, the image positions and θ_E; the primary band is starred.
-  - The zooms, the θ_E circle and the lens-light profile are centred on the lens's LIGHT, not
-    the stamp centre: one centre per lens, the median over bands of the light centroid within
-    0.15", printed in the header.
-  - The stamps are cut at the catalogue position, which misses the light by 20–50 mas typically
-    and up to 160 mas (COSJ095917+015424, COSJ095920+015851, COSJ095953+023319,
-    COSJ100013+023424; SPT2147-50 ~130 mas).
+  - The zooms, the θ_E circle and the lens-light profile are centred on the lens's measured
+    centre (`deflector_ra/dec`) at its exact sub-pixel position. The stamps are cut on it,
+    snapped to the LW grid, so it is ≤ 39 mas from the stamp centre; the header prints the
+    residual.
   - autogalaxy's `radial_median_subtract` (the mask GUI's) profiles about the array centre, a pixel
     corner here, so even a half-pixel offset leaves a dipole. `radial_subtract` takes the
     sub-pixel centre instead.

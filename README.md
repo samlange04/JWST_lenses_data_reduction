@@ -51,7 +51,8 @@ too:
 
 The SPT and COWLS stamps cover 12″ × 12″ of sky. B1938+666's cover 6.96″ × 6.96″, because its Einstein
 ring is only ~0.9″ across and a 12″ stamp was a third detector streaks and unrelated galaxies.
-Every stamp is centred on the lens, and a lens's SW and LW pixels nest exactly 2 : 1.
+Every stamp is centred on the lens's measured centre, its light peak (`deflector_ra`/`deflector_dec`
+in `info/samples/lens_samples.json`), to within 0.04″, and a lens's SW and LW pixels nest exactly 2 : 1.
 
 ## Using the finished products
 

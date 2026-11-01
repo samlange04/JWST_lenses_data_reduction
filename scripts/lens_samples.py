@@ -189,9 +189,10 @@ def coord(lens, sample=None):
 def deflector_coord(lens, sample=None):
     """SkyCoord of the MEASURED deflector (``deflector_ra``/``deflector_dec``), or None.
 
-    Only for a lens whose catalogue position misses the galaxy by more than a pixel or two
-    (B1938+666: 0.52"). ``ra``/``dec`` stay the mosaics' CRVAL, so they are not edited to
-    match; make_stamps cuts the stamp here instead (``--center auto``)."""
+    Measured by hand for B1938+666 (0.52" from its APT coordinate) and by
+    measure_lens_centres.py for every other lens (2026-11-01; up to ~0.4" off). ``ra``/``dec``
+    stay the mosaics' CRVAL, so they are not edited to match; make_stamps cuts the stamp here
+    instead (``--center auto``)."""
     from astropy.coordinates import SkyCoord
     import astropy.units as u
     e = entry(lens, sample)

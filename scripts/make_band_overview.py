@@ -12,10 +12,10 @@ the bands in wavelength order. Rows:
   2. a zoom on the lens (+-max(2.5 theta_E, 1.5")), as observed;
   3. the same zoom with the lens light removed (its azimuthal median, masked pixels left out),
      with the image positions (cyan +) where marked and the Einstein radius (dashed).
-The zooms, the theta_E circle and the lens-light profile are centred on the lens's LIGHT, one
-centre per lens (the median over bands of the light centroid within 0.15"), not on the stamp
-centre: the stamps are cut at the catalogue position, up to ~0.15" (5 SW px) off it, and a
-profile even half a pixel off leaves a dipole. The offset is printed in the header.
+The zooms, the theta_E circle and the lens-light profile are centred on the lens's measured
+centre (deflector_ra/dec, measure_lens_centres.py; else the catalogue position), at its exact
+sub-pixel position: the stamps are cut on it but snapped to the 0.06" LW grid, and a profile even
+half a pixel off the lens leaves a dipole. The residual offset is printed in the header.
 Every panel has its own arcsinh stretch (autogalaxy's arcsinh_stretch, as the GUIs). North is up
 and East left (the stamps' rows run South to North, columns East to West). The primary band
 (lens_samples.primary_band: reviewed, or choose_primary_band.py's suggestion) is starred, and
@@ -67,26 +67,7 @@ def load_band(stamp_dir, prefix):
         with open(pos_f) as f:
             d = json.load(f)
         positions = d['arguments']['values']['array'] if isinstance(d, dict) and 'arguments' in d else d
-    return dict(sci=sci, scale=scale, mask=mask, positions=[tuple(p) for p in positions])
-
-
-CENTROID_R = 0.15      # arcsec: the window of the lens's light centroid
-
-
-def light_centroid(sci, scale, r0=CENTROID_R):
-    """The flux-weighted centroid of the light within r0 of it (iterated from the stamp centre),
-    as (East, North) arcsec from the stamp centre, or None."""
-    n = sci.shape[0]
-    c = (n - 1) / 2.0
-    yy, xx = np.mgrid[:n, :n]
-    w = np.clip(np.nan_to_num(sci), 0, None)
-    cx = cy = c
-    for _ in range(8):
-        m = np.hypot(xx - cx, yy - cy) * scale < r0
-        if w[m].sum() <= 0:
-            return None
-        cx, cy = (w[m] * xx[m]).sum() / w[m].sum(), (w[m] * yy[m]).sum() / w[m].sum()
-    return -(cx - c) * scale, (cy - c) * scale
+    return dict(sci=sci, scale=scale, mask=mask, positions=[tuple(p) for p in positions], hdr=hdr)
 
 
 def radial_subtract(img, cx, cy, exclude=None):
@@ -122,10 +103,15 @@ def render(sample, lens, out=None):
     zl, zs = lens_samples.redshifts(lens, sample)
     primary, psource = lens_samples.primary_band(lens, sample)
     half_zoom = max(2.5 * (te or 0.6), 1.5)
-    # ONE lens centre for every band (the median of the bands' light centroids), so the zooms stay
-    # registered: the stamps are cut at the catalogue position, up to ~0.15" off the light
-    cents = [c for c in (light_centroid(bands[f]['sci'], bands[f]['scale']) for f in filts) if c]
-    e0, n0 = (float(np.median([c[0] for c in cents])), float(np.median([c[1] for c in cents]))) if cents else (0.0, 0.0)
+    # The lens centre: the measured deflector (lens_samples.json, measure_lens_centres.py), else
+    # the catalogue position, as (East, North) arcsec from the stamp centre. The stamps are cut on
+    # it, snapped to the 0.06" LW grid, so it sits within ~30 mas of the centre; one sky point for
+    # every band, so the zooms stay registered.
+    from astropy.wcs import WCS
+    target = lens_samples.deflector_coord(lens, sample) or lens_samples.coord(lens, sample)
+    h0, n_, s0 = bands[filts[-1]]['hdr'], bands[filts[-1]]['sci'].shape[0], bands[filts[-1]]['scale']
+    tx, ty = (float(v) for v in WCS(h0).world_to_pixel(target))
+    e0, n0 = -(tx - (n_ - 1) / 2.0) * s0, (ty - (n_ - 1) / 2.0) * s0
 
     ncol = len(filts)
     fig, axes = plt.subplots(3, ncol, figsize=(max(3.0 * ncol, 8.0), 9.8), squeeze=False)
@@ -195,7 +181,7 @@ def render(sample, lens, out=None):
     te_s = f'{te:.2f}"' if te else '?'
     prim = f'{primary} ({psource})' if primary else 'not set (no band measurable)'
     fig.suptitle(f'{lens}  ({sample})   z_l {zl_s}   z_s {zs_s}   θ_E {te_s}\n'
-                 f'primary band: {prim}  (★)    zooms centred on the lens light, '
+                 f'primary band: {prim}  (★)    zooms centred on the measured lens centre, '
                  f'{1e3 * e0:+.0f} mas E, {1e3 * n0:+.0f} mas N of the stamp centre\n'
                  f'red: contaminant mask   cyan +: image positions   dashed: θ_E', fontsize=9.5)
     fig.tight_layout(rect=(0, 0, 1, 0.92))

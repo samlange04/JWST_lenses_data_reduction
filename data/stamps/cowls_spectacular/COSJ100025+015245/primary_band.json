@@ -7,31 +7,31 @@
     "theta_e": 0.53,
     "scores": {
         "F115W": {
-            "arc_snr": 7.26,
+            "arc_snr": 11.46,
             "psf_fwhm_arcsec": 0.0527,
             "resolution_factor": 1.0,
-            "score": 7.26,
+            "score": 11.46,
             "contaminant_mask": false
         },
         "F150W": {
-            "arc_snr": 16.87,
+            "arc_snr": 25.29,
             "psf_fwhm_arcsec": 0.0637,
             "resolution_factor": 1.0,
-            "score": 16.87,
+            "score": 25.29,
             "contaminant_mask": false
         },
         "F277W": {
-            "arc_snr": 153.17,
+            "arc_snr": 171.67,
             "psf_fwhm_arcsec": 0.1246,
             "resolution_factor": 0.851,
-            "score": 130.31,
+            "score": 146.04,
             "contaminant_mask": false
         },
         "F444W": {
-            "arc_snr": 221.55,
+            "arc_snr": 236.48,
             "psf_fwhm_arcsec": 0.1666,
             "resolution_factor": 0.636,
-            "score": 140.96,
+            "score": 150.46,
             "contaminant_mask": true
         }
     },
