@@ -263,10 +263,11 @@ def load_display_base(display_dir, prefix, display, pixel_scales):
     return al.Array2D.no_mask(values=snr, pixel_scales=pixel_scales).native, 'S/N'
 
 
-# Preference order for "best band to draw the mask on" when --filt is not given. Same list
-# used by make_positions.pick_display_filt (which imports this) so the two GUIs agree on
-# which band is primary. f814W is the highest-S/N SLACS band and the stamp --center-band;
-# f606W is the gallery/BELLS primary; the rest follow by typical arc S/N.
+# The FALLBACK band order. Each lens's primary band comes first (lens_samples.primary_band:
+# the reviewed `primary_band` in lens_samples.json, else choose_primary_band.py's measured
+# suggestion), then this order. A fixed order alone picked the wrong band for 13 of 20 lenses
+# (choose_primary_band.py, 2026-11-01). make_positions and make_arc_masks import the same
+# helpers, so the GUIs agree on which band is primary.
 _BAND_PRIORITY = ['F444W', 'F356W', 'F277W', 'F200W', 'F150W', 'F115W']
 
 
@@ -277,14 +278,27 @@ def _band_rank(filt):
         return len(_BAND_PRIORITY)
 
 
-def pick_display_filt(filts, requested):
+def band_order(filts, lens=None, sample=None):
+    """`filts` in preference order: the lens's primary band first (if it has one and it is
+    among `filts`), then _BAND_PRIORITY."""
+    order = sorted(filts, key=lambda f: (_band_rank(f), f))
+    if lens is not None:
+        primary, _ = mast_target_names.primary_band(lens, sample)
+        if primary in order:
+            order.remove(primary)
+            order.insert(0, primary)
+    return order
+
+
+def pick_display_filt(filts, requested, lens=None, sample=None):
     """Choose which band to draw on. `requested` (--filt) wins if present among `filts`;
-    else the highest-priority available band. Returns None if the requested band is absent.
-    Shared with make_positions so both tools pick the same primary band per lens.
+    else the lens's primary band, else the highest-priority available band (band_order).
+    Returns None if the requested band is absent. Shared with make_positions and
+    make_arc_masks so every tool picks the same primary band per lens.
     """
     if requested is not None:
         return requested if requested in filts else None
-    return sorted(filts, key=lambda f: (_band_rank(f), f))[0]
+    return band_order(filts, lens, sample)[0]
 
 
 def reproject_mask_bool(src_bool, src_wcs, dst_wcs, dst_shape):
@@ -316,7 +330,7 @@ def reproject_mask_bool(src_bool, src_wcs, dst_wcs, dst_shape):
 
 
 def find_proposal_mask(filt_dirs, display_filt, display_hdr, drizzle_pass, propose_from,
-                       force=False):
+                       force=False, lens=None, sample=None):
     """Find a mask already drawn for this lens to PROPOSE as the starting point for the band
     about to be drawn, reprojected onto that band's grid. Returns (source_filt, bool array)
     or (None, None).
@@ -326,8 +340,8 @@ def find_proposal_mask(filt_dirs, display_filt, display_hdr, drizzle_pass, propo
     process_lens_mask). Source preference, `propose_from='auto'`:
       1. the draw band's OWN existing mask, when there is one -- i.e. a `--force` redraw
          starts from the mask being replaced, so refining it does not mean redrawing it;
-      2. otherwise the highest-priority OTHER band of this lens that has a mask
-         (`_BAND_PRIORITY`, so f814W's mask is what usually seeds f555W/f160W).
+      2. otherwise the highest-priority OTHER band of this lens that has a mask (band_order:
+         the lens's primary band first, so its mask is what seeds the others).
     An explicit `propose_from='<band>'` restricts the search to that band; 'none' is handled
     by the caller (no search at all).
 
@@ -337,8 +351,7 @@ def find_proposal_mask(filt_dirs, display_filt, display_hdr, drizzle_pass, propo
     if propose_from in (None, 'none'):
         return None, None
     if propose_from == 'auto':
-        others = sorted((f for f in filt_dirs if f != display_filt),
-                        key=lambda f: (_band_rank(f), f))
+        others = [f for f in band_order(filt_dirs, lens, sample) if f != display_filt]
         candidates = ([display_filt] if force else []) + others
     else:
         candidates = [propose_from]
@@ -532,7 +545,7 @@ def process_lens_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass, for
     is worth looking at in the band it is landing on.
     """
     filts = sorted(filt_dirs)
-    display_filt = pick_display_filt(filts, requested_filt)
+    display_filt = pick_display_filt(filts, requested_filt, lens, sample)
     if display_filt is None:
         print(f"{lens}: requested --filt {requested_filt} not present "
               f"(have {', '.join(filts)}), skipping")
@@ -552,7 +565,8 @@ def process_lens_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass, for
 
     display_hdr = fits.getheader(stamp_paths.find_stamp(display_dir, display_prefix, 'sci'))
     proposal_from, proposal = find_proposal_mask(
-        filt_dirs, display_filt, display_hdr, drizzle_pass, propose_from, force=force)
+        filt_dirs, display_filt, display_hdr, drizzle_pass, propose_from, force=force,
+        lens=lens, sample=sample)
     if proposal is not None:
         print(f"{lens} {display_filt}: reviewing the mask from {proposal_from} "
               f"({int(proposal.sum())}px) -- edit it in the GUI, then apply/reject")

@@ -1,0 +1,25 @@
+{
+    "lens": "B1938+666",
+    "sample": "b1938",
+    "primary_band": "F277W",
+    "primary_band_source": "measured",
+    "suggested": "F277W",
+    "theta_e": 0.45,
+    "scores": {
+        "F115W": {
+            "arc_snr": 1300.51,
+            "psf_fwhm_arcsec": 0.0547,
+            "resolution_factor": 1.0,
+            "score": 1300.51,
+            "contaminant_mask": true
+        },
+        "F277W": {
+            "arc_snr": 6734.95,
+            "psf_fwhm_arcsec": 0.1207,
+            "resolution_factor": 0.746,
+            "score": 5021.92,
+            "contaminant_mask": true
+        }
+    },
+    "how": "scripts/choose_primary_band.py (docstring)"
+}

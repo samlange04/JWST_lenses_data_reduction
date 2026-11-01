@@ -154,7 +154,7 @@ def _one_arc_source(filt_dirs, prefixes, display_filt, dst_wcs, dst_shape, lens,
                                           dst_wcs, dst_shape), {}
 
 
-def resolve_arc_sources(filt_dirs, display_filt, propose_from, force=False):
+def resolve_arc_sources(filt_dirs, display_filt, propose_from, force=False, lens=None, sample=None):
     """Expand `--propose-from` into an ordered, de-duplicated list of concrete sources.
 
     'none'   -> []            (blank canvas)
@@ -169,8 +169,7 @@ def resolve_arc_sources(filt_dirs, display_filt, propose_from, force=False):
         return []
     if propose_from != 'auto':
         return [t.strip() for t in str(propose_from).split(',') if t.strip()]
-    others = sorted((f for f in filt_dirs if f != display_filt),
-                    key=lambda f: (make_masks._band_rank(f), f))
+    others = [f for f in make_masks.band_order(filt_dirs, lens, sample) if f != display_filt]
     return (['detect'] + ([display_filt] if force else []) + others)
 
 
@@ -191,7 +190,7 @@ def find_arc_proposal(filt_dirs, prefixes, display_filt, display_hdr, lens, prop
     after it gets the detector plus your own reviewed region, with the per-source breakdown
     printed so you can see which part came from where.
     """
-    sources = resolve_arc_sources(filt_dirs, display_filt, propose_from, force=force)
+    sources = resolve_arc_sources(filt_dirs, display_filt, propose_from, force=force, lens=lens)
     if not sources:
         return None, None, {}
     dst_wcs = WCS(display_hdr).celestial
@@ -301,7 +300,7 @@ def process_lens_arc_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass,
     'x's to also run along the stamp border; the interior is deliberately not filled.
     """
     filts = sorted(filt_dirs)
-    display_filt = make_masks.pick_display_filt(filts, requested_filt)
+    display_filt = make_masks.pick_display_filt(filts, requested_filt, lens, sample)
     if display_filt is None:
         print(f"{lens}: requested --filt {requested_filt} not present "
               f"(have {', '.join(filts)}), skipping")

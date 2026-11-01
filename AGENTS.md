@@ -225,7 +225,8 @@ split_noise_test.py half-dither mosaics A, B -> A-B null image -> block-sum rati
 measure_corr_factor.py  blank-sky block-sum / ACF ratios on every stamp (shallow fields' NOISECOR)
 make_stamps.py     i2d SCI/ERR/WHT -> stamp<S>_sci.fits, stamp<S>_noise.fits, stamp<S>.png
 make_psf.py         i2d field stars -> ePSF -> psf.fits  (STPSF fallback)
-make_masks.py / make_arc_masks.py / make_positions.py   GUIs, one draw per band, broadcast by WCS
+choose_primary_band.py  arc S/N per band, discounted below 5 PSF widths across theta_E -> each lens's primary band
+make_masks.py / make_arc_masks.py / make_positions.py   GUIs, one draw per band (primary first), broadcast by WCS
 make_dataset_subplots.py / make_qc_grids.py              QC
 export_dataset.py   -> <dest>/<lens>/<FILT>/{data,noise_map,psf}.fits + info.json [+ mask, positions]
 ```
@@ -627,13 +628,48 @@ record.
 ## Masks, arc masks, positions, QC (`make_masks.py`, `make_arc_masks.py`, `make_positions.py`, `make_dataset_subplots.py`, `make_qc_grids.py`)
 
 Verbatim ports of the HST scripts (2026-10-01) with three mechanical changes: the sample
-module is `lens_samples`, `_BAND_PRIORITY = ['F444W', 'F356W', 'F277W', 'F200W', 'F150W',
-'F115W']` (the LW bands carry the dusty sources' signal — Lange+25 modelled F444W as the
-highest-S/N band), and the provenance JSONs record `variant` (from the stamp's `REDUCVAR`)
-instead of `bcfill`. Their docstrings and `--help` still quote HST examples (`f814W`,
+module is `lens_samples`, the band order (below), and the provenance JSONs record `variant`
+(from the stamp's `REDUCVAR`) instead of `bcfill`. Their docstrings and `--help` still quote HST examples (`f814W`,
 `slacs_gold`) and a `--pass` flag that is accepted and ignored (`stamp_paths.find_prefix`
 always answers `stamp<S>` for the lens's modelling size). The semantics are unchanged and matter:
 
+- **Each lens has a PRIMARY band** (`choose_primary_band.py`, 2026-11-01). It is drawn first
+  (every other band starts from its mask), positions are clicked on it, it seeds the arc-mask
+  proposals, and it is the band to model first. `lens_samples.primary_band(lens)` resolves it:
+  - **`reviewed`**: `primary_band` on the lens in `lens_samples.json`, set by hand, always wins;
+  - **`measured`**: the script's suggestion;
+  - otherwise the fixed fallback `_BAND_PRIORITY` (F444W > F356W > F277W > … > F115W), which
+    alone picked the wrong band for 13 of 20 lenses.
+
+  **What the script measures.** On each band's modelling stamp it takes the lens light as the
+  azimuthal median profile, interpolated in log-log across the ring annulus
+  (|r − θ_E| < max(0.25 θ_E, FWHM, 0.15")). The arc S/N is the SIGNED residual sum in that annulus
+  over its noise, so an elliptical lens's quadrupole cancels, with the band's contaminant mask
+  applied. The score is that S/N × min(1, θ_E / (5 FWHM)): resolution counts only while the ring
+  spans fewer than 5 PSF widths (SW resolves θ_E down to 0.33", F444W only to 0.83").
+
+  **Why not redshift.** The lens light peaks near rest 1.6 µm, but the arc's colour is the
+  source's: 14 of 17 COWLS sources have no redshift, and P has no lens redshift. Measured, the
+  bands do not follow z_l: H, Q and L all sit at z_l ≈ 0.37, yet L is best in F150W and H and Q
+  in F277W.
+
+  **The 2026-11-01 suggestions:**
+  - F444W: SPT0418-47, F, K, M, O, P;
+  - F356W: SPT2147-50;
+  - F277W: B1938+666, B, C, D, E, G, H, J, Q;
+  - F150W: L;
+  - none: A, I, N. No band reaches arc S/N 15 there; their arcs are too faint against the
+    lens-profile error, so set `primary_band` by eye.
+
+  The measurement is biased red for bright, compact lenses (θ_E ≲ 0.6": B, C, B1938+666), where
+  lens light leaks into the annulus; check those in the GUI.
+
+  **Where it ships.** Every band's scores and the resolved choice are in
+  `info/provenance/lens_primary_band.json`. A copy travels with the stamps as
+  `data/stamps/<sample>/<lens>/primary_band.json`, and `export_dataset.py` writes `primary_band`,
+  `primary_band_source` and `is_primary_band` into each band's `info.json`. Re-run the script
+  after setting a reviewed band, so both records carry it. θ_E for SPT and B1938+666 is now in
+  `lens_samples.json` too (`theta_e`, `theta_e_ref`).
 - Masks are `al.Mask2D` convention, **True = excluded**; `make_masks.py` paints what to
   remove, `make_arc_masks.py` paints what to keep and saves it inverted.
 - **The mask GUIs are native `al.Scribbler` (2026-10-08, autolens 2026.10.7.1).** The HST
@@ -694,7 +730,8 @@ uv run python scripts/export_dataset.py --lens SPT2147-50 --dest <modelling-proj
 
 Copies each band's stamp, noise map and PSF to `<dest>/<lens>/<FILT>/{data,noise_map,psf}.fits`,
 the contaminant mask as `mask_extra_galaxies.fits` and the positions as `positions.json` when
-they exist, and writes `info.json` with `pixel_scale`, `mask_radius`, the redshifts and the
+they exist, and writes `info.json` with `pixel_scale`, `mask_radius`, the redshifts, the
+lens's primary band (`primary_band`, `primary_band_source`, `is_primary_band`; *Masks*) and the
 provenance (i2d path, variant, jwst version, `NOISECOR`). This is the layout a PyAutoLens
 SLaM-style dataset loader expects (`data`/`noise_map`/`psf` + `info.json`; mask and positions
 optional). `mask_radius` is a modelling choice and lives only here.

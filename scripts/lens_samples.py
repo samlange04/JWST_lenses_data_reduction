@@ -28,6 +28,7 @@ import os
 
 _INFO_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'info')
 SAMPLES_JSON = os.path.join(_INFO_DIR, 'samples', 'lens_samples.json')
+PRIMARY_BAND_JSON = os.path.join(_INFO_DIR, 'provenance', 'lens_primary_band.json')
 
 DEFAULT_SAMPLE = 'spt'
 
@@ -206,6 +207,35 @@ def stamp_size(lens, sample=None):
     is a third bright neighbours and detector streaks). make_stamps.py cuts it at this size
     INTO THE DEFAULT TREE, so the tracked stamp, masks, positions and export need no --size."""
     return entry(lens, sample).get('stamp_size')
+
+
+def theta_e(lens, sample=None):
+    """The lens's Einstein radius in arcsec (`theta_e`; published or COWLS I), or None."""
+    v = entry(lens, sample).get('theta_e')
+    return None if v is None else float(v)
+
+
+def primary_band(lens, sample=None):
+    """(band, source): the lens's PRIMARY band -- the one the mask and arc-mask GUIs draw first
+    (the other bands start from its mask), the one positions are clicked on, and the one to
+    model first. `source` says where it came from:
+      'reviewed'  `primary_band` in lens_samples.json, set by hand after looking (always wins);
+      'measured'  the suggestion of choose_primary_band.py in lens_primary_band.json (the band
+                  where a lensed image's position is best defined: arc S/N, discounted where
+                  the band's PSF under-resolves theta_E);
+      (None, None) when neither exists, and callers fall back to their fixed band order."""
+    e = entry(lens, sample)
+    if e.get('primary_band'):
+        return canonical_filter(e['primary_band']), 'reviewed'
+    sample = sample or sample_of(lens)
+    try:
+        with open(PRIMARY_BAND_JSON) as f:
+            rec = json.load(f).get(sample, {}).get(lens, {})
+    except FileNotFoundError:
+        rec = {}
+    if rec.get('suggested'):
+        return rec['suggested'], 'measured'
+    return None, None
 
 
 def redshifts(lens, sample=None):

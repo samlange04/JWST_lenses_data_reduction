@@ -7,6 +7,8 @@
                 "mast_target": "B1938+666",
                 "ra": 294.6053333,
                 "dec": 66.8147,
+                "theta_e": 0.45,
+                "theta_e_ref": "approximate: the radius of the radio Einstein ring",
                 "deflector_ra": 294.6056716,
                 "deflector_dec": 66.814644,
                 "deflector_note": "Lens-core flux centroid on the F115W i2d (r = 0.09-0.18\", stable to 1 mas; F277W core agrees to 13 mas), 2026-10-04: 0.479\" E, 0.201\" S of the APT ra/dec, which is kept because it is the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid.",
@@ -25,6 +27,8 @@
                 "mast_target": "SPT0418-47",
                 "ra": 64.6653292,
                 "dec": -47.8646333,
+                "theta_e": 1.207,
+                "theta_e_ref": "Cathey+24",
                 "redshift_lens": 0.263,
                 "redshift_source": 4.22
             },
@@ -32,6 +36,8 @@
                 "mast_target": "SPT2147-50",
                 "ra": 326.8292167,
                 "dec": -50.5984722,
+                "theta_e": 1.195,
+                "theta_e_ref": "Spilker+16",
                 "redshift_lens": 0.845,
                 "redshift_source": 3.76
             }

@@ -1,0 +1,39 @@
+{
+    "lens": "SPT2147-50",
+    "sample": "spt",
+    "primary_band": "F356W",
+    "primary_band_source": "measured",
+    "suggested": "F356W",
+    "theta_e": 1.195,
+    "scores": {
+        "F200W": {
+            "arc_snr": 93.68,
+            "psf_fwhm_arcsec": 0.0753,
+            "resolution_factor": 1.0,
+            "score": 93.68,
+            "contaminant_mask": false
+        },
+        "F277W": {
+            "arc_snr": 149.66,
+            "psf_fwhm_arcsec": 0.1315,
+            "resolution_factor": 1.0,
+            "score": 149.66,
+            "contaminant_mask": false
+        },
+        "F356W": {
+            "arc_snr": 259.06,
+            "psf_fwhm_arcsec": 0.1501,
+            "resolution_factor": 1.0,
+            "score": 259.06,
+            "contaminant_mask": false
+        },
+        "F444W": {
+            "arc_snr": 216.83,
+            "psf_fwhm_arcsec": 0.1697,
+            "resolution_factor": 1.0,
+            "score": 216.83,
+            "contaminant_mask": false
+        }
+    },
+    "how": "scripts/choose_primary_band.py (docstring)"
+}

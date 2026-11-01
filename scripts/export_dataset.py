@@ -68,10 +68,14 @@ def export_band(sample, lens, filt, dest, mask_radius, size):
     hdr = fits.getheader(sci)
     nhdr = fits.getheader(noise)
     zl, zs = lens_samples.redshifts(lens, sample)
+    primary, primary_source = lens_samples.primary_band(lens, sample)
     info = {
         'pixel_scale': float(hdr['PIXSCALE']),
         'mask_radius': float(mask_radius),
         'redshift_lens': zl, 'redshift_source': zs,
+        # the band where the lensed images are best defined (choose_primary_band.py): the one to
+        # model first; 'reviewed' = set by hand, 'measured' = the script's suggestion
+        'primary_band': primary, 'primary_band_source': primary_source, 'is_primary_band': filt == primary,
         'bunit': hdr.get('BUNIT'), 'photmjsr': hdr.get('PHOTMJSR'), 'pixar_sr': hdr.get('PIXAR_SR'),
         'variant': hdr.get('REDUCVAR', 'standard'), 'jwst_version': hdr.get('CAL_VER'),
         'noise_corr_factor': nhdr.get('NOISECOR'), 'noise_corr_scale_arcsec': nhdr.get('NOISESCL'),

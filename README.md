@@ -68,6 +68,18 @@ Each lens and filter has one folder, `data/stamps/<sample>/<lens>/<filter>/`, fo
 | `stamp<S>_positions.json` | **Image positions**: where the multiple images of the lensed source are, hand-marked (see below). |
 | `stamp<S>_dataset.png` | A quick-look figure of the image, noise, PSF and mask together — the fastest way to check a lens. |
 
+**Which band is best.** Each lens also has `data/stamps/<sample>/<lens>/primary_band.json`,
+naming its **primary band**: the filter where the lensed images are best defined, so the one
+to look at or model first. It was chosen from the arc's measured signal-to-noise in every band,
+discounted where the band's resolution is coarse for the size of the Einstein ring.
+- `primary_band_source` says whether the choice was checked by eye (`reviewed`) or is the
+  measurement (`measured`).
+- The file lists every band's numbers.
+- The same choice is in `info/provenance/lens_primary_band.json` and in every exported
+  `info.json`.
+- Three COWLS lenses (COSJ095914+021219, COSJ100013+023424, COSJ100028+021928) have arcs too
+  faint to measure, and have none yet.
+
 `<S>` is the stamp size in arcseconds: `stamp7_*` for B1938+666, `stamp12_*` for the SPT
 and COWLS lenses. A stamp cut at another size (`make_stamps.py --size 20`) is written beside these as
 `stamp20_*` and is not kept in git. The PSF has no size in its name because it does not depend
@@ -202,9 +214,10 @@ uv run python scripts/make_positions.py  --lens SPT2147-50                 # GUI
 Whole samples run with `bash scripts/run_reduce_all.sh <sample>`, `run_stamps_all.sh` and
 `run_psf_all.sh`, which log to `data/run_logs/` and count ok / no data / failed. Every step
 skips work already done, so a run can be resumed after an interruption (`--force` rebuilds a
-mosaic). `scripts/export_dataset.py --lens <lens> --dest <dir>` writes a lens in the dataset
-layout a PyAutoLens modelling project loads (`data.fits`, `noise_map.fits`, `psf.fits`,
-`info.json`).
+mosaic). `scripts/choose_primary_band.py` picks each lens's primary band, which the mask and
+position tools draw first. `scripts/export_dataset.py --lens <lens> --dest <dir>` writes a lens
+in the dataset layout a PyAutoLens modelling project loads (`data.fits`, `noise_map.fits`,
+`psf.fits`, `info.json`, which names the primary band).
 
 ## Repository layout
 

@@ -449,7 +449,7 @@ def rebroadcast(lens, filt_dirs, sample, drizzle_pass, stretch, vmin_percent,
     # a lens was re-marked on another band, take the highest-priority one, as the GUI would.
     prov = info_json.load(POSITIONS_JSON).get(sample, {}).get(lens, {})
     candidates = [k for k in prov if k in filt_dirs]
-    marked_filt = pick_display_filt(sorted(candidates), None) if candidates else None
+    marked_filt = pick_display_filt(sorted(candidates), None, lens, sample) if candidates else None
     if marked_filt is None:
         return 0                      # simply not marked yet -- nothing to say
     marked_dir = filt_dirs[marked_filt]
@@ -511,7 +511,7 @@ def process_lens(lens, filt_dirs, sample, requested_filt, drizzle_pass, force,
     Returns True if positions were written.
     """
     filts = sorted(filt_dirs)
-    display_filt = pick_display_filt(filts, requested_filt)
+    display_filt = pick_display_filt(filts, requested_filt, lens, sample)
     if display_filt is None:
         print(f"{lens}: requested --filt {requested_filt} not present "
               f"(have {', '.join(filts)}), skipping")

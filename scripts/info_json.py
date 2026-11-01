@@ -22,7 +22,7 @@ INFO_LAYOUT = {
     'provenance': ('lens_products.json', 'lens_instrument.json', 'lens_exptime.json',
                    'lens_stamp_qc.json', 'lens_masks.json', 'lens_arc_masks.json',
                    'lens_positions.json', 'lens_psf.json', 'lens_dataset_subplots.json',
-                   'lens_downloads.json', 'lens_exports.json'),
+                   'lens_downloads.json', 'lens_exports.json', 'lens_primary_band.json'),
 }
 _SUBFOLDER = {n: s for s, names in INFO_LAYOUT.items() for n in names}
 

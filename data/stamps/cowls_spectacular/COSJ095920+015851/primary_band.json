@@ -1,0 +1,39 @@
+{
+    "lens": "COSJ095920+015851",
+    "sample": "cowls_spectacular",
+    "primary_band": "F277W",
+    "primary_band_source": "measured",
+    "suggested": "F277W",
+    "theta_e": 0.45,
+    "scores": {
+        "F115W": {
+            "arc_snr": 108.2,
+            "psf_fwhm_arcsec": 0.0527,
+            "resolution_factor": 1.0,
+            "score": 108.2,
+            "contaminant_mask": false
+        },
+        "F150W": {
+            "arc_snr": 223.98,
+            "psf_fwhm_arcsec": 0.0637,
+            "resolution_factor": 1.0,
+            "score": 223.98,
+            "contaminant_mask": false
+        },
+        "F277W": {
+            "arc_snr": 632.73,
+            "psf_fwhm_arcsec": 0.1246,
+            "resolution_factor": 0.722,
+            "score": 457.03,
+            "contaminant_mask": false
+        },
+        "F444W": {
+            "arc_snr": 724.6,
+            "psf_fwhm_arcsec": 0.1666,
+            "resolution_factor": 0.54,
+            "score": 391.44,
+            "contaminant_mask": true
+        }
+    },
+    "how": "scripts/choose_primary_band.py (docstring)"
+}
