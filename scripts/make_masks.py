@@ -500,6 +500,18 @@ def draw_mask_gui(display_dir, display_prefix, lens, filt, brush_radius, brush_w
             start_radius, source_label)
 
 
+def rerender_overviews(sample, lenses):
+    """Re-render the band overview (make_band_overview.py) of every lens this run changed, once,
+    at the END of the run: done after each lens it put an isophote fit (~10 s) between one GUI
+    and the next."""
+    if not lenses:
+        return
+    import make_band_overview
+    print(f"\nre-rendering the band overview of {len(lenses)} lens(es)")
+    for lens in lenses:
+        make_band_overview.rerender(sample, lens)
+
+
 def regenerate_dataset_subplot(lens, filt, sample, size, drizzle_pass):
     """Rebuild this band's `{prefix}_dataset.png` (scripts/make_dataset_subplots.py) so the
     QC subplot -- the only pipeline PNG that shows the MASK laid over the data/noise/S-N a
@@ -663,8 +675,6 @@ def process_lens_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass, for
         info_json.update(MASKS_JSON, sample, lens, filt, entry)
         if dataset_subplot:
             regenerate_dataset_subplot(lens, filt, sample, size, drizzle_pass)
-    import make_band_overview                  # the lens's all-band figure shows the new mask
-    make_band_overview.rerender(sample, lens)
     return True
 
 
@@ -778,6 +788,7 @@ def main():
 
     print(f"{len(lens_filts)} lens(es) to process")
     made = skipped = 0
+    changed = []
     for lens in sorted(lens_filts):
         if process_lens_mask(lens, lens_filts[lens], a.sample, a.filt, a.drizzle_pass,
                              a.force, a.broadcast, brush_radius=a.brush_radius,
@@ -787,10 +798,12 @@ def main():
                              dataset_subplot=a.dataset_subplot,
                              propose_from=a.propose_from):
             made += 1
+            changed.append(lens)
         else:
             skipped += 1
 
     print(f"\nDone: {made} lens(es) masked, {skipped} skipped")
+    rerender_overviews(a.sample, changed)
 
 
 if __name__ == '__main__':

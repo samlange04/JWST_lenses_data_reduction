@@ -24,12 +24,15 @@ FIT_HALF_ARCSEC = 6.0
 STARTS = [(0.5, 0.15, 0.5), (1.0, 0.3, 0.0), (0.3, 0.05, 1.5), (1.5, 0.4, 2.5)]
 
 
-def isophote_subtract(image, pixel_scale, exclude=None, centre=None, refine_centre=True):
+def isophote_subtract(image, pixel_scale, exclude=None, centre=None, refine_centre=True,
+                       fit_half_arcsec=FIT_HALF_ARCSEC, step=0.12, maxit=50):
     """`image` minus its isophote model. `exclude` (bool, True = ignore) keeps masked pixels out
     of the fit; `centre` (col, row) is refined by a windowed centroid, default the stamp centre.
     `refine_centre=False` keeps a centre that is already measured (the band overview passes the
     lens's deflector position): an iterated 0.3" centroid creeps toward bright asymmetric light,
-    such as an arc or ring inside that window."""
+    such as an arc or ring inside that window. `fit_half_arcsec` sets the fitted crop (the band
+    overview fits only its zoom). `step` (the isophotes' geometric spacing) and `maxit` (iterations
+    per isophote) trade precision for time: the band overview uses 0.2 and 15."""
     from photutils.isophote import EllipseGeometry, Ellipse, build_ellipse_model
 
     img = np.nan_to_num(np.asarray(image, dtype=float))
@@ -44,7 +47,7 @@ def isophote_subtract(image, pixel_scale, exclude=None, centre=None, refine_cent
             break
         cx, cy = (w * x).sum() / w.sum(), (w * y).sum() / w.sum()
 
-    half = int(min(FIT_HALF_ARCSEC / pixel_scale, cx, cy, nx - 1 - cx, ny - 1 - cy))
+    half = int(min(fit_half_arcsec / pixel_scale, cx, cy, nx - 1 - cx, ny - 1 - cy))
     x0, y0 = int(round(cx)) - half, int(round(cy)) - half
     sub = img[y0:y0 + 2 * half + 1, x0:x0 + 2 * half + 1]
     smsk = msk[y0:y0 + 2 * half + 1, x0:x0 + 2 * half + 1]
@@ -53,8 +56,8 @@ def isophote_subtract(image, pixel_scale, exclude=None, centre=None, refine_cent
         try:
             geometry = EllipseGeometry(x0=cx - x0, y0=cy - y0, sma=sma0 / pixel_scale, eps=eps, pa=pa)
             isolist = Ellipse(np.ma.masked_array(sub, mask=smsk), geometry).fit_image(
-                sma0=sma0 / pixel_scale, minsma=1, maxsma=half - 3, step=0.12, fix_center=True,
-                maxgerr=1.0)
+                sma0=sma0 / pixel_scale, minsma=1, maxsma=half - 3, step=step, fix_center=True,
+                maxgerr=1.0, maxit=maxit)
             if len(isolist) < 3:
                 continue
             model[y0:y0 + 2 * half + 1, x0:x0 + 2 * half + 1] = build_ellipse_model(

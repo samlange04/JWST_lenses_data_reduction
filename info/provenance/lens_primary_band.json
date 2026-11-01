@@ -381,8 +381,8 @@
         "COSJ100018+022138": {
             "measurable": true,
             "min_arc_snr": 15.0,
-            "primary_band": "F277W",
-            "primary_band_source": "measured",
+            "primary_band": "F150W",
+            "primary_band_source": "reviewed",
             "r0": 5.0,
             "scores": {
                 "F115W": {
@@ -404,7 +404,7 @@
                     "psf_fwhm_arcsec": 0.1246,
                     "resolution_factor": 0.61,
                     "score": 106.46,
-                    "contaminant_mask": false
+                    "contaminant_mask": true
                 },
                 "F444W": {
                     "arc_snr": 181.93,

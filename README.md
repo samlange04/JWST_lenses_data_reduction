@@ -224,8 +224,9 @@ uv run python scripts/make_positions.py  --lens SPT2147-50                 # GUI
 Whole samples run with `bash scripts/run_reduce_all.sh <sample>`, `run_stamps_all.sh` and
 `run_psf_all.sh`, which log to `data/run_logs/` and count ok / no data / failed. Every step
 skips work already done, so a run can be resumed after an interruption (`--force` rebuilds a
-mosaic). `scripts/choose_primary_band.py` picks each lens's primary band, which the mask and
-position tools draw first. `scripts/export_dataset.py --lens <lens> --dest <dir>` writes a lens
+mosaic). `scripts/choose_best_band.py` (a GUI over the band overview) chooses each lens's primary
+band by eye, starting from the suggestion `scripts/choose_primary_band.py` measures; the mask and
+position tools draw it first. `scripts/export_dataset.py --lens <lens> --dest <dir>` writes a lens
 in the dataset layout a PyAutoLens modelling project loads (`data.fits`, `noise_map.fits`,
 `psf.fits`, `info.json`, which names the primary band).
 

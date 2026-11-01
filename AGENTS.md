@@ -226,6 +226,7 @@ measure_corr_factor.py  blank-sky block-sum / ACF ratios on every stamp (shallow
 make_stamps.py     i2d SCI/ERR/WHT -> stamp<S>_sci.fits, stamp<S>_noise.fits, stamp<S>.png
 make_psf.py         i2d field stars -> ePSF -> psf.fits  (STPSF fallback)
 measure_lens_centres.py the lens core per band (LW-anchored) -> deflector_ra/dec, which make_stamps centres on
+choose_best_band.py     GUI over the band overview: choose each lens's primary band by eye (reviewed)
 choose_primary_band.py  arc S/N per band, discounted below 5 PSF widths across theta_E -> each lens's primary band
 make_masks.py / make_arc_masks.py / make_positions.py   GUIs, one draw per band (primary first), broadcast by WCS
 make_dataset_subplots.py / make_qc_grids.py              QC
@@ -695,10 +696,18 @@ always answers `stamp<S>` for the lens's modelling size). The semantics are unch
     lens-profile error, so set `primary_band` by eye. (The re-cut on measured centres made
     COSJ100028+021928 measurable, F444W; see *Stamps*.)
 
+  **The choice is the reviewer's: `choose_best_band.py --sample S [--unreviewed]`** (2026-11-01).
+  For each lens it opens the band overview with every band's arc S/N and score; click a column
+  or press 1–N, and Enter writes the reviewed `primary_band` (with a note) and refreshes the
+  records and PNG (`choose_primary_band.record`). The measured suggestion only pre-selects. It
+  was wrong on B1938+666 and COSJ100018+022138, and after the re-cut its arc S/N for compact
+  lenses drops sharply (COSJ095920+015851 632 → 22), so it is a guide.
+
   **Reviewed** (`primary_band` set by hand, 2026-11-01), overriding the measurement:
   - COSJ095914+021219 F277W and COSJ100013+023424 F444W, which were unmeasurable;
   - B1938+666 F115W over the measured F277W. Its 0.03" pixels and sharper PSF matter more on a
     0.45" ring than F277W's S/N.
+  - COSJ100018+022138 F150W over the measured F277W.
 
   The measurement is biased red for bright, compact lenses (θ_E ≲ 0.6": COSJ095917+015424, COSJ095920+015851,
   B1938+666), where
@@ -727,8 +736,15 @@ always answers `stamp<S>` for the lens's modelling size). The semantics are unch
     sub-pixel centre instead.
   - It is not called a "mosaic", which means the Image3 product here.
   - `make_masks.py`, `make_positions.py` (marking and `--rebroadcast`) and `choose_primary_band.py`
-    re-render it after writing (best-effort, never fatal). A stamp re-cut does not, so re-run the
-    script after one.
+    re-render it after writing, once per changed lens at the END of the run (best-effort, never
+    fatal). A stamp re-cut does not, so re-run the script after one.
+  - **It renders on a plain `matplotlib.figure.Figure`, never pyplot, and must not call
+    `matplotlib.use`.** Until 2026-11-01 it called `matplotlib.use('Agg')` at import. The mask
+    GUI imported it after the first mask it wrote, which switched the process to Agg, so every
+    later Scribbler window flashed up and returned unanswered (a "skip"). Each per-lens re-render
+    also ran isophote fits between one GUI and the next.
+  - The isophote fit covers the zoom only (to its corners), with step 0.2 and 15 iterations per
+    isophote: ~9 s per lens, against 19 s.
   - Positions are autoarray (y, x), with y toward row 0, which is South in these stamps, so they
     plot at (−x, −y) on North/East axes. Checked against `make_positions.py`'s own North-down
     overlay on B1938+666.

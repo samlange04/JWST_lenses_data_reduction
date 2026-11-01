@@ -121,40 +121,52 @@ def measure(sample, lens):
                 measurable=measurable, min_arc_snr=MIN_ARC_SNR, r0=R0)
 
 
+def record(sample, lens, rerender=True):
+    """Measure the lens, resolve its primary band (reviewed > measured), and write both records
+    (lens_primary_band.json, data/stamps/<sample>/<lens>/primary_band.json) and, with `rerender`,
+    the band overview. Returns the record, or None without stamps or theta_E."""
+    rec = measure(sample, lens)
+    if not rec['scores']:
+        return None
+    out_json = info_json.path(ws_path, 'lens_primary_band.json')
+    for k, v in rec.items():                   # the suggestion first, so primary_band() sees it
+        info_json.update(out_json, sample, lens, k, v)
+    band, source = lens_samples.primary_band(lens, sample)
+    info_json.update(out_json, sample, lens, 'primary_band', band)
+    info_json.update(out_json, sample, lens, 'primary_band_source', source)
+    rec.update(primary_band=band, primary_band_source=source)
+    stamp_rec = dict(lens=lens, sample=sample, primary_band=band, primary_band_source=source,
+                     suggested=rec['suggested'], theta_e=rec['theta_e'], scores=rec['scores'],
+                     how='scripts/choose_primary_band.py (docstring); reviewed choices via choose_best_band.py')
+    with open(os.path.join(ws_path, 'data', 'stamps', sample, lens, 'primary_band.json'), 'w') as f:
+        json.dump(stamp_rec, f, indent=4)
+    if rerender:
+        make_band_overview.rerender(sample, lens)          # its star marks the primary band
+    return rec
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--sample', type=lens_samples.sample_arg, default=None, help='default: every sample')
     p.add_argument('--lens', default=None)
     a = p.parse_args()
     warnings.simplefilter('ignore')
-    out_json = info_json.path(ws_path, 'lens_primary_band.json')
     samples = [a.sample] if a.sample else lens_samples.samples()
     for sample in samples:
         for lens in lens_samples.lenses(sample):
             if a.lens and lens != a.lens:
                 continue
-            rec = measure(sample, lens)
-            if not rec['scores']:
+            rec = record(sample, lens)
+            if rec is None:
                 print(f'{lens}: no stamps (or no theta_e), skipped')
                 continue
-            # the measured suggestion goes in first, so primary_band() sees it
-            for k, v in rec.items():
-                info_json.update(out_json, sample, lens, k, v)
-            band, source = lens_samples.primary_band(lens, sample)
-            info_json.update(out_json, sample, lens, 'primary_band', band)
-            info_json.update(out_json, sample, lens, 'primary_band_source', source)
-            stamp_rec = dict(lens=lens, sample=sample, primary_band=band, primary_band_source=source,
-                             suggested=rec['suggested'], theta_e=rec['theta_e'],
-                             scores=rec['scores'], how='scripts/choose_primary_band.py (docstring)')
-            with open(os.path.join(ws_path, 'data', 'stamps', sample, lens, 'primary_band.json'), 'w') as f:
-                json.dump(stamp_rec, f, indent=4)
-            make_band_overview.rerender(sample, lens)          # its star marks the primary band
+            band, source = rec['primary_band'], rec['primary_band_source']
             row = '  '.join(f'{f} {v["arc_snr"]}/{v["score"]}' for f, v in rec['scores'].items())
             flag = ('' if rec['measurable'] or source == 'reviewed'
                     else f'  [no band reaches arc S/N {MIN_ARC_SNR:g}: set primary_band by eye]')
             print(f'{lens:18s} theta_E {rec["theta_e"]:.2f}"  suggested {rec["suggested"]}  -> primary {band} ({source})'
                   f'{flag}\n    arc S/N/score: {row}')
-    print(f'wrote {out_json} and data/stamps/<sample>/<lens>/primary_band.json')
+    print(f"wrote {info_json.path(ws_path, 'lens_primary_band.json')} and data/stamps/<sample>/<lens>/primary_band.json")
 
 
 if __name__ == '__main__':

@@ -36,10 +36,8 @@ import sys
 import warnings
 
 import numpy as np
-import matplotlib
-matplotlib.use('Agg')
 import matplotlib.patheffects
-import matplotlib.pyplot as plt
+from matplotlib.figure import Figure     # no pyplot: GUIs import this module (see build_figure)
 from astropy.io import fits
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -79,7 +77,14 @@ def load_band(stamp_dir, prefix):
     return dict(sci=sci, scale=scale, mask=mask, sets=[s_ for s_ in sets if s_], hdr=hdr)
 
 
-def render(sample, lens, out=None):
+def build_figure(sample, lens, fig=None):
+    """Draw the overview onto `fig` (a new plain Figure by default) and return (fig, info), info
+    holding the bands in column order and the axes grid, or (None, None) without stamps.
+
+    Plain `Figure`, never pyplot: make_masks.py, make_positions.py and choose_best_band.py
+    import this module mid-GUI. Until 2026-11-01 it called matplotlib.use('Agg') at import,
+    which switched those processes' backend, so every later GUI window flashed and returned
+    unanswered."""
     from autogalaxy.gui.display_util import arcsinh_stretch, mask_boundary
     prefix = stamp_paths.stamp_prefix(stamp_paths.modelling_size(lens, sample))
     lens_dir = os.path.join(stamp_paths.stamps_root(ws_path), sample, lens)
@@ -89,7 +94,7 @@ def render(sample, lens, out=None):
         if b is not None:
             bands[os.path.basename(d)] = b
     if not bands:
-        return None
+        return None, None
     filts = sorted(bands, key=lambda f: FILTER_UM.get(f, 99))
     te = lens_samples.theta_e(lens, sample)
     zl, zs = lens_samples.redshifts(lens, sample)
@@ -106,7 +111,13 @@ def render(sample, lens, out=None):
     e0, n0 = -(tx - (n_ - 1) / 2.0) * s0, (ty - (n_ - 1) / 2.0) * s0
 
     ncol = len(filts)
-    fig, axes = plt.subplots(3, ncol, figsize=(max(3.0 * ncol, 8.0), 9.8), squeeze=False)
+    size = (max(3.0 * ncol, 8.0), 9.8)
+    if fig is None:
+        fig = Figure(figsize=size)
+    else:
+        fig.clf()
+        fig.set_size_inches(*size)
+    axes = fig.subplots(3, ncol, squeeze=False)
     for j, f in enumerate(filts):
         b = bands[f]
         sci, s, mask = b['sci'], b['scale'], b['mask']
@@ -118,7 +129,9 @@ def render(sample, lens, out=None):
         lx, ly = c - e0 / s, c + n0 / s                      # the lens centre in pixels
         bad = ~np.isfinite(sci) if mask is None else (mask | ~np.isfinite(sci))
         sub = gaussian_filter(isophote_model.isophote_subtract(sci, s, exclude=bad, centre=(lx, ly),
-                                                               refine_centre=False), SMOOTH_PX)
+                                                               refine_centre=False,
+                                                               fit_half_arcsec=1.45 * half_zoom + 0.3,   # the zoom's corners too
+                                                               step=0.2, maxit=15), SMOOTH_PX)
         zp = int(np.ceil(half_zoom / s)) + 1
         j0, i0 = max(0, int(round(lx)) - zp), max(0, int(round(ly)) - zp)
         j1, i1 = min(n, int(round(lx)) + zp + 1), min(n, int(round(ly)) + zp + 1)
@@ -196,9 +209,16 @@ def render(sample, lens, out=None):
                  f'red outline: contaminant mask   +: image positions (a colour per source)   dashed: θ_E',
                  fontsize=9)
     fig.tight_layout(rect=(0, 0, 1, 0.90))
-    out = out or os.path.join(lens_dir, f'{prefix}_bands.png')
+    return fig, dict(filts=filts, axes=axes, lens_dir=lens_dir, prefix=prefix, primary=primary)
+
+
+def render(sample, lens, out=None):
+    """Write the lens's stamp<S>_bands.png. Returns its path, or None without stamps."""
+    fig, info = build_figure(sample, lens)
+    if fig is None:
+        return None
+    out = out or os.path.join(info['lens_dir'], f"{info['prefix']}_bands.png")
     fig.savefig(out, dpi=90)
-    plt.close(fig)
     return out
 
 

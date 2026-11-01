@@ -602,9 +602,6 @@ def rebroadcast(lens, filt_dirs, sample, drizzle_pass, stretch, vmin_percent,
                  f" ({max(np.hypot(a-c, b-d) for (a, b), (c, d) in zip(new, old))/band_ps:.2f} px)")
         print(f"  {filt}: rewritten{moved}")
         n += 1
-    if n:
-        import make_band_overview
-        make_band_overview.rerender(sample, lens)
     return n
 
 
@@ -812,8 +809,6 @@ def process_lens(lens, filt_dirs, sample, requested_filt, drizzle_pass, force,
         'n_positions_on_contaminant': n_on_mask,
         'broadcast_to': written,
     })
-    import make_band_overview                  # the lens's all-band figure shows the positions
-    make_band_overview.rerender(sample, lens)
     return True
 
 
@@ -949,12 +944,17 @@ def main():
 
     print(f"{len(lens_filts)} lens(es) to process")
 
+    changed = []                      # lenses whose band overview to re-render at the end
     if a.rebroadcast:
         total = 0
         for lens in sorted(lens_filts):
-            total += rebroadcast(lens, lens_filts[lens], a.sample, a.drizzle_pass, a.stretch,
-                                 a.vmin_percent, a.vmax_percent, a.asinh_a, a.vmax_value)
+            n = rebroadcast(lens, lens_filts[lens], a.sample, a.drizzle_pass, a.stretch,
+                            a.vmin_percent, a.vmax_percent, a.asinh_a, a.vmax_value)
+            total += n
+            if n:
+                changed.append(lens)
         print(f"\nDone: {total} band(s) re-derived through the WCS")
+        make_masks.rerender_overviews(a.sample, changed)
         return
 
     if a.overlays_only:
@@ -980,10 +980,12 @@ def main():
                         a.mask_center, a.vmax_value, subtract,
                         a.side_by_side, a.hide_masked):
             made += 1
+            changed.append(lens)
         else:
             skipped += 1
 
     print(f"\nDone: {made} lens(es) marked, {skipped} skipped")
+    make_masks.rerender_overviews(a.sample, changed)
 
 
 if __name__ == '__main__':

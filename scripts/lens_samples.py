@@ -210,6 +210,22 @@ def stamp_size(lens, sample=None):
     return entry(lens, sample).get('stamp_size')
 
 
+def set_primary_band(lens, band, note, sample=None):
+    """Record a REVIEWED primary band for `lens` in lens_samples.json (choose_best_band.py), with a
+    note saying how it was chosen. The file is rewritten in its own format (4-space JSON, non-ASCII
+    kept), so a reviewed band is an ordinary one-line diff."""
+    global _cache
+    sample = sample or sample_of(lens)
+    with open(SAMPLES_JSON) as f:
+        data = json.load(f)
+    e = data[sample]['lenses'][lens]
+    e['primary_band'] = canonical_filter(band)
+    e['primary_band_note'] = note
+    with open(SAMPLES_JSON, 'w') as f:
+        f.write(json.dumps(data, indent=4, ensure_ascii=False) + '\n')
+    _cache = None
+
+
 def theta_e(lens, sample=None):
     """The lens's Einstein radius in arcsec (`theta_e`; published or COWLS I), or None."""
     v = entry(lens, sample).get('theta_e')

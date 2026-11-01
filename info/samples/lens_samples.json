@@ -186,7 +186,9 @@
                 "redshift_source_kind": "spec (van der Wel+13)",
                 "deflector_ra": 150.07694066,
                 "deflector_dec": 2.36075858,
-                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 16 mas; +22 mas E, +5 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 16 mas; +22 mas E, +5 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid.",
+                "primary_band": "F150W",
+                "primary_band_note": "Chosen by eye with choose_best_band.py (2026-11-01); the measured best band was F277W."
             },
             "COSJ100024+015334": {
                 "cowls_letter": "K",
