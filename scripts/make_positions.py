@@ -498,6 +498,9 @@ def rebroadcast(lens, filt_dirs, sample, drizzle_pass, stretch, vmin_percent,
                  f" ({max(np.hypot(a-c, b-d) for (a, b), (c, d) in zip(new, old))/band_ps:.2f} px)")
         print(f"  {filt}: rewritten{moved}")
         n += 1
+    if n:
+        import make_band_overview
+        make_band_overview.rerender(sample, lens)
     return n
 
 
@@ -690,6 +693,8 @@ def process_lens(lens, filt_dirs, sample, requested_filt, drizzle_pass, force,
         'n_positions_on_contaminant': n_on_mask,
         'broadcast_to': written,
     })
+    import make_band_overview                  # the lens's all-band figure shows the positions
+    make_band_overview.rerender(sample, lens)
     return True
 
 

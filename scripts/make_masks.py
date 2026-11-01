@@ -663,6 +663,8 @@ def process_lens_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass, for
         info_json.update(MASKS_JSON, sample, lens, filt, entry)
         if dataset_subplot:
             regenerate_dataset_subplot(lens, filt, sample, size, drizzle_pass)
+    import make_band_overview                  # the lens's all-band figure shows the new mask
+    make_band_overview.rerender(sample, lens)
     return True
 
 

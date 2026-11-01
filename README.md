@@ -68,6 +68,12 @@ Each lens and filter has one folder, `data/stamps/<sample>/<lens>/<filter>/`, fo
 | `stamp<S>_positions.json` | **Image positions**: where the multiple images of the lensed source are, hand-marked (see below). |
 | `stamp<S>_dataset.png` | A quick-look figure of the image, noise, PSF and mask together — the fastest way to check a lens. |
 
+**All bands at once.** `data/stamps/<sample>/<lens>/stamp<S>_bands.png` shows every band of the
+lens side by side, North up and East left:
+- the full stamp, then a zoom on the lens, then that zoom with the lens light removed;
+- the contaminant masks, image positions and Einstein radius drawn on, where they exist;
+- the primary band starred.
+
 **Which band is best.** Each lens also has `data/stamps/<sample>/<lens>/primary_band.json`,
 naming its **primary band**: the filter where the lensed images are best defined, so the one
 to look at or model first. It was chosen from the arc's measured signal-to-noise in every band,

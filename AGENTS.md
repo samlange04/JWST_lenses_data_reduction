@@ -228,6 +228,7 @@ make_psf.py         i2d field stars -> ePSF -> psf.fits  (STPSF fallback)
 choose_primary_band.py  arc S/N per band, discounted below 5 PSF widths across theta_E -> each lens's primary band
 make_masks.py / make_arc_masks.py / make_positions.py   GUIs, one draw per band (primary first), broadcast by WCS
 make_dataset_subplots.py / make_qc_grids.py              QC
+make_band_overview.py   every band of a lens side by side (+ masks, positions, primary band) -> <lens>/stamp<S>_bands.png
 export_dataset.py   -> <dest>/<lens>/<FILT>/{data,noise_map,psf}.fits + info.json [+ mask, positions]
 ```
 
@@ -670,6 +671,19 @@ always answers `stamp<S>` for the lens's modelling size). The semantics are unch
   `primary_band_source` and `is_primary_band` into each band's `info.json`. Re-run the script
   after setting a reviewed band, so both records carry it. θ_E for SPT and B1938+666 is now in
   `lens_samples.json` too (`theta_e`, `theta_e_ref`).
+- **Per-lens band overview** (`make_band_overview.py`, 2026-11-01): `data/stamps/<sample>/<lens>/
+  stamp<S>_bands.png`, tracked. Columns are the bands in wavelength order. The rows are the full
+  stamp, a zoom on the lens, and the zoom with the lens light removed (the radial median, as the
+  mask GUI's left panel). Each panel has its own arcsinh stretch, North up, East left. Overlaid:
+  the contaminant mask outline, the image positions and θ_E; the primary band is starred.
+  - It is not called a "mosaic", which means the Image3 product here.
+  - `make_masks.py`, `make_positions.py` (marking and `--rebroadcast`) and `choose_primary_band.py`
+    re-render it after writing (best-effort, never fatal). A stamp re-cut does not, so re-run the
+    script after one.
+  - Positions are autoarray (y, x), with y toward row 0, which is South in these stamps, so they
+    plot at (−x, −y) on North/East axes. Checked against `make_positions.py`'s own North-down
+    overlay on B1938+666.
+  - ~0.1–0.9 MB per lens per render.
 - Masks are `al.Mask2D` convention, **True = excluded**; `make_masks.py` paints what to
   remove, `make_arc_masks.py` paints what to keep and saves it inverted.
 - **The mask GUIs are native `al.Scribbler` (2026-10-08, autolens 2026.10.7.1).** The HST

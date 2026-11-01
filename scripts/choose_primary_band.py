@@ -53,6 +53,7 @@ from astropy.io import fits
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import info_json
 import lens_samples
+import make_band_overview
 import stamp_paths
 
 ws_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -146,6 +147,7 @@ def main():
                              scores=rec['scores'], how='scripts/choose_primary_band.py (docstring)')
             with open(os.path.join(ws_path, 'data', 'stamps', sample, lens, 'primary_band.json'), 'w') as f:
                 json.dump(stamp_rec, f, indent=4)
+            make_band_overview.rerender(sample, lens)          # its star marks the primary band
             row = '  '.join(f'{f} {v["arc_snr"]}/{v["score"]}' for f, v in rec['scores'].items())
             flag = '' if rec['measurable'] else f'  [no band reaches arc S/N {MIN_ARC_SNR:g}: set primary_band by eye]'
             print(f'{lens:18s} theta_E {rec["theta_e"]:.2f}"  suggested {rec["suggested"]}  -> primary {band} ({source})'
