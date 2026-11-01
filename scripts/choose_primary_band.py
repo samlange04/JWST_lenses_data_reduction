@@ -150,7 +150,8 @@ def main():
                 json.dump(stamp_rec, f, indent=4)
             make_band_overview.rerender(sample, lens)          # its star marks the primary band
             row = '  '.join(f'{f} {v["arc_snr"]}/{v["score"]}' for f, v in rec['scores'].items())
-            flag = '' if rec['measurable'] else f'  [no band reaches arc S/N {MIN_ARC_SNR:g}: set primary_band by eye]'
+            flag = ('' if rec['measurable'] or source == 'reviewed'
+                    else f'  [no band reaches arc S/N {MIN_ARC_SNR:g}: set primary_band by eye]')
             print(f'{lens:18s} theta_E {rec["theta_e"]:.2f}"  suggested {rec["suggested"]}  -> primary {band} ({source})'
                   f'{flag}\n    arc S/N/score: {row}')
     print(f'wrote {out_json} and data/stamps/<sample>/<lens>/primary_band.json')

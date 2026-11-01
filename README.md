@@ -71,7 +71,8 @@ Each lens and filter has one folder, `data/stamps/<sample>/<lens>/<filter>/`, fo
 
 **All bands at once.** `data/stamps/<sample>/<lens>/stamp<S>_bands.png` shows every band of the
 lens side by side, North up and East left:
-- the full stamp, then a zoom on the lens, then that zoom with the lens light removed;
+- the full stamp, then a zoom on the lens, then that zoom with the lens light removed by a model of
+  its elliptical isophotes (red: light the model lacks, i.e. arcs and lensed images);
 - the contaminant masks, image positions and Einstein radius drawn on, where they exist;
 - the primary band starred.
 
@@ -106,7 +107,9 @@ lens-modelling software, which reads them directly. Each entry is a `(y, x)` off
 arcseconds from the stamp centre. Following PyAutoLens's convention, +y points South and +x
 points West. To get pixels: `row = row_centre − y / pixel_size` and
 `col = col_centre + x / pixel_size`, where the centre of a 232-pixel stamp is 115.5.
-B1938+666 has two marked images, A and B.
+B1938+666 has two marked images, A and B. A lens with more than one lensed source (for example
+two source planes) has one set of positions per source: the file then holds a list of sets,
+which `al.from_json` returns as a Python list. A file with one set is a single grid, as here.
 
 A minimal example in Python:
 

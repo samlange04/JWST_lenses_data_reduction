@@ -15,7 +15,9 @@
                 "stamp_size": 7.0,
                 "stamp_size_note": "2026-10-04: 7\" (232 SW / 116 LW px, 6.96\") instead of 12\". The ring is 0.45\" and the lens light reaches ~2\"; at 12\" a third of the stamp was two detector streaks and a galaxy group to mask.",
                 "redshift_lens": 0.881,
-                "redshift_source": 2.059
+                "redshift_source": 2.059,
+                "primary_band": "F115W",
+                "primary_band_note": "Set by eye (2026-11-01): F115W, over the measured F277W, for its 0.03\" pixels and sharper PSF on a 0.45\" ring."
             }
         }
     },
@@ -71,7 +73,9 @@
                 "redshift_lens_kind": "spec (DESI, Dey+19)",
                 "deflector_ra": 149.8114099,
                 "deflector_dec": 2.2054348,
-                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 8 mas; -42 mas E, -19 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 8 mas; -42 mas E, -19 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid.",
+                "primary_band": "F277W",
+                "primary_band_note": "Set by eye (2026-11-01): choose_primary_band.py finds no band with arc S/N >= 15, the arcs being too faint against the lens-profile error."
             },
             "COSJ095917+015424": {
                 "cowls_letter": "B",
@@ -167,7 +171,9 @@
                 "redshift_lens_kind": "photo-z (COSMOS-Web catalogue, Shuntov+24)",
                 "deflector_ra": 150.05578787,
                 "deflector_dec": 2.57330667,
-                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 17 mas; +45 mas E, -145 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 17 mas; +45 mas E, -145 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid.",
+                "primary_band": "F444W",
+                "primary_band_note": "Set by eye (2026-11-01): choose_primary_band.py finds no band with arc S/N >= 15, the arcs being too faint against the lens-profile error."
             },
             "COSJ100018+022138": {
                 "cowls_letter": "J",

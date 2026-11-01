@@ -3,8 +3,8 @@
         "B1938+666": {
             "measurable": true,
             "min_arc_snr": 15.0,
-            "primary_band": "F277W",
-            "primary_band_source": "measured",
+            "primary_band": "F115W",
+            "primary_band_source": "reviewed",
             "r0": 5.0,
             "scores": {
                 "F115W": {
@@ -30,8 +30,8 @@
         "COSJ095914+021219": {
             "measurable": false,
             "min_arc_snr": 15.0,
-            "primary_band": null,
-            "primary_band_source": null,
+            "primary_band": "F277W",
+            "primary_band_source": "reviewed",
             "r0": 5.0,
             "scores": {
                 "F115W": {
@@ -342,8 +342,8 @@
         "COSJ100013+023424": {
             "measurable": false,
             "min_arc_snr": 15.0,
-            "primary_band": null,
-            "primary_band_source": null,
+            "primary_band": "F444W",
+            "primary_band_source": "reviewed",
             "r0": 5.0,
             "scores": {
                 "F115W": {

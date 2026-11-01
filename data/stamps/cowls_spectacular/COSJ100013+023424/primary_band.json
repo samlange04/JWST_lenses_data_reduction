@@ -1,8 +1,8 @@
 {
     "lens": "COSJ100013+023424",
     "sample": "cowls_spectacular",
-    "primary_band": null,
-    "primary_band_source": null,
+    "primary_band": "F444W",
+    "primary_band_source": "reviewed",
     "suggested": null,
     "theta_e": 1.45,
     "scores": {

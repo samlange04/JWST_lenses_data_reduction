@@ -1,8 +1,8 @@
 {
     "lens": "B1938+666",
     "sample": "b1938",
-    "primary_band": "F277W",
-    "primary_band_source": "measured",
+    "primary_band": "F115W",
+    "primary_band_source": "reviewed",
     "suggested": "F277W",
     "theta_e": 0.45,
     "scores": {

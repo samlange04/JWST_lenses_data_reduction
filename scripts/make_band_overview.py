@@ -10,9 +10,12 @@ of a lens's bands at once, so the lens and its arcs can be compared across wavel
 the bands in wavelength order. Rows:
   1. the full stamp as observed, with the band's contaminant mask outlined (red) where drawn;
   2. a zoom on the lens (+-max(2.5 theta_E, 1.5")), as observed;
-  3. the same zoom with the lens light removed (its azimuthal median, masked pixels left out),
-     with the image positions (cyan +) where marked and the Einstein radius (dashed).
-The zooms, the theta_E circle and the lens-light profile are centred on the lens's measured
+  3. the same zoom with the lens light removed by an ISOPHOTE model (isophote_model.py: elliptical
+     isophotes free in ellipticity and PA, centre fixed on the lens, masked pixels left out;
+     the positions GUI's panel), smoothed and on a red-blue map (red = light the model lacks,
+     masked pixels blank), with the image positions where marked and the Einstein radius (dashed).
+     A radial median, used until 2026-11-01, leaves a quadrupole on every elliptical lens.
+The zooms, the theta_E circle and the isophote model are centred on the lens's measured
 centre (deflector_ra/dec, measure_lens_centres.py; else the catalogue position), at its exact
 sub-pixel position: the stamps are cut on it but snapped to the 0.06" LW grid, and a profile even
 half a pixel off the lens leaves a dipole. The residual offset is printed in the header.
@@ -35,12 +38,22 @@ import warnings
 import numpy as np
 import matplotlib
 matplotlib.use('Agg')
+import matplotlib.patheffects
 import matplotlib.pyplot as plt
 from astropy.io import fits
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import isophote_model
 import lens_samples
+import positions_io
 import stamp_paths
+from scipy.ndimage import gaussian_filter
+
+CORE_ARCSEC = 0.2      # the core left out of the isophote panel's colour range (it saturates)
+SMOOTH_PX = 1.5        # the isophote residual's smoothing (Gaussian sigma, px), as the positions GUI
+# position sets (one per source; positions_io), dark on the red-blue panel, with a white halo
+SET_COLOURS = ['black', 'darkgreen', 'purple', 'saddlebrown', 'navy']
+HALO = [matplotlib.patheffects.withStroke(linewidth=3, foreground='white')]
 
 ws_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -49,7 +62,7 @@ FILTER_UM = {'F070W': 0.70, 'F090W': 0.90, 'F115W': 1.15, 'F150W': 1.50, 'F200W'
 
 
 def load_band(stamp_dir, prefix):
-    """The band's sci (no-data pixels NaN), pixel scale, mask (or None), positions (or [])."""
+    """The band's sci (no-data pixels NaN), pixel scale, mask (or None), position sets (or [])."""
     sci_f = stamp_paths.find_stamp(stamp_dir, prefix, 'sci')
     noise_f = stamp_paths.find_stamp(stamp_dir, prefix, 'noise')
     if sci_f is None:
@@ -62,29 +75,8 @@ def load_band(stamp_dir, prefix):
     mask_f = os.path.join(stamp_dir, f'{prefix}_mask.fits')
     mask = fits.getdata(mask_f).astype(bool) if os.path.exists(mask_f) else None
     pos_f = os.path.join(stamp_dir, f'{prefix}_positions.json')
-    positions = []
-    if os.path.exists(pos_f):
-        with open(pos_f) as f:
-            d = json.load(f)
-        positions = d['arguments']['values']['array'] if isinstance(d, dict) and 'arguments' in d else d
-    return dict(sci=sci, scale=scale, mask=mask, positions=[tuple(p) for p in positions], hdr=hdr)
-
-
-def radial_subtract(img, cx, cy, exclude=None):
-    """`img` minus its azimuthal median profile about the sub-pixel centre (cx, cy) (pixels;
-    1-px annuli), `exclude` left out of the medians. autogalaxy's radial_median_subtract (the
-    mask GUI's) takes the profile about the ARRAY centre, a pixel corner here, and a lens even
-    half a pixel from it leaves a strong dipole."""
-    n_y, n_x = img.shape
-    yy, xx = np.mgrid[:n_y, :n_x]
-    rb = np.hypot(xx - cx, yy - cy).astype(int)
-    use = np.isfinite(img) if exclude is None else (np.isfinite(img) & ~exclude)
-    prof = np.zeros(rb.max() + 1)
-    for k in range(prof.size):
-        ring = img[(rb == k) & use]
-        if ring.size:
-            prof[k] = np.median(ring)
-    return img - prof[rb]
+    sets = positions_io.read_sets(pos_f) if os.path.exists(pos_f) else []
+    return dict(sci=sci, scale=scale, mask=mask, sets=[s_ for s_ in sets if s_], hdr=hdr)
 
 
 def render(sample, lens, out=None):
@@ -124,7 +116,9 @@ def render(sample, lens, out=None):
         # stamp centre, East (left) and North positive: pixel (col j, row i) is at
         # East -(j - c) s, North (i - c) s.
         lx, ly = c - e0 / s, c + n0 / s                      # the lens centre in pixels
-        sub = radial_subtract(sci, lx, ly, exclude=mask)
+        bad = ~np.isfinite(sci) if mask is None else (mask | ~np.isfinite(sci))
+        sub = gaussian_filter(isophote_model.isophote_subtract(sci, s, exclude=bad, centre=(lx, ly),
+                                                               refine_centre=False), SMOOTH_PX)
         zp = int(np.ceil(half_zoom / s)) + 1
         j0, i0 = max(0, int(round(lx)) - zp), max(0, int(round(ly)) - zp)
         j1, i1 = min(n, int(round(lx)) + zp + 1), min(n, int(round(ly)) + zp + 1)
@@ -132,8 +126,21 @@ def render(sample, lens, out=None):
             ax = axes[i, j]
             rs, cs = (slice(i0, i1), slice(j0, j1)) if zoom else (slice(0, n), slice(0, n))
             a = img[rs, cs]
+            diverging = i == 2
             ext = [-(cs.start - 0.5 - c) * s, -(cs.stop - 0.5 - c) * s, (rs.start - 0.5 - c) * s, (rs.stop - 0.5 - c) * s]
-            ax.imshow(arcsinh_stretch(a), origin='lower', cmap='gray', extent=ext, interpolation='nearest')
+            if diverging:
+                d = np.array(a, dtype=float)
+                if mask is not None:
+                    d[mask[rs, cs]] = np.nan                     # blanked, as in the positions GUI
+                # the colour range from the zoom outside the core: the inner isophotes cannot
+                # follow the central cusp, and that residual would otherwise wash out the arcs
+                yy, xx = np.mgrid[rs, cs]
+                outer = np.hypot(xx - lx, yy - ly) * s > CORE_ARCSEC
+                vmax = float(np.nanpercentile(np.abs(d[outer]), 99.5)) if np.isfinite(d[outer]).any() else 1.0
+                ax.imshow(d, origin='lower', cmap='RdBu_r', vmin=-vmax, vmax=vmax, extent=ext,
+                          interpolation='nearest')
+            else:
+                ax.imshow(arcsinh_stretch(a), origin='lower', cmap='gray', extent=ext, interpolation='nearest')
             if mask is not None and mask[rs, cs].any():
                 edge = mask_boundary(mask[rs, cs])
                 rgba = np.zeros(edge.shape + (4,))
@@ -147,11 +154,13 @@ def render(sample, lens, out=None):
             if i == 2:
                 if te:
                     t = np.linspace(0, 2 * np.pi, 200)
-                    ax.plot(e0 + te * np.cos(t), n0 + te * np.sin(t), ls='--', lw=0.8, color='gold', alpha=0.8)
-                for y, x in b['positions']:
+                    ax.plot(e0 + te * np.cos(t), n0 + te * np.sin(t), ls='--', lw=0.8, color='0.3', alpha=0.9)
+                for k, pts in enumerate(b['sets']):
                     # autoarray (y, x) about the stamp centre: y points toward row 0 (South
                     # here), x toward higher columns (West), so (East, North) = (-x, -y)
-                    ax.plot(-x, -y, '+', color='cyan', ms=9, mew=1.4)
+                    colour = SET_COLOURS[k % len(SET_COLOURS)]
+                    for y, x in pts:
+                        ax.plot(-x, -y, '+', color=colour, ms=10, mew=1.6, path_effects=HALO, zorder=5)
             ax.set_xlim(*xl)
             ax.set_ylim(*yl)
             ax.set_xticks([]); ax.set_yticks([])
@@ -161,13 +170,14 @@ def render(sample, lens, out=None):
                              color='darkred' if f == primary else 'black')
             if j == 0:
                 ax.set_ylabel(['as observed (full stamp)', 'as observed (zoom on the lens)',
-                               'lens light removed (zoom)'][i], fontsize=9)
+                               'isophote-subtracted (zoom, smoothed)'][i], fontsize=9)
             # 1" scale bar, bottom right
             (xa, xb), (ya, yb) = xl, yl
             wx, wy = xa - xb, yb - ya
             bx, by = xb + 0.1 * wx + 1.0, ya + 0.08 * wy
-            ax.plot([bx, bx - 1.0], [by, by], color='white', lw=2)
-            ax.text(bx - 0.5, by + 0.04 * wy, '1"', color='white', ha='center', fontsize=8)
+            ink = 'black' if i == 2 else 'white'
+            ax.plot([bx, bx - 1.0], [by, by], color=ink, lw=2)
+            ax.text(bx - 0.5, by + 0.04 * wy, '1"', color=ink, ha='center', fontsize=8)
             if i == 0 and j == 0:                         # compass, top left: N up, E left
                 ox, oy, L = xa - 0.45 * wx, yb - 0.55 * wy, 0.16 * wx
                 ax.annotate('', xy=(ox, oy + L), xytext=(ox, oy),
@@ -181,10 +191,11 @@ def render(sample, lens, out=None):
     te_s = f'{te:.2f}"' if te else '?'
     prim = f'{primary} ({psource})' if primary else 'not set (no band measurable)'
     fig.suptitle(f'{lens}  ({sample})   z_l {zl_s}   z_s {zs_s}   θ_E {te_s}\n'
-                 f'primary band: {prim}  (★)    zooms centred on the measured lens centre, '
-                 f'{1e3 * e0:+.0f} mas E, {1e3 * n0:+.0f} mas N of the stamp centre\n'
-                 f'red: contaminant mask   cyan +: image positions   dashed: θ_E', fontsize=9.5)
-    fig.tight_layout(rect=(0, 0, 1, 0.92))
+                 f'primary band: {prim}  (★)\n'
+                 f'zooms on the measured lens centre ({1e3 * e0:+.0f} mas E, {1e3 * n0:+.0f} mas N of the stamp centre)\n'
+                 f'red outline: contaminant mask   +: image positions (a colour per source)   dashed: θ_E',
+                 fontsize=9)
+    fig.tight_layout(rect=(0, 0, 1, 0.90))
     out = out or os.path.join(lens_dir, f'{prefix}_bands.png')
     fig.savefig(out, dpi=90)
     plt.close(fig)

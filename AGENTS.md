@@ -229,7 +229,7 @@ measure_lens_centres.py the lens core per band (LW-anchored) -> deflector_ra/dec
 choose_primary_band.py  arc S/N per band, discounted below 5 PSF widths across theta_E -> each lens's primary band
 make_masks.py / make_arc_masks.py / make_positions.py   GUIs, one draw per band (primary first), broadcast by WCS
 make_dataset_subplots.py / make_qc_grids.py              QC
-make_band_overview.py   every band of a lens side by side (+ masks, positions, primary band) -> <lens>/stamp<S>_bands.png
+make_band_overview.py   every band of a lens side by side (isophote-subtracted; + masks, positions, primary band) -> <lens>/stamp<S>_bands.png
 export_dataset.py   -> <dest>/<lens>/<FILT>/{data,noise_map,psf}.fits + info.json [+ mask, positions]
 ```
 
@@ -692,7 +692,13 @@ always answers `stamp<S>` for the lens's modelling size). The semantics are unch
     COSJ100121+022740;
   - F150W: COSJ100024+021749;
   - none: COSJ095914+021219, COSJ100013+023424, COSJ100028+021928. No band reaches arc S/N 15 there; their arcs are too faint against the
-    lens-profile error, so set `primary_band` by eye.
+    lens-profile error, so set `primary_band` by eye. (The re-cut on measured centres made
+    COSJ100028+021928 measurable, F444W; see *Stamps*.)
+
+  **Reviewed** (`primary_band` set by hand, 2026-11-01), overriding the measurement:
+  - COSJ095914+021219 F277W and COSJ100013+023424 F444W, which were unmeasurable;
+  - B1938+666 F115W over the measured F277W. Its 0.03" pixels and sharper PSF matter more on a
+    0.45" ring than F277W's S/N.
 
   The measurement is biased red for bright, compact lenses (θ_E ≲ 0.6": COSJ095917+015424, COSJ095920+015851,
   B1938+666), where
@@ -706,10 +712,13 @@ always answers `stamp<S>` for the lens's modelling size). The semantics are unch
   `lens_samples.json` too (`theta_e`, `theta_e_ref`).
 - **Per-lens band overview** (`make_band_overview.py`, 2026-11-01): `data/stamps/<sample>/<lens>/
   stamp<S>_bands.png`, tracked. Columns are the bands in wavelength order. The rows are the full
-  stamp, a zoom on the lens, and the zoom with the lens light removed (the radial median, as the
-  mask GUI's left panel). Each panel has its own arcsinh stretch, North up, East left. Overlaid:
-  the contaminant mask outline, the image positions and θ_E; the primary band is starred.
-  - The zooms, the θ_E circle and the lens-light profile are centred on the lens's measured
+  stamp, a zoom on the lens, and the zoom with the lens light removed by an ISOPHOTE model
+  (`isophote_model.py`, as the positions GUI; smoothed, red-blue, red = light the model lacks,
+  masked pixels blank). Its colour range is set outside the central 0.2", whose cusp the inner
+  isophotes cannot follow. The other panels have their own arcsinh stretch, North up, East left.
+  Overlaid: the contaminant mask outline, the image positions (a colour per source) and θ_E; the
+  primary band is starred.
+  - The zooms, the θ_E circle and the isophote model are centred on the lens's measured
     centre (`deflector_ra/dec`) at its exact sub-pixel position. The stamps are cut on it,
     snapped to the LW grid, so it is ≤ 39 mas from the stamp centre; the header prints the
     residual.
@@ -752,6 +761,24 @@ always answers `stamp<S>` for the lens's modelling size). The semantics are unch
   Here the SW→LW reprojection is a 2:1 regrid, like the HST f160W case.
 - Positions are marked once on the best band and broadcast pixel→sky→pixel; an empty file
   means "decided: none".
+- **Ported from the HST repo, 2026-11-01** (its uncommitted positions work of that day: `isophote_model.py`,
+  `positions_io.py`, `make_positions.py`, `make_arc_masks.py`):
+  - **Isophote display.** The positions GUI and its overlay PNG show the band as observed and
+    with the lens removed by an ISOPHOTE model (photutils `Ellipse`, ellipticity and PA free with
+    radius, centre fixed, masked pixels excluded), smoothed on a red-blue map. A radial median
+    leaves a quadrupole on every elliptical lens. `--subtract isophote|radial|none`; the old
+    `--(no-)subtract-radial` still maps onto it. It is a finding aid, not photometry: it absorbs a
+    little of an arc lying along an isophote. Here `isophote_subtract(refine_centre=False)` also
+    lets the band overview keep the measured lens centre: the HST default refines it with a 0.3"
+    centroid, which creeps toward a ring inside that window.
+  - **Position sets.** Number keys 1–9 in the GUI switch the source being marked, one set per
+    source (double source planes, distinct sources), and Esc finishes.
+    - `positions_io.write_sets` writes ONE set exactly as before, a single `Grid2DIrregular`, so
+      every existing file and reader is unchanged. Two or more sets are autoconf's list type,
+      which `al.from_json` returns as a list.
+    - `positions_io.read_sets` always returns a list of sets.
+    - `lens_positions.json` keeps the flattened `positions_arcsec` and adds `n_sets` /
+      `positions_arcsec_by_set` for a multi-set lens.
 - **The band-registration check is field sources, not the deflector** (`band_tie`, 2026-10-04).
   It used to centroid the brightest object near each stamp's centre; on B1938 (stamps 0.5" off
   the lens, ring brighter than the lens in F277W) that found the lens core in F115W and the top
