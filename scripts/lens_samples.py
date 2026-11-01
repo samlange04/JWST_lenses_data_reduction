@@ -121,6 +121,23 @@ def prune_intermediates(sample):
     return bool(_sample(sample).get('prune_intermediates', False))
 
 
+def tweakreg_lens_first(sample):
+    """True if Image3's relative tweakreg should align the frames covering the lens first and
+    grow the reference from them (``tweakreg_lens_first``: the lens-covering cal files lead the
+    association, and tweakreg runs with ``expand_refcat=True, enforce_user_order=True``). By
+    default tweakwcs takes the first group in file order as the sole reference; in a survey
+    mosaic that can be a neighbouring tile's frame that barely overlaps the rest."""
+    return bool(_sample(sample).get('tweakreg_lens_first', False))
+
+
+def tweakreg_sw_from_lw(sample):
+    """True if a SW band's frames should take the tweakreg offset of their own exposure's LW
+    frames instead of being fitted (``tweakreg_sw_from_lw``; reduce_nircam.apply_offsets). SW and
+    LW are exposed together through one pointing, and in shallow SW frames tweakreg's fit is
+    noise."""
+    return bool(_sample(sample).get('tweakreg_sw_from_lw', False))
+
+
 def sample_of(lens):
     for name, block in _load().items():
         if lens in block['lenses']:

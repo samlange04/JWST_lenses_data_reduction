@@ -54,7 +54,7 @@
                 "center_ra": 149.811421524,
                 "center_dec": 2.2054401070000043,
                 "n_bad": 0,
-                "weight_uniformity": 0.5335,
+                "weight_uniformity": 0.5336,
                 "corr_factor": 1.25,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -72,7 +72,7 @@
                 "center_ra": 149.811421524,
                 "center_dec": 2.2054401070000043,
                 "n_bad": 0,
-                "weight_uniformity": 0.5298,
+                "weight_uniformity": 0.5301,
                 "corr_factor": 1.22,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -90,7 +90,7 @@
                 "center_ra": 149.811421524,
                 "center_dec": 2.2054401070000043,
                 "n_bad": 0,
-                "weight_uniformity": 0.4518,
+                "weight_uniformity": 0.4519,
                 "corr_factor": 1.03,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -108,7 +108,7 @@
                 "center_ra": 149.811421524,
                 "center_dec": 2.2054401070000043,
                 "n_bad": 0,
-                "weight_uniformity": 0.4397,
+                "weight_uniformity": 0.4401,
                 "corr_factor": 0.95,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -127,8 +127,8 @@
                 "center": "catalogue",
                 "center_ra": 149.82146219499998,
                 "center_dec": 1.9068730329999877,
-                "n_bad": 26372,
-                "weight_uniformity": 0.174,
+                "n_bad": 26382,
+                "weight_uniformity": 0.1735,
                 "corr_factor": 1.25,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -145,8 +145,8 @@
                 "center": "catalogue",
                 "center_ra": 149.82146219499998,
                 "center_dec": 1.9068730329999877,
-                "n_bad": 26338,
-                "weight_uniformity": 0.1755,
+                "n_bad": 26131,
+                "weight_uniformity": 0.1766,
                 "corr_factor": 1.22,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -163,7 +163,7 @@
                 "center": "catalogue",
                 "center_ra": 149.82146219499998,
                 "center_dec": 1.9068730329999877,
-                "n_bad": 11839,
+                "n_bad": 11853,
                 "weight_uniformity": 0.16,
                 "corr_factor": 1.03,
                 "corr_source": "json:filter",
@@ -181,8 +181,8 @@
                 "center": "catalogue",
                 "center_ra": 149.82146219499998,
                 "center_dec": 1.9068730329999877,
-                "n_bad": 11791,
-                "weight_uniformity": 0.1521,
+                "n_bad": 11753,
+                "weight_uniformity": 0.1509,
                 "corr_factor": 0.95,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -220,7 +220,7 @@
                 "center_ra": 149.833887486,
                 "center_dec": 1.9809270070000013,
                 "n_bad": 0,
-                "weight_uniformity": 0.085,
+                "weight_uniformity": 0.0848,
                 "corr_factor": 1.22,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -238,7 +238,7 @@
                 "center_ra": 149.833887486,
                 "center_dec": 1.9809270070000013,
                 "n_bad": 0,
-                "weight_uniformity": 0.0816,
+                "weight_uniformity": 0.0815,
                 "corr_factor": 1.03,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -256,7 +256,7 @@
                 "center_ra": 149.833887486,
                 "center_dec": 1.9809270070000013,
                 "n_bad": 0,
-                "weight_uniformity": 0.0793,
+                "weight_uniformity": 0.0792,
                 "corr_factor": 0.95,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -330,7 +330,7 @@
                 "center_ra": 149.840689409,
                 "center_dec": 2.110652506,
                 "n_bad": 0,
-                "weight_uniformity": 0.1354,
+                "weight_uniformity": 0.1355,
                 "corr_factor": 0.95,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -350,7 +350,7 @@
                 "center_ra": 149.96143032000003,
                 "center_dec": 2.3494115439999987,
                 "n_bad": 0,
-                "weight_uniformity": 0.2137,
+                "weight_uniformity": 0.2127,
                 "corr_factor": 1.25,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -368,7 +368,7 @@
                 "center_ra": 149.96143032000003,
                 "center_dec": 2.3494115439999987,
                 "n_bad": 0,
-                "weight_uniformity": 0.2153,
+                "weight_uniformity": 0.2143,
                 "corr_factor": 1.22,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -386,7 +386,7 @@
                 "center_ra": 149.96143032000003,
                 "center_dec": 2.3494115439999987,
                 "n_bad": 0,
-                "weight_uniformity": 0.1898,
+                "weight_uniformity": 0.1906,
                 "corr_factor": 1.03,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -404,7 +404,7 @@
                 "center_ra": 149.96143032000003,
                 "center_dec": 2.3494115439999987,
                 "n_bad": 0,
-                "weight_uniformity": 0.1883,
+                "weight_uniformity": 0.1881,
                 "corr_factor": 0.95,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -424,7 +424,7 @@
                 "center_ra": 149.97467814600003,
                 "center_dec": 2.5554456530000134,
                 "n_bad": 0,
-                "weight_uniformity": 0.4817,
+                "weight_uniformity": 0.4829,
                 "corr_factor": 1.25,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -442,7 +442,7 @@
                 "center_ra": 149.97467814600003,
                 "center_dec": 2.5554456530000134,
                 "n_bad": 0,
-                "weight_uniformity": 0.4809,
+                "weight_uniformity": 0.4804,
                 "corr_factor": 1.22,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -460,7 +460,7 @@
                 "center_ra": 149.97467814600003,
                 "center_dec": 2.5554456530000134,
                 "n_bad": 0,
-                "weight_uniformity": 0.3539,
+                "weight_uniformity": 0.3546,
                 "corr_factor": 1.03,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -478,7 +478,7 @@
                 "center_ra": 149.97467814600003,
                 "center_dec": 2.5554456530000134,
                 "n_bad": 0,
-                "weight_uniformity": 0.3346,
+                "weight_uniformity": 0.3345,
                 "corr_factor": 0.95,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -498,7 +498,7 @@
                 "center_ra": 149.983162054,
                 "center_dec": 2.316880569999998,
                 "n_bad": 0,
-                "weight_uniformity": 0.1809,
+                "weight_uniformity": 0.1806,
                 "corr_factor": 1.25,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -572,7 +572,7 @@
                 "center_ra": 150.05258822699997,
                 "center_dec": 2.3377064690000005,
                 "n_bad": 0,
-                "weight_uniformity": 0.3629,
+                "weight_uniformity": 0.3619,
                 "corr_factor": 1.25,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -608,7 +608,7 @@
                 "center_ra": 150.05258822699997,
                 "center_dec": 2.3377064690000005,
                 "n_bad": 0,
-                "weight_uniformity": 0.4141,
+                "weight_uniformity": 0.4119,
                 "corr_factor": 1.03,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -645,8 +645,8 @@
                 "center": "catalogue",
                 "center_ra": 150.055775328,
                 "center_dec": 2.573347012000002,
-                "n_bad": 1,
-                "weight_uniformity": 0.5461,
+                "n_bad": 0,
+                "weight_uniformity": 0.546,
                 "corr_factor": 1.25,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -664,7 +664,7 @@
                 "center_ra": 150.055775328,
                 "center_dec": 2.573347012000002,
                 "n_bad": 0,
-                "weight_uniformity": 0.5473,
+                "weight_uniformity": 0.5471,
                 "corr_factor": 1.22,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -720,7 +720,7 @@
                 "center_ra": 150.076934522,
                 "center_dec": 2.3607571280000124,
                 "n_bad": 0,
-                "weight_uniformity": 0.4004,
+                "weight_uniformity": 0.4007,
                 "corr_factor": 1.25,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -738,7 +738,7 @@
                 "center_ra": 150.076934522,
                 "center_dec": 2.3607571280000124,
                 "n_bad": 0,
-                "weight_uniformity": 0.4013,
+                "weight_uniformity": 0.4024,
                 "corr_factor": 1.22,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -756,7 +756,7 @@
                 "center_ra": 150.076934522,
                 "center_dec": 2.3607571280000124,
                 "n_bad": 0,
-                "weight_uniformity": 0.2076,
+                "weight_uniformity": 0.2072,
                 "corr_factor": 1.03,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -774,7 +774,7 @@
                 "center_ra": 150.076934522,
                 "center_dec": 2.3607571280000124,
                 "n_bad": 0,
-                "weight_uniformity": 0.2023,
+                "weight_uniformity": 0.2021,
                 "corr_factor": 0.95,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -794,7 +794,7 @@
                 "center_ra": 150.100467215,
                 "center_dec": 1.8930293180000144,
                 "n_bad": 0,
-                "weight_uniformity": 0.2493,
+                "weight_uniformity": 0.2497,
                 "corr_factor": 1.25,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -812,7 +812,7 @@
                 "center_ra": 150.100467215,
                 "center_dec": 1.8930293180000144,
                 "n_bad": 0,
-                "weight_uniformity": 0.2473,
+                "weight_uniformity": 0.2469,
                 "corr_factor": 1.22,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -830,7 +830,7 @@
                 "center_ra": 150.100467215,
                 "center_dec": 1.8930293180000144,
                 "n_bad": 0,
-                "weight_uniformity": 0.3168,
+                "weight_uniformity": 0.3154,
                 "corr_factor": 1.03,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -848,7 +848,7 @@
                 "center_ra": 150.100467215,
                 "center_dec": 1.8930293180000144,
                 "n_bad": 1,
-                "weight_uniformity": 0.316,
+                "weight_uniformity": 0.3161,
                 "corr_factor": 0.95,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -868,7 +868,7 @@
                 "center_ra": 150.100088848,
                 "center_dec": 2.2971327569999995,
                 "n_bad": 0,
-                "weight_uniformity": 0.0593,
+                "weight_uniformity": 0.0594,
                 "corr_factor": 1.25,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -886,7 +886,7 @@
                 "center_ra": 150.100088848,
                 "center_dec": 2.2971327569999995,
                 "n_bad": 0,
-                "weight_uniformity": 0.0609,
+                "weight_uniformity": 0.0608,
                 "corr_factor": 1.22,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -904,7 +904,7 @@
                 "center_ra": 150.100088848,
                 "center_dec": 2.2971327569999995,
                 "n_bad": 0,
-                "weight_uniformity": 0.107,
+                "weight_uniformity": 0.1071,
                 "corr_factor": 1.03,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -942,7 +942,7 @@
                 "center_ra": 150.10670790000003,
                 "center_dec": 1.879287102999985,
                 "n_bad": 0,
-                "weight_uniformity": 0.0617,
+                "weight_uniformity": 0.0616,
                 "corr_factor": 1.25,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -960,7 +960,7 @@
                 "center_ra": 150.10670790000003,
                 "center_dec": 1.879287102999985,
                 "n_bad": 0,
-                "weight_uniformity": 0.0657,
+                "weight_uniformity": 0.0658,
                 "corr_factor": 1.22,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -978,7 +978,7 @@
                 "center_ra": 150.10670790000003,
                 "center_dec": 1.879287102999985,
                 "n_bad": 0,
-                "weight_uniformity": 0.0928,
+                "weight_uniformity": 0.0927,
                 "corr_factor": 1.03,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -1015,8 +1015,8 @@
                 "center": "catalogue",
                 "center_ra": 150.11906717100004,
                 "center_dec": 2.324503234000011,
-                "n_bad": 4,
-                "weight_uniformity": 0.5243,
+                "n_bad": 2,
+                "weight_uniformity": 0.5242,
                 "corr_factor": 1.25,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -1033,8 +1033,8 @@
                 "center": "catalogue",
                 "center_ra": 150.11906717100004,
                 "center_dec": 2.324503234000011,
-                "n_bad": 4,
-                "weight_uniformity": 0.5196,
+                "n_bad": 3,
+                "weight_uniformity": 0.5199,
                 "corr_factor": 1.22,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -1052,7 +1052,7 @@
                 "center_ra": 150.11906717100004,
                 "center_dec": 2.324503234000011,
                 "n_bad": 0,
-                "weight_uniformity": 0.4139,
+                "weight_uniformity": 0.4136,
                 "corr_factor": 1.03,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -1070,7 +1070,7 @@
                 "center_ra": 150.11906717100004,
                 "center_dec": 2.324503234000011,
                 "n_bad": 0,
-                "weight_uniformity": 0.4075,
+                "weight_uniformity": 0.4074,
                 "corr_factor": 0.95,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -1090,7 +1090,7 @@
                 "center_ra": 150.19858409200003,
                 "center_dec": 1.839784558999998,
                 "n_bad": 0,
-                "weight_uniformity": 0.1993,
+                "weight_uniformity": 0.1988,
                 "corr_factor": 1.25,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -1108,7 +1108,7 @@
                 "center_ra": 150.19858409200003,
                 "center_dec": 1.839784558999998,
                 "n_bad": 0,
-                "weight_uniformity": 0.1982,
+                "weight_uniformity": 0.198,
                 "corr_factor": 1.22,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -1126,7 +1126,7 @@
                 "center_ra": 150.19858409200003,
                 "center_dec": 1.839784558999998,
                 "n_bad": 0,
-                "weight_uniformity": 0.1659,
+                "weight_uniformity": 0.1672,
                 "corr_factor": 1.03,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -1144,7 +1144,7 @@
                 "center_ra": 150.19858409200003,
                 "center_dec": 1.839784558999998,
                 "n_bad": 0,
-                "weight_uniformity": 0.1659,
+                "weight_uniformity": 0.1666,
                 "corr_factor": 0.95,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -1218,7 +1218,7 @@
                 "center_ra": 150.330525811,
                 "center_dec": 1.8136161879999955,
                 "n_bad": 0,
-                "weight_uniformity": 0.1128,
+                "weight_uniformity": 0.1129,
                 "corr_factor": 0.95,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -1238,7 +1238,7 @@
                 "center_ra": 150.34136302000002,
                 "center_dec": 2.461297052999998,
                 "n_bad": 0,
-                "weight_uniformity": 0.0653,
+                "weight_uniformity": 0.0654,
                 "corr_factor": 1.25,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -1256,7 +1256,7 @@
                 "center_ra": 150.34136302000002,
                 "center_dec": 2.461297052999998,
                 "n_bad": 0,
-                "weight_uniformity": 0.067,
+                "weight_uniformity": 0.0669,
                 "corr_factor": 1.22,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5254
@@ -1274,7 +1274,7 @@
                 "center_ra": 150.34136302000002,
                 "center_dec": 2.461297052999998,
                 "n_bad": 0,
-                "weight_uniformity": 0.09,
+                "weight_uniformity": 0.0902,
                 "corr_factor": 1.03,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384
@@ -1292,7 +1292,7 @@
                 "center_ra": 150.34136302000002,
                 "center_dec": 2.461297052999998,
                 "n_bad": 0,
-                "weight_uniformity": 0.0826,
+                "weight_uniformity": 0.0824,
                 "corr_factor": 0.95,
                 "corr_source": "json:filter",
                 "casertano_r": 1.5384

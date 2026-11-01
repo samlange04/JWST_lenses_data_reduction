@@ -13,7 +13,7 @@ measurements are not restated here.
 > reporting what is outstanding, verify against source — argparse defaults, what the
 > runner actually passes, tracking JSONs vs what is on disk.
 
-## Current state (2026-10-27)
+## Current state (2026-10-30)
 
 Repo created 2026-10-01 from the HST repo's structure, PyAutoReduce's JWST path and the
 jwst 3.0.0 docs. Program 8281 (B1938+666) became public at 03:16 UTC that day. Public on
@@ -28,13 +28,13 @@ Stamps renamed 2026-10-26 (`data/cutouts/` → `data/stamps/`, `cutout_*` → `s
 | SPT2147-50 | spt | uncal, 4 filters | F200W F277W F356W F444W | all 4 | see info/provenance/lens_psf.json | – |
 | SPT0418-47 | spt | uncal, 6 filters | F115W F150W F200W F277W F356W F444W | all 6 | see info/provenance/lens_psf.json | – |
 | B1938+666 | b1938 | uncal, 210 files / 79 GB | F115W F277W (2026-10-02, 8.5 h) | both | both, see info/provenance/lens_psf.json | both (2026-10-04) |
-| 17 COWLS II lenses | cowls_spectacular | uncal at a 90" field, 802 files / 38 GB | F115W F150W F277W F444W, all 68 bands (2026-10-29, ~11 h incl. 43 GB of new CRDS darks) | all 68, 12" (2026-10-30) | pooled per filter, 32–68 stars (2026-10-30) | – |
+| 17 COWLS II lenses | cowls_spectacular | uncal at a 90" field, 802 files / 38 GB | F115W F150W F277W F444W, all 68 bands (2026-10-29, ~11 h incl. 43 GB of new CRDS darks; Image3 re-run 2026-10-30 for tweakreg, ~1 h at 4 in parallel) | all 68, 12" (2026-10-30, re-cut after the Image3 re-run) | pooled per filter, 31–70 stars (2026-10-30) | – |
 
 **COWLS added 2026-10-29** (`cowls_spectacular`, the 17 COWLS II lenses, GO 1727
 COSMOS-Web): the first survey-program sample, located by position and cut by detector
 footprint (*Download*), reduced on 90" mosaics with pruned intermediates for disk
 (*Reduction*). Verified on COSJ100013+023424 (lens I) F444W: 7 detector files from two tiles,
-tweakreg 145–162 sources per frame, 1030.7 s at the lens (4 × 257.7 s), the lens and arc at the
+tweakreg 145–162 sources per frame (but that first reduction aligned nothing; fixed and re-run 2026-10-30, see *Reduction*), 1030.7 s at the lens (4 × 257.7 s), the lens and arc at the
 mosaic centre. The full batch then ran 12:31–23:40: 68 bands ok, every
 exposure time at the lens equal to the footprint survey (J SW 773 s, K LW 515 s, N SW 258 s),
 no rate/rateints/crf left; kept on disk 38 GB uncal + 88 GB cal + 10 GB mosaics. Two downloads
@@ -367,6 +367,37 @@ not re-run through Detector1 when its cal is there (`run_detector1(cal_dir=...)`
 re-makes the rates it needs. 90" is ~2.25 arcmin² per lens for `make_psf.py`'s stars and for
 tweakreg (`measure_corr_factor.py`'s ±30" region fits).
 
+**COWLS tweakreg: LW lens-first, SW from LW (2026-10-30; all 68 bands re-run from the kept cal
+files).** The first reduction aligned nothing. With jwst's default `expand_refcat=False`, tweakwcs
+takes the first group in FILE ORDER as the sole reference: on lens I F444W a neighbouring tile's
+frame (obs 007), against which every lens-covering group found 0–1 matches (`minobj=15`), so no
+frame moved, while `cal_step.tweakreg` still said COMPLETE. `expand_refcat=True` alone was not
+enough: it starts from the best-overlapping pair anywhere in the 90" field, which on lens A F444W
+was a neighbouring visit that the lens frames matched with only 4 sources. Two sample settings fix it
+(`info/samples/lens_samples.json`, read by `lens_samples.py`):
+
+- `tweakreg_lens_first`: the cal files covering the deflector lead the association
+  (`reduce_nircam.lens_first_order`), and tweakreg runs with `expand_refcat=True,
+  enforce_user_order=True`. The lens frames therefore align to each other first, and the
+  neighbours join the growing reference. On LW (34 bands): 198 groups aligned, 48 failed, and
+  every lens-covering group aligned except lens J's obs 053 exposure 1 (3 matches in both LW bands,
+  so it stays a-priori). Fit RMSE 0.03–0.20" (5–95%). Offsets 8 mas median, 27 at the 90th
+  percentile, 50 max. The lens frames of one band moved 2–42 mas relative to each other (median 19).
+- `tweakreg_sw_from_lw`: SW is not fitted. Each SW frame takes the offset tweakreg gave its own
+  exposure's LW frames (SW and LW are exposed together through one pointing):
+  - `apply_offsets` moves copies of the cal files by `shift_wcs`, exact to 0.001 mas across the
+    detector, and Image3 runs with tweakreg skipped;
+  - an exposure with no LW offset stays a-priori (0–1 frames per band);
+  - why: fitted on their own, the SHALLOW4 SW frames gave RMSE 0.2–0.4" on 10–50 matches, and their
+    shifts disagreed with the same exposures' LW shifts by a median 22 mas (max 113) over 204
+    exposures. On lens K one visit's four F150W dithers came out up to 125 mas apart.
+
+Each band's `lens_products.json` record carries `tweak_offsets_mas` ({rootname: [dRA cos dec,
+dDec]}: LW measured from the crf files before pruning, equal to tweakreg's own XSH/YSH to 0.01 mas;
+SW the offsets applied), `tweakreg` (`relative`, or `from_lw` for SW) and `tweakreg_lens_first`.
+`run_image3` prints tweakreg's per-group outcome (reference, matches, shift, RMSE) into the band's
+log, which stpipe otherwise does not: a tweakreg that aligns nothing looks complete.
+
 `lens_exptime.json` is the exposure time AT THE LENS: EFFEXPTM once per exposure over the cal
 files whose `S_REGION` covers the deflector (`exptime_at`), since a survey mosaic also holds
 neighbouring tiles' exposures that never see it. Identical to the old per-exposure sum on every
@@ -379,7 +410,7 @@ SPT and B1938 band (checked 2026-10-29).
 | Detector1 | `jump.expand_large_events=True` | snowball flagging for NIR detectors. The CRDS `pars-jumpstep` file turns it on for NIRCam anyway; set explicitly so a context change cannot turn it off silently |
 | Detector1 | `clean_flicker_noise.skip=False` | **1/f striping removed on the ramp**, with sources masked at 2σ (`fit_method=median`, Willott's image1overf algorithm, `background_method=median`). Skipped by default in jwst 3.0.0 (JDox *1/f noise*). It is the dominant correlated-noise term in a NIRCam frame and its scale (10–100 px stripes) is exactly the lens's. `--flicker-by-channel` adds a per-amplifier fit. **JDox caveat: a factor-10 gain for 2–3-group ramps, but "for very long ramps it can make things worse"** — compare a stamp with and without (`--start rate` gives the without, cheaply) before trusting it on B1938's 8-group MEDIUM8 data |
 | Image2 | `resample.skip=True` | per-exposure i2d previews are dead weight |
-| Image3 | `tweakreg`: relative only by default | aligns the dithers to each other (IRAFStarFinder, `minobj=15`, `fitgeometry=rshift`). `--tweakreg gaia` adds `abs_refcat=GAIADR3`; `skip` for a field where it finds too few sources. **A failed tweakreg is not fatal**: jwst logs it and keeps the a-priori WCS, which for JWST is good to ~0.1" absolute and to mas relative within a visit — nothing like WFPC2. TEMPLATES found Gaia alignment broke SW/LW registration (jwst issue 7993) and ended up aligning SW to a Gaia-tied F277W catalogue per module |
+| Image3 | `tweakreg`: relative only by default | aligns the dithers to each other (IRAFStarFinder; CRDS `pars-tweakregstep` for NIRCam: `minobj=15`, `fitgeometry=shift`, `searchrad=2`). A sample may set `tweakreg_lens_first` / `tweakreg_sw_from_lw` (COWLS; see above). `--tweakreg gaia` adds `abs_refcat=GAIADR3`; `skip` for a field where it finds too few sources. **A failed tweakreg is not fatal**: jwst logs it and keeps the a-priori WCS, which for JWST is good to ~0.1" absolute and to mas relative within a visit — nothing like WFPC2. TEMPLATES found Gaia alignment broke SW/LW registration (jwst issue 7993) and ended up aligning SW to a Gaia-tied F277W catalogue per module |
 | Image3 | `skymatch.skymethod=global+match`, `subtract=False` | one sky level per mosaic, matched across dithers. `subtract=False` is NOT "don't subtract": stcal's resample subtracts `meta.background.level` itself when `subtracted` is False (`stcal/resample/resample.py`, checked in the installed version). The mosaic is sky-subtracted |
 | Image3 | `outlier_detection`: defaults | JWST's CR pass. There is no separate no-CR product: `jump` flags CRs on the ramp and `outlier_detection` catches the rest, so this repo has ONE pass and the stamp names carry none (`stamp<S>_*`; `drizzle_pass` is recorded as `single`) |
 | Image3 | `resample`: `pixfrac=1.0`, `kernel=square`, `weight_type=ivm`, `fillval=NAN`, `rotation=0`, `crval=<catalogue>`, `crpix=<centre>`, `pixel_scale` SW **0.03"** / LW **0.06"**, `output_shape` from `--field` (150" default) | North-up, one tangent point per lens, SW/LW grids nested 2:1. Scales near native (0.031/0.063) at pixfrac 1.0 follow the HST repo's finding that pixfrac cannot change the noise a fit sees and that near-native scales keep the noise model clean; COWLS (Nightingale+25) and PyAutoReduce use the same 0.03/0.06 pair. `--scale 0.02` is the finer option JDox mentions for well-dithered data (B1938's 21 dithers qualify) — a measurement question, not settled |
@@ -410,6 +441,9 @@ EFFEXPTM), `lens_instrument.json` (`NIRCAM/SW` or `NIRCAM/LW`). No data → `nul
   Owed: a scale-matched rescale once the modelling project fixes its source-pixel scale.
 - **Model PSF broadening by injection**: the STPSF tier uses the analytic drop box; the
   HST repo's injection route (`make_psf_inject.py`) is not ported.
+- **Tweakreg on the other samples** is unchanged. They were not hit by the file-order trap (SPT
+  has 2 groups per band; B1938+666's 21 dithers share one pointing): their frames move 0–45 mas.
+  Their records have no `tweak_offsets_mas` until they are re-run.
 - **Automatic arc detection** (`detect_arcs.py`) is a stub.
 
 ## Stamps (`scripts/make_stamps.py`)
@@ -478,7 +512,9 @@ on all 68 stamps (`measure_corr_factor.py --out ..._cowls_spectacular.json`), pe
 F115W 1.25, F150W 1.22, F277W 1.03, F444W 0.95 at 0.2"** (16–84% ranges ±0.02). Per filter
 because F277W > F444W in all 17 lenses and F115W > F150W in 16 of 17, a split larger than the
 scatter; no dependence on depth (lens N's one SW exposure measures like the 4-exposure lenses).
-Curves in `sample_factors.cowls_spectacular.block_ratio_curve`. The channel medians come from
+Curves in `sample_factors.cowls_spectacular.block_ratio_curve`. Re-measured after the 2026-10-30
+Image3 re-run (*Reduction*): F115W 1.25, F150W 1.21, F277W 1.03, F444W 0.95. That is unchanged
+within the scatter, so the factors were kept. The channel medians come from
 interpolating each stamp's block-ratio curve to the scales and taking the median, which
 reproduces the SPT `factors` to 0.01.
 
@@ -579,8 +615,10 @@ cutouts onto one synthetic image at their sub-pixel offsets, so `build_epsf`, va
 the bootstrap run unchanged. The kernel goes into every lens's stamp dir (`PSFMETH =
 empirical_pooled`, `PSFPOOL` = lenses), the full kernel and png into
 `data/psf/<sample>/_pooled/<FILT>/`, and each lens's record carries `pool.stars_per_lens`.
-COWLS: F115W 32 stars, 0.054"; F150W 59, 0.065"; F277W 39, 0.124"; F444W 68, 0.167"; bootstrap
-error fraction 0.4–1.8%. It averages over the lenses' different depths (2–4 exposures) and
+COWLS, rebuilt on the re-aligned mosaics (2026-10-30): F115W 31 stars, 0.053"; F150W 51,
+0.064"; F277W 37, 0.125"; F444W 70, 0.167"; bootstrap error fraction 0.4–2.7%. On the first
+mosaics they were 32/59/39/68 stars and 0.054"/0.065"/0.124"/0.167", so the alignment moved them
+by ≤ 0.001". It averages over the lenses' different depths (2–4 exposures) and
 detector positions. The single-lens path through the refactor is bit-identical to before
 (SPT2147-50 F444W). `--output` is now a true scratch mode: until 2026-10-30 it redirected only
 `psf_kernel.fits`/`psf.png` and still overwrote the band's `psf.fits` and `lens_psf.json`
@@ -704,8 +742,9 @@ Exercised 2026-10-29: the position query + footprint cut of `download_nircam.py`
 per-sample `mosaic_field`/`prune_intermediates`, neighbour hard-linking of pool files, and
 `exptime_at` (identical to the old sums on every SPT/B1938 band).
 
-Exercised 2026-10-30: the STPSF model tier of `make_psf.py` (too narrow, see *PSF*) and the
-pooled empirical tier.
+Exercised 2026-10-30: the STPSF model tier of `make_psf.py` (too narrow, see *PSF*), the
+pooled empirical tier, and the COWLS tweakreg settings `tweakreg_lens_first` /
+`tweakreg_sw_from_lw` (all 68 bands).
 
 Not yet exercised: `make_arc_masks.py`, `make_qc_grids.py`, `--tweakreg gaia`. Stubs: `detect_arcs.py`.
 Exercised since: `measure_corr_factor.py` (12 stamps, 2026-10-04), `--start rate` and

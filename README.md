@@ -128,7 +128,7 @@ signal_to_noise = image / noise
   patterns in the SW bands). They are not subtracted, so check the SW images before trusting
   a faint SW feature.
 - **The COWLS PSFs are shared**: each filter's PSF is built from the stars of all 17 COWLS
-  fields together (32–68 stars), because a single field holds only 0–11. Every COWLS lens in a
+  fields together (31–70 stars), because a single field holds only 0–11. Every COWLS lens in a
   filter therefore has the same `psf.fits` (`PSFMETH = empirical_pooled`).
 - **COWLS depth varies from lens to lens**, because it depends on where each lens fell in
   COSMOS-Web's dither pattern: 2–4 exposures per filter, and COSJ100028+021928 has a single
