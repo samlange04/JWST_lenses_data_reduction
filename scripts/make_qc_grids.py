@@ -401,7 +401,7 @@ def plot_mosaic(entries, arrays, title_key, out_path, panel_label, split_by=None
 def main():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--sample', default=mast_target_names.DEFAULT_SAMPLE,
+    p.add_argument('--sample', type=mast_target_names.sample_arg, default=mast_target_names.DEFAULT_SAMPLE,
                    help='sample subdirectory under data/stamps/ to mosaic. Defined in '
                         f'info/samples/lens_samples.json (default {mast_target_names.DEFAULT_SAMPLE})')
     p.add_argument('--size', type=float, default=None,

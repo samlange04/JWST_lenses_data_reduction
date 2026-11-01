@@ -696,7 +696,7 @@ def process_lens(lens, filt_dirs, sample, requested_filt, drizzle_pass, force,
 def main():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--sample', default=mast_target_names.DEFAULT_SAMPLE,
+    p.add_argument('--sample', type=mast_target_names.sample_arg, default=mast_target_names.DEFAULT_SAMPLE,
                    help=f'sample subdirectory of data/stamps/ (default '
                         f'{mast_target_names.DEFAULT_SAMPLE})')
     p.add_argument('--lens', default=None,

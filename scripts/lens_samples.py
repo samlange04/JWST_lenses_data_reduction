@@ -21,6 +21,8 @@ filter is a normal outcome (``NoMastData``): the script records ``null`` in the 
 JSON and exits 0, so a runner can sweep a sample with a fixed filter list.
 """
 
+import argparse
+import difflib
 import json
 import os
 
@@ -78,6 +80,19 @@ def _load():
 
 def samples():
     return list(_load().keys())
+
+
+def sample_arg(name):
+    """argparse `type` for --sample: `name` if it is a defined sample, else an error naming the
+    closest one. Without it a mistyped sample ('cowls-spectactular') reads as a real sample with
+    no stamps, and a GUI reports "no stamps found" instead of the typo."""
+    known = samples()
+    if name in known:
+        return name
+    close = difflib.get_close_matches(name.replace('-', '_'), known, n=1, cutoff=0.5)
+    raise argparse.ArgumentTypeError(f'unknown sample {name!r}'
+                                     + (f" (did you mean '{close[0]}'?)" if close else '')
+                                     + f'; defined samples: {", ".join(known)}')
 
 
 def _sample(sample):
@@ -201,7 +216,7 @@ def redshifts(lens, sample=None):
 if __name__ == '__main__':
     import argparse
     p = argparse.ArgumentParser(description='Print the lenses in a sample, one per line.')
-    p.add_argument('sample', nargs='?', default=DEFAULT_SAMPLE)
+    p.add_argument('sample', nargs='?', type=sample_arg, default=DEFAULT_SAMPLE)
     p.add_argument('--list', action='store_true', help='list sample names and sizes')
     p.add_argument('--print-sample', action='store_true',
                    help='print only the resolved sample name (for shell runners)')
@@ -210,7 +225,6 @@ if __name__ == '__main__':
         for s in samples():
             print(f'{s:18s} GO {proposal_id(s):6s} {len(lenses(s)):3d} lenses')
     elif a.print_sample:
-        _sample(a.sample)
         print(a.sample)
     else:
         for lens in lenses(a.sample):

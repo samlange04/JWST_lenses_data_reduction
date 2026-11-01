@@ -202,7 +202,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--lens', required=True)
     p.add_argument('--filt', required=True)
-    p.add_argument('--sample', default=None)
+    p.add_argument('--sample', type=lens_samples.sample_arg, default=None)
     p.add_argument('--size', type=float, default=None,
                    help='arcsec on a side; also names the files (stamp<S>_*). Omitted: the '
                         "lens's modelling size, its stamp_size in info/samples/lens_samples.json "

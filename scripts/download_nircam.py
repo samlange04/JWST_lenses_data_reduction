@@ -284,7 +284,7 @@ def sort_pool(pool_dir, lens_dir, level):
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--lens', required=True)
-    p.add_argument('--sample', default=None, help='default: the sample the lens is in')
+    p.add_argument('--sample', type=lens_samples.sample_arg, default=None, help='default: the sample the lens is in')
     p.add_argument('--level', choices=LEVELS, default='uncal')
     p.add_argument('--filters', nargs='*', default=None,
                    help='restrict the MAST query to these filters (the pool still receives '

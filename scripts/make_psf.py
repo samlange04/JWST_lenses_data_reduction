@@ -895,7 +895,7 @@ def main():
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--lens', default=None, help='the lens (not with --pool)')
     p.add_argument('--filt', required=True)
-    p.add_argument('--sample', default=None)
+    p.add_argument('--sample', type=mast_target_names.sample_arg, default=None)
     p.add_argument('--variant', default='', choices=('',) + stamp_paths.VARIANT_COMPONENTS,
                    help="which reduction's mosaic to build from (default standard)")
     p.add_argument('--method', choices=['auto', 'empirical', 'model'], default='auto',

@@ -89,7 +89,7 @@ def export_band(sample, lens, filt, dest, mask_radius, size):
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--lens', required=True)
-    p.add_argument('--sample', default=None)
+    p.add_argument('--sample', type=lens_samples.sample_arg, default=None)
     p.add_argument('--dest', required=True, help='modelling project data root, e.g. <modelling-project>/data')
     p.add_argument('--filters', nargs='*', default=None, help='default: every band with a stamp')
     p.add_argument('--mask-radius', type=float, default=3.0, help='info.json mask_radius, arcsec')

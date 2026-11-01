@@ -143,7 +143,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--lens', required=True)
     p.add_argument('--filt', required=True)
-    p.add_argument('--sample', default=None)
+    p.add_argument('--sample', type=lens_samples.sample_arg, default=None)
     p.add_argument('--analyse-only', action='store_true')
     a = p.parse_args()
     sample = a.sample or lens_samples.sample_of(a.lens)
