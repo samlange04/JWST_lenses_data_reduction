@@ -5,12 +5,12 @@ mask and arc-mask GUIs draw it first (every other band starts from its mask), po
 clicked on it, and it is the band to model first.
 
     uv run python scripts/choose_primary_band.py                    # every sample
-    uv run python scripts/choose_primary_band.py --sample cowls_spectacular [--lens L]
+    uv run python scripts/choose_primary_band.py --sample cowls_spectacular [--lens LENS]
 
 A fixed order cannot do this. It used to be F444W > F356W > F277W > ... > F115W, but the best
 band depends on the lens and source spectra: the lens light is old stars peaking near rest
 1.6 um, and the arc is whatever the source is. Most sources have no redshift (14 of the 17
-COWLS ones, and COWLS P has no lens redshift either), so the colour is measured, not inferred.
+COWLS ones, and COSJ100119+014849 has no lens redshift either), so the colour is measured, not inferred.
 It also depends on how well the band's PSF resolves the Einstein ring.
 
 Per band, on the modelling stamp:
@@ -23,7 +23,8 @@ Per band, on the modelling stamp:
     goes as FWHM / S/N while the ring is under-resolved; once theta_E spans R0 PSF widths,
     more resolution no longer helps, and S/N alone decides.
 The suggestion is the best score. None if no band reaches MIN_ARC_SNR: the arcs are then too
-faint against the error of the lens-light profile, as on COWLS A, I and N (2026-11-01). It is
+faint against the error of the lens-light profile, as on COSJ095914+021219, COSJ100013+023424
+and COSJ100028+021928 (2026-11-01). It is
 also biased toward the red bands for bright, compact lenses (theta_E < ~0.6"), where lens light
 leaks into the annulus.
 

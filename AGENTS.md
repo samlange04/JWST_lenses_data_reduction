@@ -33,10 +33,10 @@ Stamps renamed 2026-10-26 (`data/cutouts/` → `data/stamps/`, `cutout_*` → `s
 **COWLS added 2026-10-29** (`cowls_spectacular`, the 17 COWLS II lenses, GO 1727
 COSMOS-Web): the first survey-program sample, located by position and cut by detector
 footprint (*Download*), reduced on 90" mosaics with pruned intermediates for disk
-(*Reduction*). Verified on COSJ100013+023424 (lens I) F444W: 7 detector files from two tiles,
+(*Reduction*). Verified on COSJ100013+023424 F444W: 7 detector files from two tiles,
 tweakreg 145–162 sources per frame (but that first reduction aligned nothing; fixed and re-run 2026-10-30, see *Reduction*), 1030.7 s at the lens (4 × 257.7 s), the lens and arc at the
 mosaic centre. The full batch then ran 12:31–23:40: 68 bands ok, every
-exposure time at the lens equal to the footprint survey (J SW 773 s, K LW 515 s, N SW 258 s),
+exposure time at the lens equal to the footprint survey (COSJ100018+022138 SW 773 s, COSJ100024+015334 LW 515 s, COSJ100028+021928 SW 258 s),
 no rate/rateints/crf left; kept on disk 38 GB uncal + 88 GB cal + 10 GB mosaics. Two downloads
 died in a network outage at the MAST query, which had no retry; `with_retries` now wraps every
 query, and a second `run_reduce_all.sh` pass picked them up. **Disk on macOS:** Time Machine's
@@ -260,8 +260,9 @@ are the COWLS IDs, `cowls_letter` the paper's A–Q. `ra`/`dec` are the COSMOS-W
 positions OF THE LENS GALAXY (Shuntov+24), so unlike an APT coordinate they need no
 `deflector_ra`. `theta_e` is COWLS I's PyAutoLens value, for orientation. Redshifts carry
 their source in `redshift_*_kind` (DESI spec, COSMOS-Web photo-z, van der Wel+13); P has no
-lens redshift and only J, K, L have source redshifts, so the rest export `null`. Depth at the
-lens is set by where it falls in the COSMOS-Web dither pattern, not by the tile: lens N's SW
+lens redshift and only COSJ100018+022138, COSJ100024+015334 and COSJ100024+021749 have source
+redshifts, so the rest export `null`. Depth at the
+lens is set by where it falls in the COSMOS-Web dither pattern, not by the tile: COSJ100028+021928's SW
 stamp rests on ONE exposure, so Image3's outlier detection has nothing to compare and its
 cosmic rays are caught by `jump` alone — look at it before trusting faint SW structure.
 Every lens has all four filters. Only GO 1727 is downloaded: other JWST programs that image
@@ -371,10 +372,10 @@ tweakreg (`measure_corr_factor.py`'s ±30" region fits).
 
 **COWLS tweakreg: LW lens-first, SW from LW (2026-10-30; all 68 bands re-run from the kept cal
 files).** The first reduction aligned nothing. With jwst's default `expand_refcat=False`, tweakwcs
-takes the first group in FILE ORDER as the sole reference: on lens I F444W a neighbouring tile's
+takes the first group in FILE ORDER as the sole reference: on COSJ100013+023424 F444W a neighbouring tile's
 frame (obs 007), against which every lens-covering group found 0–1 matches (`minobj=15`), so no
 frame moved, while `cal_step.tweakreg` still said COMPLETE. `expand_refcat=True` alone was not
-enough: it starts from the best-overlapping pair anywhere in the 90" field, which on lens A F444W
+enough: it starts from the best-overlapping pair anywhere in the 90" field, which on COSJ095914+021219 F444W
 was a neighbouring visit that the lens frames matched with only 4 sources. Two sample settings fix it
 (`info/samples/lens_samples.json`, read by `lens_samples.py`):
 
@@ -382,7 +383,7 @@ was a neighbouring visit that the lens frames matched with only 4 sources. Two s
   (`reduce_nircam.lens_first_order`), and tweakreg runs with `expand_refcat=True,
   enforce_user_order=True`. The lens frames therefore align to each other first, and the
   neighbours join the growing reference. On LW (34 bands): 198 groups aligned, 48 failed, and
-  every lens-covering group aligned except lens J's obs 053 exposure 1 (3 matches in both LW bands,
+  every lens-covering group aligned except COSJ100018+022138's obs 053 exposure 1 (3 matches in both LW bands,
   so it stays a-priori). Fit RMSE 0.03–0.20" (5–95%). Offsets 8 mas median, 27 at the 90th
   percentile, 50 max. The lens frames of one band moved 2–42 mas relative to each other (median 19).
 - `tweakreg_sw_from_lw`: SW is not fitted. Each SW frame takes the offset tweakreg gave its own
@@ -392,7 +393,7 @@ was a neighbouring visit that the lens frames matched with only 4 sources. Two s
   - an exposure with no LW offset stays a-priori (0–1 frames per band);
   - why: fitted on their own, the SHALLOW4 SW frames gave RMSE 0.2–0.4" on 10–50 matches, and their
     shifts disagreed with the same exposures' LW shifts by a median 22 mas (max 113) over 204
-    exposures. On lens K one visit's four F150W dithers came out up to 125 mas apart.
+    exposures. On COSJ100024+015334 one visit's four F150W dithers came out up to 125 mas apart.
 
 Each band's `lens_products.json` record carries `tweak_offsets_mas` ({rootname: [dRA cos dec,
 dDec]}: LW measured from the crf files before pruning, equal to tweakreg's own XSH/YSH to 0.01 mas;
@@ -513,7 +514,7 @@ with `--corr-factor 1.0`, measure, add `sample_factors`, re-cut. **COWLS, measur
 on all 68 stamps (`measure_corr_factor.py --out ..._cowls_spectacular.json`), per FILTER:
 F115W 1.25, F150W 1.22, F277W 1.03, F444W 0.95 at 0.2"** (16–84% ranges ±0.02). Per filter
 because F277W > F444W in all 17 lenses and F115W > F150W in 16 of 17, a split larger than the
-scatter; no dependence on depth (lens N's one SW exposure measures like the 4-exposure lenses).
+scatter; no dependence on depth (COSJ100028+021928's one SW exposure measures like the 4-exposure lenses).
 Curves in `sample_factors.cowls_spectacular.block_ratio_curve`. Re-measured after the 2026-10-30
 Image3 re-run (*Reduction*): F115W 1.25, F150W 1.21, F277W 1.03, F444W 0.95. That is unchanged
 within the scatter, so the factors were kept. The channel medians come from
@@ -611,7 +612,7 @@ fields are each star-poor but share one PSF. COWLS: a 90" field holds 0–11 PSF
 bands had < 3; the sample shares filter, readout, output grid, and two telescope rolls (PA_V3
 107° and 293°, 186° apart, under which the diffraction pattern nearly maps onto itself).
 `pooled_field` prepares each lens's mosaic exactly as a single build (`prepare_field`), drops
-a star already taken from a neighbouring mosaic (0.3"; K and M share a third of a field, but
+a star already taken from a neighbouring mosaic (0.3"; COSJ100024+015334 and COSJ100025+015245 share a third of a field, but
 their closest stars are 15" apart, so none dropped), and tiles the background-subtracted star
 cutouts onto one synthetic image at their sub-pixel offsets, so `build_epsf`, validation and
 the bootstrap run unchanged. The kernel goes into every lens's stamp dir (`PSFMETH =
@@ -651,18 +652,23 @@ always answers `stamp<S>` for the lens's modelling size). The semantics are unch
 
   **Why not redshift.** The lens light peaks near rest 1.6 µm, but the arc's colour is the
   source's: 14 of 17 COWLS sources have no redshift, and P has no lens redshift. Measured, the
-  bands do not follow z_l: H, Q and L all sit at z_l ≈ 0.37, yet L is best in F150W and H and Q
+  bands do not follow z_l: COSJ100012+022015, COSJ100121+022740 and COSJ100024+021749 all sit at
+  z_l ≈ 0.37, yet COSJ100024+021749 is best in F150W and the other two
   in F277W.
 
   **The 2026-11-01 suggestions:**
-  - F444W: SPT0418-47, F, K, M, O, P;
+  - F444W: SPT0418-47, COSJ095953+023319, COSJ100024+015334, COSJ100025+015245,
+    COSJ100047+015023, COSJ100119+014849;
   - F356W: SPT2147-50;
-  - F277W: B1938+666, B, C, D, E, G, H, J, Q;
-  - F150W: L;
-  - none: A, I, N. No band reaches arc S/N 15 there; their arcs are too faint against the
+  - F277W: B1938+666, COSJ095917+015424, COSJ095920+015851, COSJ095921+020638,
+    COSJ095950+022057, COSJ095955+021900, COSJ100012+022015, COSJ100018+022138,
+    COSJ100121+022740;
+  - F150W: COSJ100024+021749;
+  - none: COSJ095914+021219, COSJ100013+023424, COSJ100028+021928. No band reaches arc S/N 15 there; their arcs are too faint against the
     lens-profile error, so set `primary_band` by eye.
 
-  The measurement is biased red for bright, compact lenses (θ_E ≲ 0.6": B, C, B1938+666), where
+  The measurement is biased red for bright, compact lenses (θ_E ≲ 0.6": COSJ095917+015424, COSJ095920+015851,
+  B1938+666), where
   lens light leaks into the annulus; check those in the GUI.
 
   **Where it ships.** Every band's scores and the resolved choice are in
@@ -676,6 +682,15 @@ always answers `stamp<S>` for the lens's modelling size). The semantics are unch
   stamp, a zoom on the lens, and the zoom with the lens light removed (the radial median, as the
   mask GUI's left panel). Each panel has its own arcsinh stretch, North up, East left. Overlaid:
   the contaminant mask outline, the image positions and θ_E; the primary band is starred.
+  - The zooms, the θ_E circle and the lens-light profile are centred on the lens's LIGHT, not
+    the stamp centre: one centre per lens, the median over bands of the light centroid within
+    0.15", printed in the header.
+  - The stamps are cut at the catalogue position, which misses the light by 20–50 mas typically
+    and up to 160 mas (COSJ095917+015424, COSJ095920+015851, COSJ095953+023319,
+    COSJ100013+023424; SPT2147-50 ~130 mas).
+  - autogalaxy's `radial_median_subtract` (the mask GUI's) profiles about the array centre, a pixel
+    corner here, so even a half-pixel offset leaves a dipole. `radial_subtract` takes the
+    sub-pixel centre instead.
   - It is not called a "mosaic", which means the Image3 product here.
   - `make_masks.py`, `make_positions.py` (marking and `--rebroadcast`) and `choose_primary_band.py`
     re-render it after writing (best-effort, never fatal). A stamp re-cut does not, so re-run the

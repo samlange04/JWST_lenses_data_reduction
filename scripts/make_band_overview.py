@@ -3,16 +3,19 @@
 One figure per lens with every band's stamp side by side: data/stamps/<sample>/<lens>/stamp<S>_bands.png.
 
     uv run python scripts/make_band_overview.py                          # every lens of every sample
-    uv run python scripts/make_band_overview.py --sample cowls_spectacular [--lens L]
+    uv run python scripts/make_band_overview.py --sample cowls_spectacular [--lens LENS]
 
 The per-band QC (stamp<S>_dataset.png) shows one band's data, noise, PSF and mask; this shows all
 of a lens's bands at once, so the lens and its arcs can be compared across wavelength. Columns are
 the bands in wavelength order. Rows:
   1. the full stamp as observed, with the band's contaminant mask outlined (red) where drawn;
-  2. a zoom on the lens (+-max(2.5 theta_E, 1.5") about the centre), as observed;
-  3. the same zoom with the lens light removed (the azimuthal median about the centre,
-     masked pixels left out of it; autogalaxy's radial_median_subtract, as the mask GUI's left
-     panel), with the image positions (cyan +) where marked and the Einstein radius (dashed).
+  2. a zoom on the lens (+-max(2.5 theta_E, 1.5")), as observed;
+  3. the same zoom with the lens light removed (its azimuthal median, masked pixels left out),
+     with the image positions (cyan +) where marked and the Einstein radius (dashed).
+The zooms, the theta_E circle and the lens-light profile are centred on the lens's LIGHT, one
+centre per lens (the median over bands of the light centroid within 0.15"), not on the stamp
+centre: the stamps are cut at the catalogue position, up to ~0.15" (5 SW px) off it, and a
+profile even half a pixel off leaves a dipole. The offset is printed in the header.
 Every panel has its own arcsinh stretch (autogalaxy's arcsinh_stretch, as the GUIs). North is up
 and East left (the stamps' rows run South to North, columns East to West). The primary band
 (lens_samples.primary_band: reviewed, or choose_primary_band.py's suggestion) is starred, and
@@ -67,8 +70,44 @@ def load_band(stamp_dir, prefix):
     return dict(sci=sci, scale=scale, mask=mask, positions=[tuple(p) for p in positions])
 
 
+CENTROID_R = 0.15      # arcsec: the window of the lens's light centroid
+
+
+def light_centroid(sci, scale, r0=CENTROID_R):
+    """The flux-weighted centroid of the light within r0 of it (iterated from the stamp centre),
+    as (East, North) arcsec from the stamp centre, or None."""
+    n = sci.shape[0]
+    c = (n - 1) / 2.0
+    yy, xx = np.mgrid[:n, :n]
+    w = np.clip(np.nan_to_num(sci), 0, None)
+    cx = cy = c
+    for _ in range(8):
+        m = np.hypot(xx - cx, yy - cy) * scale < r0
+        if w[m].sum() <= 0:
+            return None
+        cx, cy = (w[m] * xx[m]).sum() / w[m].sum(), (w[m] * yy[m]).sum() / w[m].sum()
+    return -(cx - c) * scale, (cy - c) * scale
+
+
+def radial_subtract(img, cx, cy, exclude=None):
+    """`img` minus its azimuthal median profile about the sub-pixel centre (cx, cy) (pixels;
+    1-px annuli), `exclude` left out of the medians. autogalaxy's radial_median_subtract (the
+    mask GUI's) takes the profile about the ARRAY centre, a pixel corner here, and a lens even
+    half a pixel from it leaves a strong dipole."""
+    n_y, n_x = img.shape
+    yy, xx = np.mgrid[:n_y, :n_x]
+    rb = np.hypot(xx - cx, yy - cy).astype(int)
+    use = np.isfinite(img) if exclude is None else (np.isfinite(img) & ~exclude)
+    prof = np.zeros(rb.max() + 1)
+    for k in range(prof.size):
+        ring = img[(rb == k) & use]
+        if ring.size:
+            prof[k] = np.median(ring)
+    return img - prof[rb]
+
+
 def render(sample, lens, out=None):
-    from autogalaxy.gui.display_util import arcsinh_stretch, mask_boundary, radial_median_subtract
+    from autogalaxy.gui.display_util import arcsinh_stretch, mask_boundary
     prefix = stamp_paths.stamp_prefix(stamp_paths.modelling_size(lens, sample))
     lens_dir = os.path.join(stamp_paths.stamps_root(ws_path), sample, lens)
     bands = {}
@@ -83,6 +122,10 @@ def render(sample, lens, out=None):
     zl, zs = lens_samples.redshifts(lens, sample)
     primary, psource = lens_samples.primary_band(lens, sample)
     half_zoom = max(2.5 * (te or 0.6), 1.5)
+    # ONE lens centre for every band (the median of the bands' light centroids), so the zooms stay
+    # registered: the stamps are cut at the catalogue position, up to ~0.15" off the light
+    cents = [c for c in (light_centroid(bands[f]['sci'], bands[f]['scale']) for f in filts) if c]
+    e0, n0 = (float(np.median([c[0] for c in cents])), float(np.median([c[1] for c in cents]))) if cents else (0.0, 0.0)
 
     ncol = len(filts)
     fig, axes = plt.subplots(3, ncol, figsize=(max(3.0 * ncol, 8.0), 9.8), squeeze=False)
@@ -90,47 +133,57 @@ def render(sample, lens, out=None):
         b = bands[f]
         sci, s, mask = b['sci'], b['scale'], b['mask']
         n = sci.shape[0]
-        sub = radial_median_subtract(sci, exclude=mask)
-        zoom_px = min(int(round(half_zoom / s)), n // 2)
-        zs_ = slice(n // 2 - zoom_px, n // 2 + zoom_px)          # symmetric about the centre
+        c = (n - 1) / 2.0
+        # Rows run South -> North and columns East -> West. Every panel is in arcsec from the
+        # stamp centre, East (left) and North positive: pixel (col j, row i) is at
+        # East -(j - c) s, North (i - c) s.
+        lx, ly = c - e0 / s, c + n0 / s                      # the lens centre in pixels
+        sub = radial_subtract(sci, lx, ly, exclude=mask)
+        zp = int(np.ceil(half_zoom / s)) + 1
+        j0, i0 = max(0, int(round(lx)) - zp), max(0, int(round(ly)) - zp)
+        j1, i1 = min(n, int(round(lx)) + zp + 1), min(n, int(round(ly)) + zp + 1)
         for i, (img, zoom) in enumerate(((sci, False), (sci, True), (sub, True))):
             ax = axes[i, j]
-            a = img[zs_, zs_] if zoom else img
-            m = None if mask is None else (mask[zs_, zs_] if zoom else mask)
-            # Rows run South -> North and columns East -> West, so origin='lower' is North up,
-            # East left. The axes are arcsec from the centre, positive East (left) and North.
-            e = (a.shape[0] / 2.0) * s
-            ax.imshow(arcsinh_stretch(a), origin='lower', cmap='gray', extent=[e, -e, -e, e],
-                      interpolation='nearest')
-            if m is not None and m.any():
-                edge = mask_boundary(m)
+            rs, cs = (slice(i0, i1), slice(j0, j1)) if zoom else (slice(0, n), slice(0, n))
+            a = img[rs, cs]
+            ext = [-(cs.start - 0.5 - c) * s, -(cs.stop - 0.5 - c) * s, (rs.start - 0.5 - c) * s, (rs.stop - 0.5 - c) * s]
+            ax.imshow(arcsinh_stretch(a), origin='lower', cmap='gray', extent=ext, interpolation='nearest')
+            if mask is not None and mask[rs, cs].any():
+                edge = mask_boundary(mask[rs, cs])
                 rgba = np.zeros(edge.shape + (4,))
                 rgba[edge] = (1.0, 0.15, 0.15, 0.9)
-                ax.imshow(rgba, origin='lower', extent=[e, -e, -e, e], interpolation='nearest')
+                ax.imshow(rgba, origin='lower', extent=ext, interpolation='nearest')
+            if zoom:
+                xl, yl = (e0 + half_zoom, e0 - half_zoom), (n0 - half_zoom, n0 + half_zoom)
+            else:
+                h = (n / 2.0) * s
+                xl, yl = (h, -h), (-h, h)
             if i == 2:
                 if te:
                     t = np.linspace(0, 2 * np.pi, 200)
-                    ax.plot(te * np.cos(t), te * np.sin(t), ls='--', lw=0.8, color='gold', alpha=0.8)
+                    ax.plot(e0 + te * np.cos(t), n0 + te * np.sin(t), ls='--', lw=0.8, color='gold', alpha=0.8)
                 for y, x in b['positions']:
-                    # autoarray (y, x): y points toward row 0 (South here), x toward higher
-                    # columns (West), so in these North/East axes the position is (-x, -y)
+                    # autoarray (y, x) about the stamp centre: y points toward row 0 (South
+                    # here), x toward higher columns (West), so (East, North) = (-x, -y)
                     ax.plot(-x, -y, '+', color='cyan', ms=9, mew=1.4)
-            ax.set_xlim(e, -e)
-            ax.set_ylim(-e, e)
+            ax.set_xlim(*xl)
+            ax.set_ylim(*yl)
             ax.set_xticks([]); ax.set_yticks([])
             if i == 0:
                 star = ' ★' if f == primary else ''
                 ax.set_title(f'{f}{star}\n{s:.2f}"/px', fontsize=10,
                              color='darkred' if f == primary else 'black')
             if j == 0:
-                ax.set_ylabel(['as observed (full stamp)', 'as observed (zoom)', 'lens light removed (zoom)'][i],
-                              fontsize=9)
+                ax.set_ylabel(['as observed (full stamp)', 'as observed (zoom on the lens)',
+                               'lens light removed (zoom)'][i], fontsize=9)
             # 1" scale bar, bottom right
-            bar = 1.0
-            ax.plot([-e * 0.9, -e * 0.9 + bar], [-e * 0.88, -e * 0.88], color='white', lw=2)
-            ax.text(-e * 0.9 + bar / 2, -e * 0.8, '1"', color='white', ha='center', fontsize=8)
+            (xa, xb), (ya, yb) = xl, yl
+            wx, wy = xa - xb, yb - ya
+            bx, by = xb + 0.1 * wx + 1.0, ya + 0.08 * wy
+            ax.plot([bx, bx - 1.0], [by, by], color='white', lw=2)
+            ax.text(bx - 0.5, by + 0.04 * wy, '1"', color='white', ha='center', fontsize=8)
             if i == 0 and j == 0:                         # compass, top left: N up, E left
-                ox, oy, L = e * 0.55, e * 0.45, e * 0.32
+                ox, oy, L = xa - 0.45 * wx, yb - 0.55 * wy, 0.16 * wx
                 ax.annotate('', xy=(ox, oy + L), xytext=(ox, oy),
                             arrowprops=dict(arrowstyle='->', color='white', lw=1.2))
                 ax.annotate('', xy=(ox + L, oy), xytext=(ox, oy),
@@ -142,7 +195,8 @@ def render(sample, lens, out=None):
     te_s = f'{te:.2f}"' if te else '?'
     prim = f'{primary} ({psource})' if primary else 'not set (no band measurable)'
     fig.suptitle(f'{lens}  ({sample})   z_l {zl_s}   z_s {zs_s}   θ_E {te_s}\n'
-                 f'primary band: {prim}  (★)\n'
+                 f'primary band: {prim}  (★)    zooms centred on the lens light, '
+                 f'{1e3 * e0:+.0f} mas E, {1e3 * n0:+.0f} mas N of the stamp centre\n'
                  f'red: contaminant mask   cyan +: image positions   dashed: θ_E', fontsize=9.5)
     fig.tight_layout(rect=(0, 0, 1, 0.92))
     out = out or os.path.join(lens_dir, f'{prefix}_bands.png')
