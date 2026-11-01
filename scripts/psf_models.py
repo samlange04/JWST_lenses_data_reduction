@@ -12,9 +12,10 @@ module is the FALLBACK for star-poor fields, and the same two caveats apply as f
     from one contributing _cal file's FITS-approximated WCS (assign_wcs writes a SIP
     approximation into the cal header, good to ~0.01 px over a detector).
   * It omits the resampling broadening (drop size pixfrac x native / output px). The honest
-    fix is injection into the cal frames and a re-run of resample (the HST repo's
-    make_psf_inject.py; the JWST `spike` package does the same); until that is ported,
-    `analytic_drop_broaden` is applied and the kernel is tagged PSFBROAD='analytic'.
+    fix is injection into the cal frames and a re-run of resample: make_psf_inject.py (the
+    HST repo's route; the JWST `spike` package does the same), which make_psf.py's model tier
+    uses. `analytic_drop_broaden` is only its fallback, tagged PSFBROAD='analytic'; on COWLS
+    it came out 5-11% narrower than the empirical PSF in every band (2026-10-30).
 
 STPSF needs its data files: STPSF_PATH is pointed at data/reference_files/stpsf-data here,
 at import (a shell export wins). Until 2026-10-30 only reduce_nircam.setup_crds() set it, which
@@ -130,35 +131,56 @@ def model_psf(sample, lens, filt, oversample, size, out_scale, fov_pad=1.5):
     """STPSF NIRCam PSF at the lens position in a representative exposure, as a
     (size*oversample)^2 North-up stamp at out_scale/oversample arcsec/px (make_psf's
     convention). Returns (stamp, info dict)."""
-    import stpsf
     rep = representative_cal(sample, lens, filt)
     if rep is None:
         raise RuntimeError(f'no stage2 cal file containing {lens} for {filt}; run reduce_nircam.py first')
     cal_path, phdr, sci_hdr, w, (x, y) = rep
     cd = w.wcs.cd if w.wcs.has_cd() else w.pixel_scale_matrix
-    ch = lens_samples.channel(filt)
-    det_scale = lens_samples.NATIVE_SCALE[ch]
+    det_scale = lens_samples.NATIVE_SCALE[lens_samples.channel(filt)]
+    fov_pix = int(np.ceil(size * out_scale / det_scale * fov_pad)) | 1
+    src, info = stpsf_detector_psf(filt, phdr['DETECTOR'], x, y, phdr.get('DATE-BEG', phdr.get('DATE-OBS')), fov_pix)
+    stamp = resample_centered(src, det_scale / info['stpsf_oversample'], out_scale, oversample, size,
+                              cd_detector=cd, det_scale=det_scale)
+    return stamp, dict(cal=os.path.basename(cal_path), **info)
 
+
+STPSF_OVERSAMPLE = 4
+OPD_TIMEOUT = 120      # s, per network read of the measured-OPD fetch
+
+
+def stpsf_detector_psf(filt, detector, x, y, date, fov_pixels, oversample=STPSF_OVERSAMPLE):
+    """STPSF's OVERDIST PSF for `detector` ('NRCB1', or the header's 'NRCBLONG') at detector
+    pixel (x, y): (fov_pixels*oversample)^2, unit sum, the star at the array centre
+    ((n-1)/2 in each axis, the centre of the central detector pixel; DET_DIST is exactly its
+    oversample-block sum). Distortion, charge diffusion and IPC are included -- IPC rightly,
+    since Detector1's ipc step is skipped for NIRCam, so the cal frames carry it. The measured
+    OPD closest to `date` is used when the server is reachable. Returns (array, info)."""
+    import stpsf
     nrc = stpsf.NIRCam()
     nrc.filter = filt
-    nrc.detector = str(phdr['DETECTOR']).upper().replace('LONG', '5')
+    nrc.detector = str(detector).upper().replace('LONG', '5')
     nrc.detector_position = (x, y)
     opd = 'default'
-    date = phdr.get('DATE-BEG', phdr.get('DATE-OBS'))
     if date:
+        # the MAST query behind it has no timeout of its own: a stalled read hung a B1938 build
+        # for 20 min with no CPU (2026-10-30), so bound it and retry before falling back
+        import socket
+        saved = socket.getdefaulttimeout()
+        socket.setdefaulttimeout(OPD_TIMEOUT)
         try:
-            nrc.load_wss_opd_by_date(date, choice='closest', verbose=False)
-            opd = f'wss:{date}'
-        except Exception as exc:
-            print(f'  WARNING: measured OPD unavailable ({exc.__class__.__name__}); default OPD used')
-    fov_pix = int(np.ceil(size * out_scale / det_scale * fov_pad)) | 1
-    stpsf_os = 4
-    psf = nrc.calc_psf(oversample=stpsf_os, fov_pixels=fov_pix)
-    # OVERDIST: oversampled, distorted, charge diffusion included, before IPC (IPC is only
-    # applied in the detector-sampled DET_DIST).
+            for attempt in range(3):
+                try:
+                    nrc.load_wss_opd_by_date(str(date), choice='closest', verbose=False)
+                    opd = f'wss:{date}'
+                    break
+                except Exception as exc:
+                    print(f'  WARNING: measured OPD unavailable ({exc.__class__.__name__}), try {attempt + 1}/3')
+        finally:
+            socket.setdefaulttimeout(saved)
+        if opd == 'default':
+            print('  WARNING: default OPD used')
+    psf = nrc.calc_psf(oversample=oversample, fov_pixels=fov_pixels)
     src = np.asarray(psf['OVERDIST'].data, float)
-    stamp = resample_centered(src, det_scale / stpsf_os, out_scale, oversample, size,
-                              cd_detector=cd, det_scale=det_scale)
-    info = dict(cal=os.path.basename(cal_path), detector=nrc.detector, detector_position=[x, y],
-                opd=opd, stpsf_version=stpsf.__version__, stpsf_oversample=stpsf_os, fov_pixels=fov_pix)
-    return stamp, info
+    info = dict(detector=nrc.detector, detector_position=[float(x), float(y)], opd=opd,
+                stpsf_version=stpsf.__version__, stpsf_oversample=oversample, fov_pixels=fov_pixels)
+    return src / src.sum(), info

@@ -1,0 +1,4241 @@
+{
+    "b1938": {
+        "B1938+666": {
+            "F115W": {
+                "n_frames": 168,
+                "n_injected": 21,
+                "n_stars": 25,
+                "star_spacing_px": 121,
+                "frames": [
+                    {
+                        "file": "jw08281001001_02101_00001_nrca1_cal.fits",
+                        "x": 9293.775,
+                        "y": 4329.37,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00001_nrca2_cal.fits",
+                        "x": 10204.061,
+                        "y": 1200.801,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00001_nrca3_cal.fits",
+                        "x": 6501.635,
+                        "y": 3205.505,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00001_nrca4_cal.fits",
+                        "x": 6923.013,
+                        "y": 1249.752,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00001_nrcb1_cal.fits",
+                        "x": 901.534,
+                        "y": 1163.075,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCB1",
+                        "opd": "wss:2025-09-20T19:18:56.399",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00001_nrcb2_cal.fits",
+                        "x": 918.989,
+                        "y": 3344.365,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00001_nrcb3_cal.fits",
+                        "x": 3106.475,
+                        "y": 1164.848,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00001_nrcb4_cal.fits",
+                        "x": 3106.535,
+                        "y": 3348.88,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00002_nrca1_cal.fits",
+                        "x": 9295.668,
+                        "y": 4334.971,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.2
+                    },
+                    {
+                        "file": "jw08281001001_02101_00002_nrca2_cal.fits",
+                        "x": 10206.437,
+                        "y": 1205.095,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 12.9
+                    },
+                    {
+                        "file": "jw08281001001_02101_00002_nrca3_cal.fits",
+                        "x": 6502.915,
+                        "y": 3209.703,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 12.9
+                    },
+                    {
+                        "file": "jw08281001001_02101_00002_nrca4_cal.fits",
+                        "x": 6924.918,
+                        "y": 1254.337,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.1
+                    },
+                    {
+                        "file": "jw08281001001_02101_00002_nrcb1_cal.fits",
+                        "x": 902.785,
+                        "y": 1167.733,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.7,
+                        "detector": "NRCB1",
+                        "opd": "wss:2025-09-20T19:18:56.399",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00002_nrcb2_cal.fits",
+                        "x": 920.234,
+                        "y": 3348.993,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.6
+                    },
+                    {
+                        "file": "jw08281001001_02101_00002_nrcb3_cal.fits",
+                        "x": 3107.709,
+                        "y": 1169.506,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.7
+                    },
+                    {
+                        "file": "jw08281001001_02101_00002_nrcb4_cal.fits",
+                        "x": 3107.821,
+                        "y": 3353.559,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.7
+                    },
+                    {
+                        "file": "jw08281001001_02101_00003_nrca1_cal.fits",
+                        "x": 9298.721,
+                        "y": 4339.491,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 16.8
+                    },
+                    {
+                        "file": "jw08281001001_02101_00003_nrca2_cal.fits",
+                        "x": 10210.636,
+                        "y": 1207.936,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 17.1
+                    },
+                    {
+                        "file": "jw08281001001_02101_00003_nrca3_cal.fits",
+                        "x": 6505.101,
+                        "y": 3212.321,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 16.9
+                    },
+                    {
+                        "file": "jw08281001001_02101_00003_nrca4_cal.fits",
+                        "x": 6928.02,
+                        "y": 1257.448,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 17.1
+                    },
+                    {
+                        "file": "jw08281001001_02101_00003_nrcb1_cal.fits",
+                        "x": 904.962,
+                        "y": 1170.782,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 17.9,
+                        "detector": "NRCB1",
+                        "opd": "wss:2025-09-20T19:18:56.399",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00003_nrcb2_cal.fits",
+                        "x": 922.406,
+                        "y": 3352.018,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 17.9
+                    },
+                    {
+                        "file": "jw08281001001_02101_00003_nrcb3_cal.fits",
+                        "x": 3109.873,
+                        "y": 1172.557,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 17.9
+                    },
+                    {
+                        "file": "jw08281001001_02101_00003_nrcb4_cal.fits",
+                        "x": 3110.031,
+                        "y": 3356.631,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 18.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00004_nrca1_cal.fits",
+                        "x": 9300.135,
+                        "y": 4334.789,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 10.4
+                    },
+                    {
+                        "file": "jw08281001001_02101_00004_nrca2_cal.fits",
+                        "x": 10213.13,
+                        "y": 1203.108,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 16.6
+                    },
+                    {
+                        "file": "jw08281001001_02101_00004_nrca3_cal.fits",
+                        "x": 6506.296,
+                        "y": 3207.286,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 11.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00004_nrca4_cal.fits",
+                        "x": 6929.504,
+                        "y": 1252.445,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 12.3
+                    },
+                    {
+                        "file": "jw08281001001_02101_00004_nrcb1_cal.fits",
+                        "x": 906.213,
+                        "y": 1165.48,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 11.0,
+                        "detector": "NRCB1",
+                        "opd": "wss:2025-09-20T19:18:56.399",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00004_nrcb2_cal.fits",
+                        "x": 923.658,
+                        "y": 3346.74,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 11.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00004_nrcb3_cal.fits",
+                        "x": 3111.134,
+                        "y": 1167.258,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 11.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00004_nrcb4_cal.fits",
+                        "x": 3111.26,
+                        "y": 3351.32,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 11.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00005_nrca1_cal.fits",
+                        "x": 9302.647,
+                        "y": 4340.846,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 24.9
+                    },
+                    {
+                        "file": "jw08281001001_02101_00005_nrca2_cal.fits",
+                        "x": 10216.395,
+                        "y": 1207.559,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 20.7
+                    },
+                    {
+                        "file": "jw08281001001_02101_00005_nrca3_cal.fits",
+                        "x": 6508.03,
+                        "y": 3211.588,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 18.3
+                    },
+                    {
+                        "file": "jw08281001001_02101_00005_nrca4_cal.fits",
+                        "x": 6932.041,
+                        "y": 1257.222,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 20.8
+                    },
+                    {
+                        "file": "jw08281001001_02101_00005_nrcb1_cal.fits",
+                        "x": 907.92,
+                        "y": 1170.298,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 20.1,
+                        "detector": "NRCB1",
+                        "opd": "wss:2025-09-21T00:07:45.534",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00005_nrcb2_cal.fits",
+                        "x": 925.358,
+                        "y": 3351.526,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 20.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00005_nrcb3_cal.fits",
+                        "x": 3112.823,
+                        "y": 1172.077,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 20.1
+                    },
+                    {
+                        "file": "jw08281001001_02101_00005_nrcb4_cal.fits",
+                        "x": 3113.007,
+                        "y": 3356.164,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 20.2
+                    },
+                    {
+                        "file": "jw08281001001_02101_00006_nrca1_cal.fits",
+                        "x": 9303.939,
+                        "y": 4335.373,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 4.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00006_nrca2_cal.fits",
+                        "x": 10218.771,
+                        "y": 1202.084,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 4.5
+                    },
+                    {
+                        "file": "jw08281001001_02101_00006_nrca3_cal.fits",
+                        "x": 6509.154,
+                        "y": 3205.906,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 2.4
+                    },
+                    {
+                        "file": "jw08281001001_02101_00006_nrca4_cal.fits",
+                        "x": 6933.405,
+                        "y": 1251.536,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 3.4
+                    },
+                    {
+                        "file": "jw08281001001_02101_00006_nrcb1_cal.fits",
+                        "x": 909.104,
+                        "y": 1164.291,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 2.5,
+                        "detector": "NRCB1",
+                        "opd": "wss:2025-09-21T00:07:45.534",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00006_nrcb2_cal.fits",
+                        "x": 926.545,
+                        "y": 3345.547,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 2.5
+                    },
+                    {
+                        "file": "jw08281001001_02101_00006_nrcb3_cal.fits",
+                        "x": 3114.021,
+                        "y": 1166.073,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 2.5
+                    },
+                    {
+                        "file": "jw08281001001_02101_00006_nrcb4_cal.fits",
+                        "x": 3114.165,
+                        "y": 3350.145,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 2.6
+                    },
+                    {
+                        "file": "jw08281001001_02101_00007_nrca1_cal.fits",
+                        "x": 9307.21,
+                        "y": 4340.021,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 6.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00007_nrca2_cal.fits",
+                        "x": 10223.287,
+                        "y": 1204.948,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 9.4
+                    },
+                    {
+                        "file": "jw08281001001_02101_00007_nrca3_cal.fits",
+                        "x": 6511.499,
+                        "y": 3208.527,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 6.6
+                    },
+                    {
+                        "file": "jw08281001001_02101_00007_nrca4_cal.fits",
+                        "x": 6936.732,
+                        "y": 1254.682,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 7.2
+                    },
+                    {
+                        "file": "jw08281001001_02101_00007_nrcb1_cal.fits",
+                        "x": 911.442,
+                        "y": 1167.362,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 6.6,
+                        "detector": "NRCB1",
+                        "opd": "wss:2025-09-21T00:07:45.534",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00007_nrcb2_cal.fits",
+                        "x": 928.876,
+                        "y": 3348.593,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 6.6
+                    },
+                    {
+                        "file": "jw08281001001_02101_00007_nrcb3_cal.fits",
+                        "x": 3116.344,
+                        "y": 1169.146,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 6.6
+                    },
+                    {
+                        "file": "jw08281001001_02101_00007_nrcb4_cal.fits",
+                        "x": 3116.537,
+                        "y": 3353.239,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 6.6
+                    },
+                    {
+                        "file": "jw08281001001_02101_00008_nrca1_cal.fits",
+                        "x": 9609.911,
+                        "y": 4235.012,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 29.9
+                    },
+                    {
+                        "file": "jw08281001001_02101_00008_nrca2_cal.fits",
+                        "x": 10694.724,
+                        "y": 983.816,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 29.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00008_nrca3_cal.fits",
+                        "x": 6741.475,
+                        "y": 2955.426,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 17.5
+                    },
+                    {
+                        "file": "jw08281001001_02101_00008_nrca4_cal.fits",
+                        "x": 7251.175,
+                        "y": 1035.289,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 24.1
+                    },
+                    {
+                        "file": "jw08281001001_02101_00008_nrcb1_cal.fits",
+                        "x": 1143.735,
+                        "y": 916.843,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 19.2,
+                        "detector": "NRCB1",
+                        "opd": "wss:2025-09-21T03:44:16.945",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00008_nrcb2_cal.fits",
+                        "x": 1160.888,
+                        "y": 3098.296,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 19.1
+                    },
+                    {
+                        "file": "jw08281001001_02101_00008_nrcb3_cal.fits",
+                        "x": 3348.613,
+                        "y": 918.909,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 19.2
+                    },
+                    {
+                        "file": "jw08281001001_02101_00008_nrcb4_cal.fits",
+                        "x": 3349.111,
+                        "y": 3103.297,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 19.4
+                    },
+                    {
+                        "file": "jw08281001001_02101_00009_nrca1_cal.fits",
+                        "x": 9612.061,
+                        "y": 4242.246,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 12.2
+                    },
+                    {
+                        "file": "jw08281001001_02101_00009_nrca2_cal.fits",
+                        "x": 10697.371,
+                        "y": 989.34,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 18.6
+                    },
+                    {
+                        "file": "jw08281001001_02101_00009_nrca3_cal.fits",
+                        "x": 6742.845,
+                        "y": 2960.854,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.1
+                    },
+                    {
+                        "file": "jw08281001001_02101_00009_nrca4_cal.fits",
+                        "x": 7253.373,
+                        "y": 1041.248,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.9
+                    },
+                    {
+                        "file": "jw08281001001_02101_00009_nrcb1_cal.fits",
+                        "x": 1145.072,
+                        "y": 922.899,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.5,
+                        "detector": "NRCB1",
+                        "opd": "wss:2025-09-21T03:44:16.945",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00009_nrcb2_cal.fits",
+                        "x": 1162.227,
+                        "y": 3104.326,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.5
+                    },
+                    {
+                        "file": "jw08281001001_02101_00009_nrcb3_cal.fits",
+                        "x": 3349.925,
+                        "y": 924.962,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.5
+                    },
+                    {
+                        "file": "jw08281001001_02101_00009_nrcb4_cal.fits",
+                        "x": 3350.488,
+                        "y": 3109.381,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.5
+                    },
+                    {
+                        "file": "jw08281001001_02101_00010_nrca1_cal.fits",
+                        "x": 9615.357,
+                        "y": 4246.278,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 16.4
+                    },
+                    {
+                        "file": "jw08281001001_02101_00010_nrca2_cal.fits",
+                        "x": 10702.117,
+                        "y": 991.517,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.4
+                    },
+                    {
+                        "file": "jw08281001001_02101_00010_nrca3_cal.fits",
+                        "x": 6745.169,
+                        "y": 2962.758,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.1
+                    },
+                    {
+                        "file": "jw08281001001_02101_00010_nrca4_cal.fits",
+                        "x": 7256.794,
+                        "y": 1043.713,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.3
+                    },
+                    {
+                        "file": "jw08281001001_02101_00010_nrcb1_cal.fits",
+                        "x": 1147.379,
+                        "y": 925.213,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.5,
+                        "detector": "NRCB1",
+                        "opd": "wss:2025-09-21T03:44:16.945",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00010_nrcb2_cal.fits",
+                        "x": 1164.533,
+                        "y": 3106.623,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.4
+                    },
+                    {
+                        "file": "jw08281001001_02101_00010_nrcb3_cal.fits",
+                        "x": 3352.215,
+                        "y": 927.276,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.5
+                    },
+                    {
+                        "file": "jw08281001001_02101_00010_nrcb4_cal.fits",
+                        "x": 3352.824,
+                        "y": 3111.717,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.5
+                    },
+                    {
+                        "file": "jw08281001001_02101_00011_nrca1_cal.fits",
+                        "x": 9616.879,
+                        "y": 4241.372,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00011_nrca2_cal.fits",
+                        "x": 10704.965,
+                        "y": 986.492,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 17.4
+                    },
+                    {
+                        "file": "jw08281001001_02101_00011_nrca3_cal.fits",
+                        "x": 6746.456,
+                        "y": 2957.487,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.7
+                    },
+                    {
+                        "file": "jw08281001001_02101_00011_nrca4_cal.fits",
+                        "x": 7258.421,
+                        "y": 1038.458,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 15.1
+                    },
+                    {
+                        "file": "jw08281001001_02101_00011_nrcb1_cal.fits",
+                        "x": 1148.69,
+                        "y": 919.601,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 15.4,
+                        "detector": "NRCB1",
+                        "opd": "wss:2025-09-21T03:44:16.945",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00011_nrcb2_cal.fits",
+                        "x": 1165.84,
+                        "y": 3101.025,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 15.3
+                    },
+                    {
+                        "file": "jw08281001001_02101_00011_nrcb3_cal.fits",
+                        "x": 3353.539,
+                        "y": 921.667,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 15.4
+                    },
+                    {
+                        "file": "jw08281001001_02101_00011_nrcb4_cal.fits",
+                        "x": 3354.115,
+                        "y": 3106.094,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 15.4
+                    },
+                    {
+                        "file": "jw08281001001_02101_00012_nrca1_cal.fits",
+                        "x": 9619.542,
+                        "y": 4247.718,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 29.7
+                    },
+                    {
+                        "file": "jw08281001001_02101_00012_nrca2_cal.fits",
+                        "x": 10708.5,
+                        "y": 991.001,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 24.3
+                    },
+                    {
+                        "file": "jw08281001001_02101_00012_nrca3_cal.fits",
+                        "x": 6748.235,
+                        "y": 2961.83,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 21.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00012_nrca4_cal.fits",
+                        "x": 7261.164,
+                        "y": 1043.366,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 24.5
+                    },
+                    {
+                        "file": "jw08281001001_02101_00012_nrcb1_cal.fits",
+                        "x": 1150.44,
+                        "y": 924.518,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 23.3,
+                        "detector": "NRCB1",
+                        "opd": "wss:2025-09-21T03:44:16.945",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00012_nrcb2_cal.fits",
+                        "x": 1167.591,
+                        "y": 3105.918,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 23.2
+                    },
+                    {
+                        "file": "jw08281001001_02101_00012_nrcb3_cal.fits",
+                        "x": 3355.267,
+                        "y": 926.582,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 23.2
+                    },
+                    {
+                        "file": "jw08281001001_02101_00012_nrcb4_cal.fits",
+                        "x": 3355.904,
+                        "y": 3111.039,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 23.4
+                    },
+                    {
+                        "file": "jw08281001001_02101_00013_nrca1_cal.fits",
+                        "x": 9620.879,
+                        "y": 4242.007,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 16.4
+                    },
+                    {
+                        "file": "jw08281001001_02101_00013_nrca2_cal.fits",
+                        "x": 10711.142,
+                        "y": 985.338,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.3
+                    },
+                    {
+                        "file": "jw08281001001_02101_00013_nrca3_cal.fits",
+                        "x": 6749.41,
+                        "y": 2955.926,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 12.6
+                    },
+                    {
+                        "file": "jw08281001001_02101_00013_nrca4_cal.fits",
+                        "x": 7262.605,
+                        "y": 1037.426,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00013_nrcb1_cal.fits",
+                        "x": 1151.643,
+                        "y": 918.204,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.9,
+                        "detector": "NRCB1",
+                        "opd": "wss:2025-09-21T03:44:16.945",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00013_nrcb2_cal.fits",
+                        "x": 1168.79,
+                        "y": 3099.621,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.8
+                    },
+                    {
+                        "file": "jw08281001001_02101_00013_nrcb3_cal.fits",
+                        "x": 3356.485,
+                        "y": 920.271,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.9
+                    },
+                    {
+                        "file": "jw08281001001_02101_00013_nrcb4_cal.fits",
+                        "x": 3357.083,
+                        "y": 3104.71,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00014_nrca1_cal.fits",
+                        "x": 9624.299,
+                        "y": 4247.223,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 7.4
+                    },
+                    {
+                        "file": "jw08281001001_02101_00014_nrca2_cal.fits",
+                        "x": 10715.969,
+                        "y": 988.514,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 11.8
+                    },
+                    {
+                        "file": "jw08281001001_02101_00014_nrca3_cal.fits",
+                        "x": 6751.787,
+                        "y": 2958.835,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 8.5
+                    },
+                    {
+                        "file": "jw08281001001_02101_00014_nrca4_cal.fits",
+                        "x": 7266.148,
+                        "y": 1040.956,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 9.1
+                    },
+                    {
+                        "file": "jw08281001001_02101_00014_nrcb1_cal.fits",
+                        "x": 1153.997,
+                        "y": 921.621,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 8.6,
+                        "detector": "NRCB1",
+                        "opd": "wss:2025-09-21T10:57:30.584",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00014_nrcb2_cal.fits",
+                        "x": 1171.143,
+                        "y": 3103.017,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 8.6
+                    },
+                    {
+                        "file": "jw08281001001_02101_00014_nrcb3_cal.fits",
+                        "x": 3358.818,
+                        "y": 923.687,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 8.6
+                    },
+                    {
+                        "file": "jw08281001001_02101_00014_nrcb4_cal.fits",
+                        "x": 3359.471,
+                        "y": 3108.154,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 8.6
+                    },
+                    {
+                        "file": "jw08281001002_02101_00001_nrca1_cal.fits",
+                        "x": 9936.093,
+                        "y": 4159.683,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 15.1
+                    },
+                    {
+                        "file": "jw08281001002_02101_00001_nrca2_cal.fits",
+                        "x": 11222.471,
+                        "y": 774.025,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 18.1
+                    },
+                    {
+                        "file": "jw08281001002_02101_00001_nrca3_cal.fits",
+                        "x": 6984.888,
+                        "y": 2708.174,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 16.4
+                    },
+                    {
+                        "file": "jw08281001002_02101_00001_nrca4_cal.fits",
+                        "x": 7596.858,
+                        "y": 827.783,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 16.7
+                    },
+                    {
+                        "file": "jw08281001002_02101_00001_nrcb1_cal.fits",
+                        "x": 1386.001,
+                        "y": 670.947,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 17.4,
+                        "detector": "NRCB1",
+                        "opd": "wss:2025-09-29T02:40:14.594",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001002_02101_00001_nrcb2_cal.fits",
+                        "x": 1402.711,
+                        "y": 2852.127,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 17.4
+                    },
+                    {
+                        "file": "jw08281001002_02101_00001_nrcb3_cal.fits",
+                        "x": 3590.588,
+                        "y": 673.075,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 17.4
+                    },
+                    {
+                        "file": "jw08281001002_02101_00001_nrcb4_cal.fits",
+                        "x": 3591.959,
+                        "y": 2858.02,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 17.5
+                    },
+                    {
+                        "file": "jw08281001002_02101_00002_nrca1_cal.fits",
+                        "x": 9937.557,
+                        "y": 4165.647,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 27.2
+                    },
+                    {
+                        "file": "jw08281001002_02101_00002_nrca2_cal.fits",
+                        "x": 11224.151,
+                        "y": 778.595,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 21.9
+                    },
+                    {
+                        "file": "jw08281001002_02101_00002_nrca3_cal.fits",
+                        "x": 6985.743,
+                        "y": 2712.715,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 18.8
+                    },
+                    {
+                        "file": "jw08281001002_02101_00002_nrca4_cal.fits",
+                        "x": 7598.372,
+                        "y": 832.763,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 22.3
+                    },
+                    {
+                        "file": "jw08281001002_02101_00002_nrcb1_cal.fits",
+                        "x": 1386.831,
+                        "y": 676.027,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 21.0,
+                        "detector": "NRCB1",
+                        "opd": "wss:2025-09-29T02:40:14.594",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001002_02101_00002_nrcb2_cal.fits",
+                        "x": 1403.549,
+                        "y": 2857.193,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 21.0
+                    },
+                    {
+                        "file": "jw08281001002_02101_00002_nrcb3_cal.fits",
+                        "x": 3591.394,
+                        "y": 678.151,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 21.0
+                    },
+                    {
+                        "file": "jw08281001002_02101_00002_nrcb4_cal.fits",
+                        "x": 3592.818,
+                        "y": 2863.125,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 21.2
+                    },
+                    {
+                        "file": "jw08281001002_02101_00003_nrca1_cal.fits",
+                        "x": 9940.591,
+                        "y": 4170.544,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 32.8
+                    },
+                    {
+                        "file": "jw08281001002_02101_00003_nrca2_cal.fits",
+                        "x": 11228.515,
+                        "y": 781.525,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 28.3
+                    },
+                    {
+                        "file": "jw08281001002_02101_00003_nrca3_cal.fits",
+                        "x": 6987.787,
+                        "y": 2715.408,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 20.3
+                    },
+                    {
+                        "file": "jw08281001002_02101_00003_nrca4_cal.fits",
+                        "x": 7601.577,
+                        "y": 836.065,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 26.3
+                    },
+                    {
+                        "file": "jw08281001002_02101_00003_nrcb1_cal.fits",
+                        "x": 1388.837,
+                        "y": 679.196,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 22.7,
+                        "detector": "NRCB1",
+                        "opd": "wss:2025-09-29T02:40:14.594",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001002_02101_00003_nrcb2_cal.fits",
+                        "x": 1405.56,
+                        "y": 2860.347,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 22.7
+                    },
+                    {
+                        "file": "jw08281001002_02101_00003_nrcb3_cal.fits",
+                        "x": 3593.377,
+                        "y": 681.315,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 22.6
+                    },
+                    {
+                        "file": "jw08281001002_02101_00003_nrcb4_cal.fits",
+                        "x": 3594.853,
+                        "y": 2866.318,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 22.9
+                    },
+                    {
+                        "file": "jw08281001002_02101_00004_nrca1_cal.fits",
+                        "x": 9942.4,
+                        "y": 4166.089,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 12.2
+                    },
+                    {
+                        "file": "jw08281001002_02101_00004_nrca2_cal.fits",
+                        "x": 11231.992,
+                        "y": 776.808,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.7
+                    },
+                    {
+                        "file": "jw08281001002_02101_00004_nrca3_cal.fits",
+                        "x": 6989.275,
+                        "y": 2710.375,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 12.8
+                    },
+                    {
+                        "file": "jw08281001002_02101_00004_nrca4_cal.fits",
+                        "x": 7603.552,
+                        "y": 831.098,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.0
+                    },
+                    {
+                        "file": "jw08281001002_02101_00004_nrcb1_cal.fits",
+                        "x": 1390.317,
+                        "y": 673.812,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.7,
+                        "detector": "NRCB1",
+                        "opd": "wss:2025-09-29T02:40:14.594",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001002_02101_00004_nrcb2_cal.fits",
+                        "x": 1407.03,
+                        "y": 2854.968,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.7
+                    },
+                    {
+                        "file": "jw08281001002_02101_00004_nrcb3_cal.fits",
+                        "x": 3594.869,
+                        "y": 675.933,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.7
+                    },
+                    {
+                        "file": "jw08281001002_02101_00004_nrcb4_cal.fits",
+                        "x": 3596.32,
+                        "y": 2860.922,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.7
+                    },
+                    {
+                        "file": "jw08281001002_02101_00005_nrca1_cal.fits",
+                        "x": 9945.686,
+                        "y": 4173.13,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.8
+                    },
+                    {
+                        "file": "jw08281001002_02101_00005_nrca2_cal.fits",
+                        "x": 11236.515,
+                        "y": 781.501,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.6
+                    },
+                    {
+                        "file": "jw08281001002_02101_00005_nrca3_cal.fits",
+                        "x": 6991.424,
+                        "y": 2714.852,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.4
+                    },
+                    {
+                        "file": "jw08281001002_02101_00005_nrca4_cal.fits",
+                        "x": 7607.009,
+                        "y": 836.306,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.8
+                    },
+                    {
+                        "file": "jw08281001002_02101_00005_nrcb1_cal.fits",
+                        "x": 1392.422,
+                        "y": 678.954,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.6,
+                        "detector": "NRCB1",
+                        "opd": "wss:2025-09-29T02:40:14.594",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001002_02101_00005_nrcb2_cal.fits",
+                        "x": 1409.142,
+                        "y": 2860.09,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.6
+                    },
+                    {
+                        "file": "jw08281001002_02101_00005_nrcb3_cal.fits",
+                        "x": 3596.942,
+                        "y": 681.069,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.6
+                    },
+                    {
+                        "file": "jw08281001002_02101_00005_nrcb4_cal.fits",
+                        "x": 3598.464,
+                        "y": 2866.097,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.6
+                    },
+                    {
+                        "file": "jw08281001002_02101_00006_nrca1_cal.fits",
+                        "x": 9946.318,
+                        "y": 4167.125,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 18.4
+                    },
+                    {
+                        "file": "jw08281001002_02101_00006_nrca2_cal.fits",
+                        "x": 11238.258,
+                        "y": 775.956,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 21.4
+                    },
+                    {
+                        "file": "jw08281001002_02101_00006_nrca3_cal.fits",
+                        "x": 6992.107,
+                        "y": 2709.092,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 10.2
+                    },
+                    {
+                        "file": "jw08281001002_02101_00006_nrca4_cal.fits",
+                        "x": 7607.738,
+                        "y": 830.388,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 15.7
+                    },
+                    {
+                        "file": "jw08281001002_02101_00006_nrcb1_cal.fits",
+                        "x": 1393.11,
+                        "y": 672.686,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 10.5,
+                        "detector": "NRCB1",
+                        "opd": "wss:2025-09-29T02:40:14.594",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001002_02101_00006_nrcb2_cal.fits",
+                        "x": 1409.82,
+                        "y": 2853.834,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 10.5
+                    },
+                    {
+                        "file": "jw08281001002_02101_00006_nrcb3_cal.fits",
+                        "x": 3597.65,
+                        "y": 674.805,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 10.5
+                    },
+                    {
+                        "file": "jw08281001002_02101_00006_nrcb4_cal.fits",
+                        "x": 3599.129,
+                        "y": 2859.81,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 10.6
+                    },
+                    {
+                        "file": "jw08281001002_02101_00007_nrca1_cal.fits",
+                        "x": 9949.439,
+                        "y": 4172.034,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 23.3
+                    },
+                    {
+                        "file": "jw08281001002_02101_00007_nrca2_cal.fits",
+                        "x": 11242.767,
+                        "y": 778.852,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 26.6
+                    },
+                    {
+                        "file": "jw08281001002_02101_00007_nrca3_cal.fits",
+                        "x": 6994.213,
+                        "y": 2711.741,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 12.8
+                    },
+                    {
+                        "file": "jw08281001002_02101_00007_nrca4_cal.fits",
+                        "x": 7611.038,
+                        "y": 833.66,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 19.6
+                    },
+                    {
+                        "file": "jw08281001002_02101_00007_nrcb1_cal.fits",
+                        "x": 1395.177,
+                        "y": 675.814,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.3,
+                        "detector": "NRCB1",
+                        "opd": "wss:2025-09-29T02:40:14.594",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001002_02101_00007_nrcb2_cal.fits",
+                        "x": 1411.891,
+                        "y": 2856.946,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.3
+                    },
+                    {
+                        "file": "jw08281001002_02101_00007_nrcb3_cal.fits",
+                        "x": 3599.694,
+                        "y": 677.928,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.2
+                    },
+                    {
+                        "file": "jw08281001002_02101_00007_nrcb4_cal.fits",
+                        "x": 3601.226,
+                        "y": 2862.962,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.4
+                    }
+                ],
+                "tweakreg": "relative",
+                "lens_star_ra": 294.60566138,
+                "lens_star_dec": 66.81464583,
+                "star_fwhm_arcsec": [
+                    0.0551,
+                    0.0571,
+                    0.0587
+                ],
+                "centroid_offset_mas": [
+                    0.17,
+                    -3.17
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 119,
+                "seconds": 2851.5,
+                "fwhm_pix": 1.8992,
+                "fwhm_arcsec": 0.057,
+                "pedestal_frac": 2.2e-05,
+                "compared_with": "empirical",
+                "compared_fwhm_arcsec": 0.0547
+            },
+            "F277W": {
+                "n_frames": 42,
+                "n_injected": 21,
+                "n_stars": 25,
+                "star_spacing_px": 61,
+                "frames": [
+                    {
+                        "file": "jw08281001001_02101_00001_nrcalong_cal.fits",
+                        "x": 4229.159,
+                        "y": 1591.336,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00001_nrcblong_cal.fits",
+                        "x": 1491.448,
+                        "y": 1624.739,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCB5",
+                        "opd": "wss:2025-09-20T19:18:56.399",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00002_nrcalong_cal.fits",
+                        "x": 4229.629,
+                        "y": 1593.782,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 8.5
+                    },
+                    {
+                        "file": "jw08281001001_02101_00002_nrcblong_cal.fits",
+                        "x": 1491.9,
+                        "y": 1627.297,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 8.9,
+                        "detector": "NRCB5",
+                        "opd": "wss:2025-09-20T19:18:56.399",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00003_nrcalong_cal.fits",
+                        "x": 4230.742,
+                        "y": 1595.333,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 9.3
+                    },
+                    {
+                        "file": "jw08281001001_02101_00003_nrcblong_cal.fits",
+                        "x": 1493.054,
+                        "y": 1628.959,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 9.6,
+                        "detector": "NRCB5",
+                        "opd": "wss:2025-09-20T19:18:56.399",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00004_nrcalong_cal.fits",
+                        "x": 4231.277,
+                        "y": 1592.377,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 8.4
+                    },
+                    {
+                        "file": "jw08281001001_02101_00004_nrcblong_cal.fits",
+                        "x": 1493.678,
+                        "y": 1625.922,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 8.7,
+                        "detector": "NRCB5",
+                        "opd": "wss:2025-09-20T19:18:56.399",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00005_nrcalong_cal.fits",
+                        "x": 4232.472,
+                        "y": 1594.887,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.1
+                    },
+                    {
+                        "file": "jw08281001001_02101_00005_nrcblong_cal.fits",
+                        "x": 1494.901,
+                        "y": 1628.581,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.9,
+                        "detector": "NRCB5",
+                        "opd": "wss:2025-09-21T00:07:45.534",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00006_nrcalong_cal.fits",
+                        "x": 4232.502,
+                        "y": 1591.828,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00006_nrcblong_cal.fits",
+                        "x": 1494.991,
+                        "y": 1625.413,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.7,
+                        "detector": "NRCB5",
+                        "opd": "wss:2025-09-21T00:07:45.534",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00007_nrcalong_cal.fits",
+                        "x": 4233.553,
+                        "y": 1593.409,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.5
+                    },
+                    {
+                        "file": "jw08281001001_02101_00007_nrcblong_cal.fits",
+                        "x": 1496.077,
+                        "y": 1627.102,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 15.0,
+                        "detector": "NRCB5",
+                        "opd": "wss:2025-09-21T00:07:45.534",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00008_nrcalong_cal.fits",
+                        "x": 4339.288,
+                        "y": 1469.876,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 7.2
+                    },
+                    {
+                        "file": "jw08281001001_02101_00008_nrcblong_cal.fits",
+                        "x": 1610.884,
+                        "y": 1504.074,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 7.7,
+                        "detector": "NRCB5",
+                        "opd": "wss:2025-09-21T00:07:45.534",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00009_nrcalong_cal.fits",
+                        "x": 4340.097,
+                        "y": 1472.276,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.1
+                    },
+                    {
+                        "file": "jw08281001001_02101_00009_nrcblong_cal.fits",
+                        "x": 1611.701,
+                        "y": 1506.606,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.7,
+                        "detector": "NRCB5",
+                        "opd": "wss:2025-09-21T00:07:45.534",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00010_nrcalong_cal.fits",
+                        "x": 4341.111,
+                        "y": 1473.565,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 21.5
+                    },
+                    {
+                        "file": "jw08281001001_02101_00010_nrcblong_cal.fits",
+                        "x": 1612.757,
+                        "y": 1507.993,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 22.2,
+                        "detector": "NRCB5",
+                        "opd": "wss:2025-09-21T00:07:45.534",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00011_nrcalong_cal.fits",
+                        "x": 4341.4,
+                        "y": 1471.188,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.8
+                    },
+                    {
+                        "file": "jw08281001001_02101_00011_nrcblong_cal.fits",
+                        "x": 1613.109,
+                        "y": 1505.538,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.9,
+                        "detector": "NRCB5",
+                        "opd": "wss:2025-09-21T00:07:45.534",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00012_nrcalong_cal.fits",
+                        "x": 4342.156,
+                        "y": 1473.729,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 18.8
+                    },
+                    {
+                        "file": "jw08281001001_02101_00012_nrcblong_cal.fits",
+                        "x": 1613.865,
+                        "y": 1508.213,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 19.6,
+                        "detector": "NRCB5",
+                        "opd": "wss:2025-09-21T00:07:45.534",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00013_nrcalong_cal.fits",
+                        "x": 4342.832,
+                        "y": 1470.406,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 3.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00013_nrcblong_cal.fits",
+                        "x": 1614.648,
+                        "y": 1504.794,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 3.1,
+                        "detector": "NRCB5",
+                        "opd": "wss:2025-09-21T00:07:45.534",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001001_02101_00014_nrcalong_cal.fits",
+                        "x": 4343.85,
+                        "y": 1471.953,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 2.4
+                    },
+                    {
+                        "file": "jw08281001001_02101_00014_nrcblong_cal.fits",
+                        "x": 1615.703,
+                        "y": 1506.45,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 2.5,
+                        "detector": "NRCB5",
+                        "opd": "wss:2025-09-21T00:07:45.534",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001002_02101_00001_nrcalong_cal.fits",
+                        "x": 4448.978,
+                        "y": 1348.85,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 9.9
+                    },
+                    {
+                        "file": "jw08281001002_02101_00001_nrcblong_cal.fits",
+                        "x": 1730.035,
+                        "y": 1383.412,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 10.3,
+                        "detector": "NRCB5",
+                        "opd": "wss:2025-09-29T02:40:14.594",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001002_02101_00002_nrcalong_cal.fits",
+                        "x": 4449.623,
+                        "y": 1351.433,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 4.7
+                    },
+                    {
+                        "file": "jw08281001002_02101_00002_nrcblong_cal.fits",
+                        "x": 1730.675,
+                        "y": 1386.131,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 5.0,
+                        "detector": "NRCB5",
+                        "opd": "wss:2025-09-29T02:40:14.594",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001002_02101_00003_nrcalong_cal.fits",
+                        "x": 4450.558,
+                        "y": 1352.986,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 6.3
+                    },
+                    {
+                        "file": "jw08281001002_02101_00003_nrcblong_cal.fits",
+                        "x": 1731.643,
+                        "y": 1387.792,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 6.5,
+                        "detector": "NRCB5",
+                        "opd": "wss:2025-09-29T02:40:14.594",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001002_02101_00004_nrcalong_cal.fits",
+                        "x": 4451.218,
+                        "y": 1350.079,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 15.8
+                    },
+                    {
+                        "file": "jw08281001002_02101_00004_nrcblong_cal.fits",
+                        "x": 1732.402,
+                        "y": 1384.797,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 16.6,
+                        "detector": "NRCB5",
+                        "opd": "wss:2025-09-29T02:40:14.594",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001002_02101_00005_nrcalong_cal.fits",
+                        "x": 4452.196,
+                        "y": 1352.201,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 28.1
+                    },
+                    {
+                        "file": "jw08281001002_02101_00005_nrcblong_cal.fits",
+                        "x": 1733.406,
+                        "y": 1387.051,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 29.1,
+                        "detector": "NRCB5",
+                        "opd": "wss:2025-09-29T02:40:14.594",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001002_02101_00006_nrcalong_cal.fits",
+                        "x": 4452.557,
+                        "y": 1349.35,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 10.4
+                    },
+                    {
+                        "file": "jw08281001002_02101_00006_nrcblong_cal.fits",
+                        "x": 1733.843,
+                        "y": 1384.099,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 10.8,
+                        "detector": "NRCB5",
+                        "opd": "wss:2025-09-29T02:40:14.594",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw08281001002_02101_00007_nrcalong_cal.fits",
+                        "x": 4453.061,
+                        "y": 1351.003,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 26.4
+                    },
+                    {
+                        "file": "jw08281001002_02101_00007_nrcblong_cal.fits",
+                        "x": 1734.351,
+                        "y": 1385.845,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 28.1,
+                        "detector": "NRCB5",
+                        "opd": "wss:2025-09-29T02:40:14.594",
+                        "flux_on_frame": 1.0
+                    }
+                ],
+                "tweakreg": "relative",
+                "lens_star_ra": 294.60565079,
+                "lens_star_dec": 66.81464167,
+                "star_fwhm_arcsec": [
+                    0.1249,
+                    0.1282,
+                    0.1315
+                ],
+                "centroid_offset_mas": [
+                    -0.66,
+                    -3.79
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 59,
+                "seconds": 261.4,
+                "fwhm_pix": 2.1409,
+                "fwhm_arcsec": 0.1285,
+                "pedestal_frac": 0.000139,
+                "compared_with": "empirical",
+                "compared_fwhm_arcsec": 0.1207
+            }
+        }
+    },
+    "cowls_spectacular": {
+        "COSJ095914+021219": {
+            "F115W": {
+                "n_frames": 26,
+                "n_injected": 2,
+                "n_stars": 12,
+                "star_spacing_px": 121,
+                "frames": [
+                    {
+                        "file": "jw01727080001_02101_00001_nrcb1_cal.fits",
+                        "x": 510.916,
+                        "y": 317.482,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCB1",
+                        "opd": "wss:2023-04-07T10:26:28.999",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727080001_02101_00002_nrcb1_cal.fits",
+                        "x": 506.368,
+                        "y": 510.953,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 29.7,
+                        "detector": "NRCB1",
+                        "opd": "wss:2023-04-07T10:32:12.551",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727079001_02101_00003_nrca1_cal.fits",
+                        "x": -1249.098,
+                        "y": 2162.981,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727079001_02101_00003_nrca2_cal.fits",
+                        "x": -1263.625,
+                        "y": -13.008,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727079001_02101_00004_nrca1_cal.fits",
+                        "x": -1238.883,
+                        "y": 1969.654,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 7.4
+                    },
+                    {
+                        "file": "jw01727079001_02101_00004_nrca2_cal.fits",
+                        "x": -1253.032,
+                        "y": -206.401,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 7.4
+                    },
+                    {
+                        "file": "jw01727080001_02101_00001_nrcb2_cal.fits",
+                        "x": 527.038,
+                        "y": 2502.763,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727080001_02101_00001_nrcb3_cal.fits",
+                        "x": 2718.894,
+                        "y": 318.801,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727080001_02101_00001_nrcb4_cal.fits",
+                        "x": 2712.437,
+                        "y": 2500.389,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727080001_02101_00002_nrcb2_cal.fits",
+                        "x": 523.157,
+                        "y": 2695.999,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 29.7
+                    },
+                    {
+                        "file": "jw01727080001_02101_00002_nrcb3_cal.fits",
+                        "x": 2713.843,
+                        "y": 512.233,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 29.7
+                    },
+                    {
+                        "file": "jw01727080001_02101_00002_nrcb4_cal.fits",
+                        "x": 2707.917,
+                        "y": 2694.016,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 29.7
+                    },
+                    {
+                        "file": "jw01727080001_02101_00003_nrcb1_cal.fits",
+                        "x": 2110.53,
+                        "y": 500.371,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 29.1
+                    },
+                    {
+                        "file": "jw01727080001_02101_00003_nrcb2_cal.fits",
+                        "x": 2126.718,
+                        "y": 2678.891,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 29.1
+                    },
+                    {
+                        "file": "jw01727080001_02101_00004_nrcb1_cal.fits",
+                        "x": 2113.689,
+                        "y": 305.259,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 42.4
+                    },
+                    {
+                        "file": "jw01727080001_02101_00004_nrcb2_cal.fits",
+                        "x": 2129.426,
+                        "y": 2484.066,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 42.3
+                    },
+                    {
+                        "file": "jw01727082001_02101_00001_nrcb2_cal.fits",
+                        "x": 694.029,
+                        "y": -1634.142,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727082001_02101_00001_nrcb4_cal.fits",
+                        "x": 2896.253,
+                        "y": -1634.349,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727082001_02101_00002_nrcb2_cal.fits",
+                        "x": 687.646,
+                        "y": -1449.093,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 21.8
+                    },
+                    {
+                        "file": "jw01727082001_02101_00002_nrcb4_cal.fits",
+                        "x": 2891.021,
+                        "y": -1449.943,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 21.9
+                    },
+                    {
+                        "file": "jw01727154001_03101_00001_nrcb2_cal.fits",
+                        "x": 696.413,
+                        "y": -1637.925,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 8.3
+                    },
+                    {
+                        "file": "jw01727154001_03101_00001_nrcb4_cal.fits",
+                        "x": 2898.604,
+                        "y": -1638.112,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 8.3
+                    },
+                    {
+                        "file": "jw01727154001_03101_00002_nrcb2_cal.fits",
+                        "x": 690.646,
+                        "y": -1453.216,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 15.8
+                    },
+                    {
+                        "file": "jw01727154001_03101_00002_nrcb4_cal.fits",
+                        "x": 2894.0,
+                        "y": -1454.046,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 15.9
+                    },
+                    {
+                        "file": "jw01727154001_03101_00003_nrcb2_cal.fits",
+                        "x": 2244.619,
+                        "y": -1474.834,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 11.2
+                    },
+                    {
+                        "file": "jw01727154001_03101_00004_nrcb2_cal.fits",
+                        "x": 2246.192,
+                        "y": -1659.686,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 4.7
+                    }
+                ],
+                "tweakreg": "from_lw",
+                "lens_star_ra": 149.81141735,
+                "lens_star_dec": 2.20543594,
+                "star_fwhm_arcsec": [
+                    0.0525,
+                    0.058,
+                    0.0612
+                ],
+                "centroid_offset_mas": [
+                    -0.68,
+                    0.17
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 119,
+                "seconds": 32.9,
+                "fwhm_pix": 1.9295,
+                "fwhm_arcsec": 0.0579,
+                "pedestal_frac": 2.2e-05,
+                "compared_with": "empirical_pooled",
+                "compared_fwhm_arcsec": 0.0539
+            },
+            "F150W": {
+                "n_frames": 22,
+                "n_injected": 2,
+                "n_stars": 12,
+                "star_spacing_px": 121,
+                "frames": [
+                    {
+                        "file": "jw01727080001_04101_00001_nrcb1_cal.fits",
+                        "x": 511.024,
+                        "y": 317.433,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCB1",
+                        "opd": "wss:2023-04-07T11:01:11.941",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727080001_04101_00002_nrcb1_cal.fits",
+                        "x": 505.613,
+                        "y": 511.409,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 5.1,
+                        "detector": "NRCB1",
+                        "opd": "wss:2023-04-07T11:06:55.493",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727079001_04101_00003_nrca1_cal.fits",
+                        "x": -1250.622,
+                        "y": 2165.067,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727079001_04101_00003_nrca2_cal.fits",
+                        "x": -1260.686,
+                        "y": -12.857,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727079001_04101_00004_nrca1_cal.fits",
+                        "x": -1240.183,
+                        "y": 1971.586,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 6.8
+                    },
+                    {
+                        "file": "jw01727079001_04101_00004_nrca2_cal.fits",
+                        "x": -1250.062,
+                        "y": -206.252,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 6.8
+                    },
+                    {
+                        "file": "jw01727080001_04101_00001_nrcb2_cal.fits",
+                        "x": 527.423,
+                        "y": 2503.097,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727080001_04101_00001_nrcb3_cal.fits",
+                        "x": 2719.744,
+                        "y": 319.094,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727080001_04101_00001_nrcb4_cal.fits",
+                        "x": 2712.902,
+                        "y": 2500.984,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727080001_04101_00002_nrcb2_cal.fits",
+                        "x": 522.976,
+                        "y": 2697.275,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 5.1
+                    },
+                    {
+                        "file": "jw01727080001_04101_00002_nrcb3_cal.fits",
+                        "x": 2713.858,
+                        "y": 513.043,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 5.1
+                    },
+                    {
+                        "file": "jw01727080001_04101_00002_nrcb4_cal.fits",
+                        "x": 2707.468,
+                        "y": 2695.248,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 5.1
+                    },
+                    {
+                        "file": "jw01727080001_04101_00003_nrcb1_cal.fits",
+                        "x": 2110.04,
+                        "y": 500.946,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 7.4
+                    },
+                    {
+                        "file": "jw01727080001_04101_00003_nrcb2_cal.fits",
+                        "x": 2126.667,
+                        "y": 2679.983,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 7.4
+                    },
+                    {
+                        "file": "jw01727080001_04101_00004_nrcb1_cal.fits",
+                        "x": 2113.216,
+                        "y": 306.476,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 6.3
+                    },
+                    {
+                        "file": "jw01727080001_04101_00004_nrcb2_cal.fits",
+                        "x": 2129.143,
+                        "y": 2485.494,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 6.3
+                    },
+                    {
+                        "file": "jw01727167001_02101_00001_nrcb2_cal.fits",
+                        "x": 689.271,
+                        "y": -1645.395,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727167001_02101_00001_nrcb4_cal.fits",
+                        "x": 2897.737,
+                        "y": -1632.531,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727167001_02101_00002_nrcb2_cal.fits",
+                        "x": 686.187,
+                        "y": -1457.707,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 11.0
+                    },
+                    {
+                        "file": "jw01727167001_02101_00002_nrcb4_cal.fits",
+                        "x": 2894.343,
+                        "y": -1449.518,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 10.9
+                    },
+                    {
+                        "file": "jw01727167001_02101_00003_nrcb2_cal.fits",
+                        "x": 2240.626,
+                        "y": -1479.511,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 13.6
+                    },
+                    {
+                        "file": "jw01727167001_02101_00004_nrcb2_cal.fits",
+                        "x": 2240.542,
+                        "y": -1667.202,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 12.2
+                    }
+                ],
+                "tweakreg": "from_lw",
+                "lens_star_ra": 149.81141735,
+                "lens_star_dec": 2.20543594,
+                "star_fwhm_arcsec": [
+                    0.0595,
+                    0.065,
+                    0.0673
+                ],
+                "centroid_offset_mas": [
+                    -0.49,
+                    0.19
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 119,
+                "seconds": 30.2,
+                "fwhm_pix": 2.1534,
+                "fwhm_arcsec": 0.0646,
+                "pedestal_frac": 3e-05,
+                "compared_with": "empirical_pooled",
+                "compared_fwhm_arcsec": 0.0646
+            },
+            "F277W": {
+                "n_frames": 12,
+                "n_injected": 2,
+                "n_stars": 13,
+                "star_spacing_px": 61,
+                "frames": [
+                    {
+                        "file": "jw01727080001_02101_00001_nrcblong_cal.fits",
+                        "x": 1300.321,
+                        "y": 1209.0,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCB5",
+                        "opd": "wss:2023-04-07T10:26:29.063",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727080001_02101_00002_nrcblong_cal.fits",
+                        "x": 1297.9,
+                        "y": 1304.088,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 29.7,
+                        "detector": "NRCB5",
+                        "opd": "wss:2023-04-07T10:26:29.063",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727079001_02101_00003_nrcalong_cal.fits",
+                        "x": -643.466,
+                        "y": 1044.549,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727079001_02101_00004_nrcalong_cal.fits",
+                        "x": -638.332,
+                        "y": 949.434,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 7.3
+                    },
+                    {
+                        "file": "jw01727080001_02101_00003_nrcblong_cal.fits",
+                        "x": 2086.364,
+                        "y": 1300.005,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 29.0
+                    },
+                    {
+                        "file": "jw01727080001_02101_00004_nrcblong_cal.fits",
+                        "x": 2088.161,
+                        "y": 1204.156,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 42.3
+                    },
+                    {
+                        "file": "jw01727082001_02101_00001_nrcblong_cal.fits",
+                        "x": 1388.352,
+                        "y": -824.478,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727082001_02101_00002_nrcblong_cal.fits",
+                        "x": 1386.33,
+                        "y": -733.355,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 21.8
+                    },
+                    {
+                        "file": "jw01727154001_03101_00001_nrcblong_cal.fits",
+                        "x": 1389.497,
+                        "y": -826.331,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 8.4
+                    },
+                    {
+                        "file": "jw01727154001_03101_00002_nrcblong_cal.fits",
+                        "x": 1387.785,
+                        "y": -735.372,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 16.0
+                    },
+                    {
+                        "file": "jw01727154001_03101_00003_nrcblong_cal.fits",
+                        "x": 2152.571,
+                        "y": -740.666,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 11.2
+                    },
+                    {
+                        "file": "jw01727154001_03101_00004_nrcblong_cal.fits",
+                        "x": 2152.664,
+                        "y": -831.6,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 4.7
+                    }
+                ],
+                "tweakreg": "relative",
+                "lens_star_ra": 149.81141318,
+                "lens_star_dec": 2.20543177,
+                "star_fwhm_arcsec": [
+                    0.1174,
+                    0.1293,
+                    0.1366
+                ],
+                "centroid_offset_mas": [
+                    -1.47,
+                    -1.36
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 59,
+                "seconds": 42.8,
+                "fwhm_pix": 2.1483,
+                "fwhm_arcsec": 0.1289,
+                "pedestal_frac": 0.000139,
+                "compared_with": "empirical_pooled",
+                "compared_fwhm_arcsec": 0.1235
+            },
+            "F444W": {
+                "n_frames": 10,
+                "n_injected": 2,
+                "n_stars": 13,
+                "star_spacing_px": 61,
+                "frames": [
+                    {
+                        "file": "jw01727080001_04101_00001_nrcblong_cal.fits",
+                        "x": 1300.409,
+                        "y": 1209.292,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCB5",
+                        "opd": "wss:2023-04-07T11:01:11.941",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727080001_04101_00002_nrcblong_cal.fits",
+                        "x": 1297.568,
+                        "y": 1304.625,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 5.1,
+                        "detector": "NRCB5",
+                        "opd": "wss:2023-04-07T11:01:11.941",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727079001_04101_00003_nrcalong_cal.fits",
+                        "x": -643.379,
+                        "y": 1044.613,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727079001_04101_00004_nrcalong_cal.fits",
+                        "x": -638.264,
+                        "y": 949.435,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 6.8
+                    },
+                    {
+                        "file": "jw01727080001_04101_00003_nrcblong_cal.fits",
+                        "x": 2086.164,
+                        "y": 1300.6,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 7.4
+                    },
+                    {
+                        "file": "jw01727080001_04101_00004_nrcblong_cal.fits",
+                        "x": 2087.962,
+                        "y": 1205.068,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 6.3
+                    },
+                    {
+                        "file": "jw01727167001_02101_00001_nrcblong_cal.fits",
+                        "x": 1389.911,
+                        "y": -826.178,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727167001_02101_00002_nrcblong_cal.fits",
+                        "x": 1388.306,
+                        "y": -734.932,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 11.0
+                    },
+                    {
+                        "file": "jw01727167001_02101_00003_nrcblong_cal.fits",
+                        "x": 2152.852,
+                        "y": -740.332,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.5
+                    },
+                    {
+                        "file": "jw01727167001_02101_00004_nrcblong_cal.fits",
+                        "x": 2153.182,
+                        "y": -831.43,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 12.0
+                    }
+                ],
+                "tweakreg": "relative",
+                "lens_star_ra": 149.81141318,
+                "lens_star_dec": 2.20543177,
+                "star_fwhm_arcsec": [
+                    0.1601,
+                    0.1625,
+                    0.1669
+                ],
+                "centroid_offset_mas": [
+                    -0.48,
+                    0.35
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 59,
+                "seconds": 38.3,
+                "fwhm_pix": 2.7179,
+                "fwhm_arcsec": 0.1631,
+                "pedestal_frac": 0.000312,
+                "compared_with": "empirical_pooled",
+                "compared_fwhm_arcsec": 0.1669
+            }
+        },
+        "COSJ095920+015851": {
+            "F444W": {
+                "n_frames": 8,
+                "n_injected": 4,
+                "n_stars": 25,
+                "star_spacing_px": 61,
+                "frames": [
+                    {
+                        "file": "jw01727124001_04101_00001_nrcblong_cal.fits",
+                        "x": 732.338,
+                        "y": 547.966,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCB5",
+                        "opd": "wss:2023-04-11T11:27:52.014",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727124001_04101_00002_nrcblong_cal.fits",
+                        "x": 729.007,
+                        "y": 642.562,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 22.6,
+                        "detector": "NRCB5",
+                        "opd": "wss:2023-04-11T11:33:35.630",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727124001_04101_00003_nrcblong_cal.fits",
+                        "x": 1511.271,
+                        "y": 641.532,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 16.3,
+                        "detector": "NRCB5",
+                        "opd": "wss:2023-04-11T11:43:04.653",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727124001_04101_00004_nrcblong_cal.fits",
+                        "x": 1513.552,
+                        "y": 546.903,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 10.9,
+                        "detector": "NRCB5",
+                        "opd": "wss:2023-04-11T11:48:58.957",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727122001_04101_00001_nrcblong_cal.fits",
+                        "x": 615.721,
+                        "y": 2624.197,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727122001_04101_00002_nrcblong_cal.fits",
+                        "x": 611.842,
+                        "y": 2719.523,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 21.9
+                    },
+                    {
+                        "file": "jw01727122001_04101_00003_nrcblong_cal.fits",
+                        "x": 1409.369,
+                        "y": 2725.735,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 8.9
+                    },
+                    {
+                        "file": "jw01727122001_04101_00004_nrcblong_cal.fits",
+                        "x": 1412.673,
+                        "y": 2629.733,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 9.1
+                    }
+                ],
+                "tweakreg": "relative",
+                "lens_star_ra": 149.83387915,
+                "lens_star_dec": 1.98091867,
+                "star_fwhm_arcsec": [
+                    0.1608,
+                    0.1641,
+                    0.1663
+                ],
+                "centroid_offset_mas": [
+                    0.13,
+                    0.26
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 59,
+                "seconds": 36.1,
+                "fwhm_pix": 2.7336,
+                "fwhm_arcsec": 0.164,
+                "pedestal_frac": 0.000312,
+                "compared_with": "empirical_pooled",
+                "compared_fwhm_arcsec": 0.1669
+            }
+        },
+        "COSJ100013+023424": {
+            "F115W": {
+                "n_frames": 17,
+                "n_injected": 4,
+                "n_stars": 6,
+                "star_spacing_px": 121,
+                "frames": [
+                    {
+                        "file": "jw01727009001_02101_00001_nrca3_cal.fits",
+                        "x": 29.007,
+                        "y": 1849.611,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCA3",
+                        "opd": "wss:2023-05-17T01:46:46.683",
+                        "flux_on_frame": 0.9929
+                    },
+                    {
+                        "file": "jw01727009001_02101_00002_nrca3_cal.fits",
+                        "x": 22.994,
+                        "y": 2042.679,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 11.0,
+                        "detector": "NRCA3",
+                        "opd": "wss:2023-05-17T01:52:41.051",
+                        "flux_on_frame": 0.9347
+                    },
+                    {
+                        "file": "jw01727009001_02101_00003_nrca3_cal.fits",
+                        "x": 1614.182,
+                        "y": 2044.696,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 38.4,
+                        "detector": "NRCA3",
+                        "opd": "wss:2023-05-17T02:02:10.074",
+                        "flux_on_frame": 0.9231
+                    },
+                    {
+                        "file": "jw01727009001_02101_00004_nrca3_cal.fits",
+                        "x": 1618.305,
+                        "y": 1852.402,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 29.7,
+                        "detector": "NRCA3",
+                        "opd": "wss:2023-05-17T02:08:04.378",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727007001_02101_00003_nrcb4_cal.fits",
+                        "x": 1835.357,
+                        "y": -1747.039,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727009001_02101_00001_nrca1_cal.fits",
+                        "x": 2230.373,
+                        "y": 1845.065,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727009001_02101_00001_nrca2_cal.fits",
+                        "x": 2217.842,
+                        "y": -337.62,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727009001_02101_00001_nrca4_cal.fits",
+                        "x": 36.375,
+                        "y": -337.374,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727009001_02101_00002_nrca1_cal.fits",
+                        "x": 2224.362,
+                        "y": 2038.13,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 11.0
+                    },
+                    {
+                        "file": "jw01727009001_02101_00002_nrca2_cal.fits",
+                        "x": 2211.936,
+                        "y": -144.521,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 11.0
+                    },
+                    {
+                        "file": "jw01727009001_02101_00002_nrca4_cal.fits",
+                        "x": 29.335,
+                        "y": -144.361,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 11.0
+                    },
+                    {
+                        "file": "jw01727009001_02101_00003_nrca1_cal.fits",
+                        "x": 3820.231,
+                        "y": 2045.508,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 38.6
+                    },
+                    {
+                        "file": "jw01727009001_02101_00003_nrca4_cal.fits",
+                        "x": 1620.505,
+                        "y": -134.399,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 38.4
+                    },
+                    {
+                        "file": "jw01727009001_02101_00003_nrcb3_cal.fits",
+                        "x": -1778.351,
+                        "y": -225.433,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 37.7
+                    },
+                    {
+                        "file": "jw01727009001_02101_00004_nrca1_cal.fits",
+                        "x": 3824.321,
+                        "y": 1853.083,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 29.8
+                    },
+                    {
+                        "file": "jw01727009001_02101_00004_nrca4_cal.fits",
+                        "x": 1625.606,
+                        "y": -326.641,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 29.7
+                    },
+                    {
+                        "file": "jw01727009001_02101_00004_nrcb3_cal.fits",
+                        "x": -1767.334,
+                        "y": -416.314,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 29.3
+                    }
+                ],
+                "tweakreg": "from_lw",
+                "lens_star_ra": 150.05577116,
+                "lens_star_dec": 2.57334285,
+                "star_fwhm_arcsec": [
+                    0.0515,
+                    0.0588,
+                    0.0601
+                ],
+                "centroid_offset_mas": [
+                    1.43,
+                    -1.37
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 119,
+                "seconds": 36.4,
+                "fwhm_pix": 1.9195,
+                "fwhm_arcsec": 0.0576,
+                "pedestal_frac": 2e-05,
+                "compared_with": "empirical_pooled",
+                "compared_fwhm_arcsec": 0.0539
+            },
+            "F150W": {
+                "n_frames": 17,
+                "n_injected": 4,
+                "n_stars": 6,
+                "star_spacing_px": 121,
+                "frames": [
+                    {
+                        "file": "jw01727009001_04101_00001_nrca3_cal.fits",
+                        "x": 29.138,
+                        "y": 1849.554,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCA3",
+                        "opd": "wss:2023-05-17T02:21:40.377",
+                        "flux_on_frame": 0.9918
+                    },
+                    {
+                        "file": "jw01727009001_04101_00002_nrca3_cal.fits",
+                        "x": 23.238,
+                        "y": 2042.104,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 12.3,
+                        "detector": "NRCA3",
+                        "opd": "wss:2023-05-17T02:27:23.993",
+                        "flux_on_frame": 0.9387
+                    },
+                    {
+                        "file": "jw01727009001_04101_00003_nrca3_cal.fits",
+                        "x": 1613.681,
+                        "y": 2043.776,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 12.7,
+                        "detector": "NRCA3",
+                        "opd": "wss:2023-05-17T02:36:53.016",
+                        "flux_on_frame": 0.9358
+                    },
+                    {
+                        "file": "jw01727009001_04101_00004_nrca3_cal.fits",
+                        "x": 1618.087,
+                        "y": 1851.372,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 3.8,
+                        "detector": "NRCA3",
+                        "opd": "wss:2023-05-17T02:42:36.632",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727007001_04101_00003_nrcb4_cal.fits",
+                        "x": 1831.569,
+                        "y": -1742.192,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727009001_04101_00001_nrca1_cal.fits",
+                        "x": 2230.535,
+                        "y": 1844.939,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727009001_04101_00001_nrca2_cal.fits",
+                        "x": 2217.738,
+                        "y": -337.789,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727009001_04101_00001_nrca4_cal.fits",
+                        "x": 36.444,
+                        "y": -337.462,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727009001_04101_00002_nrca1_cal.fits",
+                        "x": 2224.646,
+                        "y": 2037.458,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 12.3
+                    },
+                    {
+                        "file": "jw01727009001_04101_00002_nrca2_cal.fits",
+                        "x": 2212.07,
+                        "y": -145.206,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 12.3
+                    },
+                    {
+                        "file": "jw01727009001_04101_00002_nrca4_cal.fits",
+                        "x": 29.6,
+                        "y": -144.975,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 12.3
+                    },
+                    {
+                        "file": "jw01727009001_04101_00003_nrca1_cal.fits",
+                        "x": 3821.26,
+                        "y": 2037.118,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 12.7
+                    },
+                    {
+                        "file": "jw01727009001_04101_00003_nrca4_cal.fits",
+                        "x": 1620.044,
+                        "y": -135.305,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 12.7
+                    },
+                    {
+                        "file": "jw01727009001_04101_00003_nrcb3_cal.fits",
+                        "x": -1790.626,
+                        "y": -241.053,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 12.7
+                    },
+                    {
+                        "file": "jw01727009001_04101_00004_nrca1_cal.fits",
+                        "x": 3825.703,
+                        "y": 1844.844,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 3.8
+                    },
+                    {
+                        "file": "jw01727009001_04101_00004_nrca4_cal.fits",
+                        "x": 1625.367,
+                        "y": -327.666,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 3.8
+                    },
+                    {
+                        "file": "jw01727009001_04101_00004_nrcb3_cal.fits",
+                        "x": -1779.055,
+                        "y": -432.778,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 3.7
+                    }
+                ],
+                "tweakreg": "from_lw",
+                "lens_star_ra": 150.05577116,
+                "lens_star_dec": 2.57334285,
+                "star_fwhm_arcsec": [
+                    0.0594,
+                    0.0645,
+                    0.0655
+                ],
+                "centroid_offset_mas": [
+                    1.4,
+                    -1.19
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 119,
+                "seconds": 36.7,
+                "fwhm_pix": 2.1282,
+                "fwhm_arcsec": 0.0638,
+                "pedestal_frac": 2.6e-05,
+                "compared_with": "empirical_pooled",
+                "compared_fwhm_arcsec": 0.0646
+            },
+            "F277W": {
+                "n_frames": 7,
+                "n_injected": 4,
+                "n_stars": 25,
+                "star_spacing_px": 61,
+                "frames": [
+                    {
+                        "file": "jw01727009001_02101_00001_nrcalong_cal.fits",
+                        "x": 1070.534,
+                        "y": 888.095,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCA5",
+                        "opd": "wss:2023-05-17T01:46:46.683",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727009001_02101_00002_nrcalong_cal.fits",
+                        "x": 1067.514,
+                        "y": 983.286,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 11.0,
+                        "detector": "NRCA5",
+                        "opd": "wss:2023-05-17T01:52:41.051",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727009001_02101_00003_nrcalong_cal.fits",
+                        "x": 1852.347,
+                        "y": 984.728,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 38.4,
+                        "detector": "NRCA5",
+                        "opd": "wss:2023-05-17T02:02:10.074",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727009001_02101_00004_nrcalong_cal.fits",
+                        "x": 1854.465,
+                        "y": 889.941,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 29.7,
+                        "detector": "NRCA5",
+                        "opd": "wss:2023-05-17T02:08:04.378",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727007001_02101_00003_nrcblong_cal.fits",
+                        "x": 866.864,
+                        "y": -880.003,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727009001_02101_00003_nrcblong_cal.fits",
+                        "x": -914.976,
+                        "y": 937.601,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 37.9
+                    },
+                    {
+                        "file": "jw01727009001_02101_00004_nrcblong_cal.fits",
+                        "x": -909.948,
+                        "y": 843.984,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 29.3
+                    }
+                ],
+                "tweakreg": "relative",
+                "lens_star_ra": 150.05576699,
+                "lens_star_dec": 2.57333868,
+                "star_fwhm_arcsec": [
+                    0.1197,
+                    0.1274,
+                    0.1316
+                ],
+                "centroid_offset_mas": [
+                    1.89,
+                    0.86
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 59,
+                "seconds": 31.3,
+                "fwhm_pix": 2.1215,
+                "fwhm_arcsec": 0.1273,
+                "pedestal_frac": 0.000132,
+                "compared_with": "empirical_pooled",
+                "compared_fwhm_arcsec": 0.1235
+            },
+            "F444W": {
+                "n_frames": 7,
+                "n_injected": 4,
+                "n_stars": 25,
+                "star_spacing_px": 61,
+                "frames": [
+                    {
+                        "file": "jw01727009001_04101_00001_nrcalong_cal.fits",
+                        "x": 1070.722,
+                        "y": 888.211,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCA5",
+                        "opd": "wss:2023-05-17T02:21:40.377",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727009001_04101_00002_nrcalong_cal.fits",
+                        "x": 1067.763,
+                        "y": 983.134,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 12.3,
+                        "detector": "NRCA5",
+                        "opd": "wss:2023-05-17T02:27:23.928",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727009001_04101_00003_nrcalong_cal.fits",
+                        "x": 1852.19,
+                        "y": 984.454,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 12.7,
+                        "detector": "NRCA5",
+                        "opd": "wss:2023-05-17T02:36:53.016",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727009001_04101_00004_nrcalong_cal.fits",
+                        "x": 1854.436,
+                        "y": 889.61,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 3.8,
+                        "detector": "NRCA5",
+                        "opd": "wss:2023-05-17T02:42:36.568",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727007001_04101_00003_nrcblong_cal.fits",
+                        "x": 867.076,
+                        "y": -879.881,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727009001_04101_00003_nrcblong_cal.fits",
+                        "x": -915.414,
+                        "y": 937.71,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 12.6
+                    },
+                    {
+                        "file": "jw01727009001_04101_00004_nrcblong_cal.fits",
+                        "x": -910.258,
+                        "y": 844.033,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 3.7
+                    }
+                ],
+                "tweakreg": "relative",
+                "lens_star_ra": 150.05576699,
+                "lens_star_dec": 2.57333868,
+                "star_fwhm_arcsec": [
+                    0.1612,
+                    0.1633,
+                    0.1658
+                ],
+                "centroid_offset_mas": [
+                    0.71,
+                    0.29
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 59,
+                "seconds": 32.1,
+                "fwhm_pix": 2.7257,
+                "fwhm_arcsec": 0.1635,
+                "pedestal_frac": 0.000309,
+                "compared_with": "empirical_pooled",
+                "compared_fwhm_arcsec": 0.1669
+            }
+        },
+        "COSJ100028+021928": {
+            "F150W": {
+                "n_frames": 17,
+                "n_injected": 2,
+                "n_stars": 6,
+                "star_spacing_px": 121,
+                "frames": [
+                    {
+                        "file": "jw01727055001_04101_00002_nrcb1_cal.fits",
+                        "x": 524.735,
+                        "y": 155.876,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 14.0,
+                        "detector": "NRCB1",
+                        "opd": "wss:2023-12-29T07:32:23.850",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727053001_04101_00002_nrcb4_cal.fits",
+                        "x": 2477.597,
+                        "y": -1784.213,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727053001_04101_00003_nrcb2_cal.fits",
+                        "x": 1819.423,
+                        "y": -1820.4,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 22.6
+                    },
+                    {
+                        "file": "jw01727055001_04101_00001_nrcb1_cal.fits",
+                        "x": 529.996,
+                        "y": -38.209,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCB1",
+                        "opd": "wss:2023-12-29T07:26:40.234",
+                        "flux_on_frame": 0.0017
+                    },
+                    {
+                        "file": "jw01727055001_04101_00001_nrcb2_cal.fits",
+                        "x": 544.821,
+                        "y": 2146.916,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727055001_04101_00001_nrcb3_cal.fits",
+                        "x": 2739.361,
+                        "y": -36.609,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727055001_04101_00001_nrcb4_cal.fits",
+                        "x": 2731.938,
+                        "y": 2144.671,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727055001_04101_00002_nrcb2_cal.fits",
+                        "x": 540.39,
+                        "y": 2341.071,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 14.0
+                    },
+                    {
+                        "file": "jw01727055001_04101_00002_nrcb3_cal.fits",
+                        "x": 2733.558,
+                        "y": 157.561,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 14.0
+                    },
+                    {
+                        "file": "jw01727055001_04101_00002_nrcb4_cal.fits",
+                        "x": 2726.435,
+                        "y": 2338.941,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 14.0
+                    },
+                    {
+                        "file": "jw01727055001_04101_00003_nrcb1_cal.fits",
+                        "x": 2125.283,
+                        "y": 145.225,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 31.7
+                    },
+                    {
+                        "file": "jw01727055001_04101_00003_nrcb2_cal.fits",
+                        "x": 2140.607,
+                        "y": 2323.875,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 31.7
+                    },
+                    {
+                        "file": "jw01727055001_04101_00004_nrcb1_cal.fits",
+                        "x": 2128.833,
+                        "y": -49.132,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 17.5
+                    },
+                    {
+                        "file": "jw01727055001_04101_00004_nrcb2_cal.fits",
+                        "x": 2143.405,
+                        "y": 2129.523,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 17.5
+                    },
+                    {
+                        "file": "jw01727056001_04101_00003_nrca2_cal.fits",
+                        "x": -1253.345,
+                        "y": 800.18,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727056001_04101_00004_nrca1_cal.fits",
+                        "x": -1232.074,
+                        "y": 2784.6,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 11.7
+                    },
+                    {
+                        "file": "jw01727056001_04101_00004_nrca2_cal.fits",
+                        "x": -1243.44,
+                        "y": 606.162,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 11.7
+                    }
+                ],
+                "tweakreg": "from_lw",
+                "lens_star_ra": 150.119063,
+                "lens_star_dec": 2.32449907,
+                "star_fwhm_arcsec": [
+                    0.0625,
+                    0.064,
+                    0.0673
+                ],
+                "centroid_offset_mas": [
+                    -1.18,
+                    1.36
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 119,
+                "seconds": 30.3,
+                "fwhm_pix": 2.1562,
+                "fwhm_arcsec": 0.0647,
+                "pedestal_frac": 3.1e-05,
+                "compared_with": "empirical_pooled",
+                "compared_fwhm_arcsec": 0.0646
+            },
+            "F444W": {
+                "n_frames": 8,
+                "n_injected": 2,
+                "n_stars": 14,
+                "star_spacing_px": 61,
+                "frames": [
+                    {
+                        "file": "jw01727055001_04101_00001_nrcblong_cal.fits",
+                        "x": 1310.591,
+                        "y": 1034.695,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCB5",
+                        "opd": "wss:2023-12-29T07:26:40.234",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727055001_04101_00002_nrcblong_cal.fits",
+                        "x": 1307.831,
+                        "y": 1130.094,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.0,
+                        "detector": "NRCB5",
+                        "opd": "wss:2023-12-29T07:26:40.234",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727053001_04101_00002_nrcblong_cal.fits",
+                        "x": 1184.574,
+                        "y": -901.773,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727053001_04101_00003_nrcblong_cal.fits",
+                        "x": 1947.027,
+                        "y": -906.574,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 22.2
+                    },
+                    {
+                        "file": "jw01727055001_04101_00003_nrcblong_cal.fits",
+                        "x": 2094.607,
+                        "y": 1126.044,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 31.6
+                    },
+                    {
+                        "file": "jw01727055001_04101_00004_nrcblong_cal.fits",
+                        "x": 2096.551,
+                        "y": 1030.534,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 17.5
+                    },
+                    {
+                        "file": "jw01727056001_04101_00003_nrcalong_cal.fits",
+                        "x": -638.672,
+                        "y": 1444.891,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727056001_04101_00004_nrcalong_cal.fits",
+                        "x": -633.89,
+                        "y": 1349.476,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 11.7
+                    }
+                ],
+                "tweakreg": "relative",
+                "lens_star_ra": 150.11905883,
+                "lens_star_dec": 2.3244949,
+                "star_fwhm_arcsec": [
+                    0.1616,
+                    0.1635,
+                    0.1665
+                ],
+                "centroid_offset_mas": [
+                    -0.41,
+                    -0.77
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 59,
+                "seconds": 29.6,
+                "fwhm_pix": 2.7303,
+                "fwhm_arcsec": 0.1638,
+                "pedestal_frac": 0.000309,
+                "compared_with": "empirical_pooled",
+                "compared_fwhm_arcsec": 0.1669
+            }
+        },
+        "COSJ100047+015023": {
+            "F150W": {
+                "n_frames": 14,
+                "n_injected": 4,
+                "n_stars": 9,
+                "star_spacing_px": 121,
+                "frames": [
+                    {
+                        "file": "jw01727146001_04101_00001_nrcb4_cal.fits",
+                        "x": 760.988,
+                        "y": 189.758,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCB4",
+                        "opd": "wss:2023-04-14T02:31:46.161",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727146001_04101_00002_nrcb4_cal.fits",
+                        "x": 753.647,
+                        "y": 379.308,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 6.3,
+                        "detector": "NRCB4",
+                        "opd": "wss:2023-04-14T02:31:46.161",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727146001_04101_00003_nrcb2_cal.fits",
+                        "x": 133.59,
+                        "y": 385.828,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 12.8,
+                        "detector": "NRCB2",
+                        "opd": "wss:2023-04-14T02:46:58.800",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727146001_04101_00004_nrcb2_cal.fits",
+                        "x": 138.079,
+                        "y": 195.737,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 11.5,
+                        "detector": "NRCB2",
+                        "opd": "wss:2023-04-14T02:52:42.415",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727144001_04101_00001_nrcb3_cal.fits",
+                        "x": 450.204,
+                        "y": 2117.311,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727144001_04101_00002_nrcb3_cal.fits",
+                        "x": 441.435,
+                        "y": 2312.549,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 23.4
+                    },
+                    {
+                        "file": "jw01727144001_04101_00003_nrcb1_cal.fits",
+                        "x": -148.014,
+                        "y": 2331.648,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 13.5
+                    },
+                    {
+                        "file": "jw01727144001_04101_00003_nrcb3_cal.fits",
+                        "x": 2055.189,
+                        "y": 2331.488,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 13.5
+                    },
+                    {
+                        "file": "jw01727144001_04101_00004_nrcb1_cal.fits",
+                        "x": -141.298,
+                        "y": 2136.597,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 21.1
+                    },
+                    {
+                        "file": "jw01727144001_04101_00004_nrcb3_cal.fits",
+                        "x": 2062.423,
+                        "y": 2136.387,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 21.1
+                    },
+                    {
+                        "file": "jw01727146001_04101_00001_nrcb2_cal.fits",
+                        "x": -1443.432,
+                        "y": 205.021,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727146001_04101_00002_nrcb2_cal.fits",
+                        "x": -1449.927,
+                        "y": 394.51,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 6.3
+                    },
+                    {
+                        "file": "jw01727146001_04101_00003_nrcb4_cal.fits",
+                        "x": 2330.447,
+                        "y": 380.576,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 12.9
+                    },
+                    {
+                        "file": "jw01727146001_04101_00004_nrcb4_cal.fits",
+                        "x": 2336.077,
+                        "y": 190.522,
+                        "tweakreg": null,
+                        "tweak_shift_mas": 11.5
+                    }
+                ],
+                "tweakreg": "from_lw",
+                "lens_star_ra": 150.19857992,
+                "lens_star_dec": 1.83978039,
+                "star_fwhm_arcsec": [
+                    0.0625,
+                    0.0638,
+                    0.0662
+                ],
+                "centroid_offset_mas": [
+                    2.18,
+                    -2.18
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 119,
+                "seconds": 39.2,
+                "fwhm_pix": 2.1415,
+                "fwhm_arcsec": 0.0642,
+                "pedestal_frac": 2.8e-05,
+                "compared_with": "empirical_pooled",
+                "compared_fwhm_arcsec": 0.0646
+            },
+            "F444W": {
+                "n_frames": 8,
+                "n_injected": 4,
+                "n_stars": 14,
+                "star_spacing_px": 61,
+                "frames": [
+                    {
+                        "file": "jw01727146001_04101_00001_nrcblong_cal.fits",
+                        "x": 340.74,
+                        "y": 74.158,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCB5",
+                        "opd": "wss:2023-04-14T02:31:46.225",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727146001_04101_00002_nrcblong_cal.fits",
+                        "x": 337.158,
+                        "y": 167.338,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 6.2,
+                        "detector": "NRCB5",
+                        "opd": "wss:2023-04-14T02:37:29.776",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727146001_04101_00003_nrcblong_cal.fits",
+                        "x": 1112.624,
+                        "y": 167.379,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 12.8,
+                        "detector": "NRCB5",
+                        "opd": "wss:2023-04-14T02:46:58.800",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727146001_04101_00004_nrcblong_cal.fits",
+                        "x": 1115.341,
+                        "y": 73.938,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 11.5,
+                        "detector": "NRCB5",
+                        "opd": "wss:2023-04-14T02:52:42.415",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727144001_04101_00001_nrcblong_cal.fits",
+                        "x": 186.033,
+                        "y": 2093.242,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727144001_04101_00002_nrcblong_cal.fits",
+                        "x": 181.871,
+                        "y": 2188.964,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 23.3
+                    },
+                    {
+                        "file": "jw01727144001_04101_00003_nrcblong_cal.fits",
+                        "x": 974.514,
+                        "y": 2197.99,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 13.5
+                    },
+                    {
+                        "file": "jw01727144001_04101_00004_nrcblong_cal.fits",
+                        "x": 978.051,
+                        "y": 2102.314,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 21.0
+                    }
+                ],
+                "tweakreg": "relative",
+                "lens_star_ra": 150.19857575,
+                "lens_star_dec": 1.83977623,
+                "star_fwhm_arcsec": [
+                    0.16,
+                    0.1641,
+                    0.1663
+                ],
+                "centroid_offset_mas": [
+                    -0.26,
+                    -0.46
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 59,
+                "seconds": 42.1,
+                "fwhm_pix": 2.7272,
+                "fwhm_arcsec": 0.1636,
+                "pedestal_frac": 0.000306,
+                "compared_with": "empirical_pooled",
+                "compared_fwhm_arcsec": 0.1669
+            }
+        },
+        "COSJ100121+022740": {
+            "F444W": {
+                "n_frames": 8,
+                "n_injected": 4,
+                "n_stars": 23,
+                "star_spacing_px": 61,
+                "frames": [
+                    {
+                        "file": "jw01727025001_04101_00001_nrcblong_cal.fits",
+                        "x": 594.22,
+                        "y": 133.231,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCB5",
+                        "opd": "wss:2023-12-27T22:25:20.554",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727025001_04101_00002_nrcblong_cal.fits",
+                        "x": 591.396,
+                        "y": 226.647,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 32.4,
+                        "detector": "NRCB5",
+                        "opd": "wss:2023-12-27T22:25:20.554",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727025001_04101_00003_nrcblong_cal.fits",
+                        "x": 1368.438,
+                        "y": 225.466,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.4,
+                        "detector": "NRCB5",
+                        "opd": "wss:2023-12-27T22:40:43.881",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727025001_04101_00004_nrcblong_cal.fits",
+                        "x": 1370.797,
+                        "y": 131.91,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 22.7,
+                        "detector": "NRCB5",
+                        "opd": "wss:2023-12-27T22:40:43.881",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01727027001_04101_00001_nrcblong_cal.fits",
+                        "x": 696.885,
+                        "y": 2195.364,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01727027001_04101_00002_nrcblong_cal.fits",
+                        "x": 693.289,
+                        "y": 2290.988,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 7.7
+                    },
+                    {
+                        "file": "jw01727027001_04101_00003_nrcblong_cal.fits",
+                        "x": 1488.763,
+                        "y": 2294.563,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 16.1
+                    },
+                    {
+                        "file": "jw01727027001_04101_00004_nrcblong_cal.fits",
+                        "x": 1491.886,
+                        "y": 2198.51,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 17.5
+                    }
+                ],
+                "tweakreg": "relative",
+                "lens_star_ra": 150.34135468,
+                "lens_star_dec": 2.46128872,
+                "star_fwhm_arcsec": [
+                    0.1624,
+                    0.1637,
+                    0.1658
+                ],
+                "centroid_offset_mas": [
+                    0.21,
+                    0.32
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 59,
+                "seconds": 37.1,
+                "fwhm_pix": 2.7286,
+                "fwhm_arcsec": 0.1637,
+                "pedestal_frac": 0.000307,
+                "compared_with": "empirical_pooled",
+                "compared_fwhm_arcsec": 0.1669
+            }
+        }
+    },
+    "spt": {
+        "SPT0418-47": {
+            "F115W": {
+                "n_frames": 8,
+                "n_injected": 2,
+                "n_stars": 25,
+                "star_spacing_px": 121,
+                "frames": [
+                    {
+                        "file": "jw01355016001_02101_00001_nrcb1_cal.fits",
+                        "x": -1216.663,
+                        "y": -1052.146,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01355016001_02101_00001_nrcb2_cal.fits",
+                        "x": -1216.673,
+                        "y": 1139.657,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01355016001_02101_00001_nrcb3_cal.fits",
+                        "x": 992.209,
+                        "y": -1057.365,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01355016001_02101_00001_nrcb4_cal.fits",
+                        "x": 983.935,
+                        "y": 1125.271,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCB4",
+                        "opd": "wss:2022-08-11T16:33:23.972",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01355016001_02101_00002_nrcb1_cal.fits",
+                        "x": -954.79,
+                        "y": -790.293,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 45.3
+                    },
+                    {
+                        "file": "jw01355016001_02101_00002_nrcb2_cal.fits",
+                        "x": -948.76,
+                        "y": 1400.441,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 45.7
+                    },
+                    {
+                        "file": "jw01355016001_02101_00002_nrcb3_cal.fits",
+                        "x": 1254.244,
+                        "y": -793.81,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 45.4
+                    },
+                    {
+                        "file": "jw01355016001_02101_00002_nrcb4_cal.fits",
+                        "x": 1246.086,
+                        "y": 1388.173,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 45.4,
+                        "detector": "NRCB4",
+                        "opd": "wss:2022-08-11T16:40:33.476",
+                        "flux_on_frame": 1.0
+                    }
+                ],
+                "tweakreg": "relative",
+                "lens_star_ra": 64.66532299,
+                "lens_star_dec": -47.86463747,
+                "star_fwhm_arcsec": [
+                    0.0489,
+                    0.0565,
+                    0.0618
+                ],
+                "centroid_offset_mas": [
+                    0.5,
+                    2.46
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 119,
+                "seconds": 28.9,
+                "fwhm_pix": 1.8927,
+                "fwhm_arcsec": 0.0568,
+                "pedestal_frac": 2e-05,
+                "compared_with": "empirical",
+                "compared_fwhm_arcsec": 0.0598
+            },
+            "F150W": {
+                "n_frames": 8,
+                "n_injected": 2,
+                "n_stars": 25,
+                "star_spacing_px": 121,
+                "frames": [
+                    {
+                        "file": "jw01355016001_02103_00001_nrcb1_cal.fits",
+                        "x": -1217.755,
+                        "y": -1054.216,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01355016001_02103_00001_nrcb2_cal.fits",
+                        "x": -1212.323,
+                        "y": 1138.947,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01355016001_02103_00001_nrcb3_cal.fits",
+                        "x": 992.627,
+                        "y": -1057.504,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01355016001_02103_00001_nrcb4_cal.fits",
+                        "x": 983.918,
+                        "y": 1125.257,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCB4",
+                        "opd": "wss:2022-08-11T16:50:02.513",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01355016001_02103_00002_nrcb1_cal.fits",
+                        "x": -956.121,
+                        "y": -791.453,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 30.7
+                    },
+                    {
+                        "file": "jw01355016001_02103_00002_nrcb2_cal.fits",
+                        "x": -947.457,
+                        "y": 1400.131,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 30.7
+                    },
+                    {
+                        "file": "jw01355016001_02103_00002_nrcb3_cal.fits",
+                        "x": 1253.511,
+                        "y": -793.867,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 30.8
+                    },
+                    {
+                        "file": "jw01355016001_02103_00002_nrcb4_cal.fits",
+                        "x": 1245.118,
+                        "y": 1388.138,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 30.7,
+                        "detector": "NRCB4",
+                        "opd": "wss:2022-08-11T16:54:20.240",
+                        "flux_on_frame": 1.0
+                    }
+                ],
+                "tweakreg": "relative",
+                "lens_star_ra": 64.66532299,
+                "lens_star_dec": -47.86463747,
+                "star_fwhm_arcsec": [
+                    0.0591,
+                    0.0638,
+                    0.0656
+                ],
+                "centroid_offset_mas": [
+                    0.23,
+                    1.97
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 119,
+                "seconds": 28.2,
+                "fwhm_pix": 2.1151,
+                "fwhm_arcsec": 0.0635,
+                "pedestal_frac": 2.7e-05,
+                "compared_with": "empirical",
+                "compared_fwhm_arcsec": 0.0667
+            },
+            "F200W": {
+                "n_frames": 8,
+                "n_injected": 2,
+                "n_stars": 25,
+                "star_spacing_px": 121,
+                "frames": [
+                    {
+                        "file": "jw01355016001_02105_00001_nrcb1_cal.fits",
+                        "x": -1220.096,
+                        "y": -1056.304,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01355016001_02105_00001_nrcb2_cal.fits",
+                        "x": -1213.393,
+                        "y": 1137.3,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01355016001_02105_00001_nrcb3_cal.fits",
+                        "x": 991.9,
+                        "y": -1059.039,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01355016001_02105_00001_nrcb4_cal.fits",
+                        "x": 982.784,
+                        "y": 1123.597,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCB4",
+                        "opd": "wss:2022-08-11T17:00:57.485",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01355016001_02105_00002_nrcb1_cal.fits",
+                        "x": -957.484,
+                        "y": -794.15,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 16.4
+                    },
+                    {
+                        "file": "jw01355016001_02105_00002_nrcb2_cal.fits",
+                        "x": -948.154,
+                        "y": 1397.608,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 16.5
+                    },
+                    {
+                        "file": "jw01355016001_02105_00002_nrcb3_cal.fits",
+                        "x": 1252.903,
+                        "y": -796.347,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 16.4
+                    },
+                    {
+                        "file": "jw01355016001_02105_00002_nrcb4_cal.fits",
+                        "x": 1244.374,
+                        "y": 1385.651,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 16.4,
+                        "detector": "NRCB4",
+                        "opd": "wss:2022-08-11T17:05:58.093",
+                        "flux_on_frame": 1.0
+                    }
+                ],
+                "tweakreg": "relative",
+                "lens_star_ra": 64.66532299,
+                "lens_star_dec": -47.86463747,
+                "star_fwhm_arcsec": [
+                    0.0728,
+                    0.0745,
+                    0.0762
+                ],
+                "centroid_offset_mas": [
+                    -0.2,
+                    0.34
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 119,
+                "seconds": 32.4,
+                "fwhm_pix": 2.4843,
+                "fwhm_arcsec": 0.0745,
+                "pedestal_frac": 4.4e-05,
+                "compared_with": "empirical",
+                "compared_fwhm_arcsec": 0.0732
+            },
+            "F277W": {
+                "n_frames": 2,
+                "n_injected": 2,
+                "n_stars": 25,
+                "star_spacing_px": 61,
+                "frames": [
+                    {
+                        "file": "jw01355016001_02101_00001_nrcblong_cal.fits",
+                        "x": 450.913,
+                        "y": 534.113,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCB5",
+                        "opd": "wss:2022-08-11T16:33:23.972",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01355016001_02101_00002_nrcblong_cal.fits",
+                        "x": 579.544,
+                        "y": 663.004,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 15.5,
+                        "detector": "NRCB5",
+                        "opd": "wss:2022-08-11T16:40:33.476",
+                        "flux_on_frame": 1.0
+                    }
+                ],
+                "tweakreg": "relative",
+                "lens_star_ra": 64.66531678,
+                "lens_star_dec": -47.86464163,
+                "star_fwhm_arcsec": [
+                    0.1177,
+                    0.1281,
+                    0.1355
+                ],
+                "centroid_offset_mas": [
+                    2.03,
+                    3.14
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 59,
+                "seconds": 14.2,
+                "fwhm_pix": 2.144,
+                "fwhm_arcsec": 0.1286,
+                "pedestal_frac": 0.000135,
+                "compared_with": "empirical",
+                "compared_fwhm_arcsec": 0.1199
+            },
+            "F356W": {
+                "n_frames": 2,
+                "n_injected": 2,
+                "n_stars": 25,
+                "star_spacing_px": 61,
+                "frames": [
+                    {
+                        "file": "jw01355016001_02103_00001_nrcblong_cal.fits",
+                        "x": 450.966,
+                        "y": 534.146,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCB5",
+                        "opd": "wss:2022-08-11T16:50:02.513",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01355016001_02103_00002_nrcblong_cal.fits",
+                        "x": 579.235,
+                        "y": 662.872,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 14.4,
+                        "detector": "NRCB5",
+                        "opd": "wss:2022-08-11T16:54:20.240",
+                        "flux_on_frame": 1.0
+                    }
+                ],
+                "tweakreg": "relative",
+                "lens_star_ra": 64.66531678,
+                "lens_star_dec": -47.86464163,
+                "star_fwhm_arcsec": [
+                    0.1389,
+                    0.1447,
+                    0.1483
+                ],
+                "centroid_offset_mas": [
+                    1.15,
+                    1.8
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 59,
+                "seconds": 15.0,
+                "fwhm_pix": 2.4126,
+                "fwhm_arcsec": 0.1448,
+                "pedestal_frac": 0.000235,
+                "compared_with": "empirical",
+                "compared_fwhm_arcsec": 0.148
+            },
+            "F444W": {
+                "n_frames": 2,
+                "n_injected": 2,
+                "n_stars": 25,
+                "star_spacing_px": 61,
+                "frames": [
+                    {
+                        "file": "jw01355016001_02105_00001_nrcblong_cal.fits",
+                        "x": 451.006,
+                        "y": 534.528,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCB5",
+                        "opd": "wss:2022-08-11T17:00:57.485",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01355016001_02105_00002_nrcblong_cal.fits",
+                        "x": 579.457,
+                        "y": 663.063,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 9.2,
+                        "detector": "NRCB5",
+                        "opd": "wss:2022-08-11T17:05:58.093",
+                        "flux_on_frame": 1.0
+                    }
+                ],
+                "tweakreg": "relative",
+                "lens_star_ra": 64.66531678,
+                "lens_star_dec": -47.86464163,
+                "star_fwhm_arcsec": [
+                    0.1611,
+                    0.1638,
+                    0.166
+                ],
+                "centroid_offset_mas": [
+                    0.11,
+                    0.32
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 59,
+                "seconds": 15.3,
+                "fwhm_pix": 2.7266,
+                "fwhm_arcsec": 0.1636,
+                "pedestal_frac": 0.000303,
+                "compared_with": "empirical",
+                "compared_fwhm_arcsec": 0.1689
+            }
+        },
+        "SPT2147-50": {
+            "F200W": {
+                "n_frames": 24,
+                "n_injected": 6,
+                "n_stars": 25,
+                "star_spacing_px": 121,
+                "frames": [
+                    {
+                        "file": "jw01355024001_03101_00001_nrcb1_cal.fits",
+                        "x": -1221.164,
+                        "y": -1053.176,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01355024001_03101_00001_nrcb2_cal.fits",
+                        "x": -1214.46,
+                        "y": 1140.607,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01355024001_03101_00001_nrcb3_cal.fits",
+                        "x": 990.997,
+                        "y": -1055.906,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0
+                    },
+                    {
+                        "file": "jw01355024001_03101_00001_nrcb4_cal.fits",
+                        "x": 981.89,
+                        "y": 1126.896,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCB4",
+                        "opd": "wss:2022-09-05T20:45:32.296",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01355024001_03101_00002_nrcb1_cal.fits",
+                        "x": -959.395,
+                        "y": -791.224,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 11.1
+                    },
+                    {
+                        "file": "jw01355024001_03101_00002_nrcb2_cal.fits",
+                        "x": -950.063,
+                        "y": 1400.721,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 11.2
+                    },
+                    {
+                        "file": "jw01355024001_03101_00002_nrcb3_cal.fits",
+                        "x": 1251.163,
+                        "y": -793.42,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 11.1
+                    },
+                    {
+                        "file": "jw01355024001_03101_00002_nrcb4_cal.fits",
+                        "x": 1242.64,
+                        "y": 1388.751,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 11.1,
+                        "detector": "NRCB4",
+                        "opd": "wss:2022-09-05T20:52:41.800",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01355024001_05101_00001_nrcb1_cal.fits",
+                        "x": -1221.611,
+                        "y": -1052.665,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 20.0
+                    },
+                    {
+                        "file": "jw01355024001_05101_00001_nrcb2_cal.fits",
+                        "x": -1214.91,
+                        "y": 1141.12,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 20.1
+                    },
+                    {
+                        "file": "jw01355024001_05101_00001_nrcb3_cal.fits",
+                        "x": 990.547,
+                        "y": -1055.394,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 20.1
+                    },
+                    {
+                        "file": "jw01355024001_05101_00001_nrcb4_cal.fits",
+                        "x": 981.442,
+                        "y": 1127.406,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 20.0,
+                        "detector": "NRCB4",
+                        "opd": "wss:2022-09-05T20:45:32.296",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01355024001_05101_00002_nrcb1_cal.fits",
+                        "x": -958.531,
+                        "y": -790.641,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 22.2
+                    },
+                    {
+                        "file": "jw01355024001_05101_00002_nrcb2_cal.fits",
+                        "x": -949.192,
+                        "y": 1401.298,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 22.2
+                    },
+                    {
+                        "file": "jw01355024001_05101_00002_nrcb3_cal.fits",
+                        "x": 1252.024,
+                        "y": -792.835,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 22.1
+                    },
+                    {
+                        "file": "jw01355024001_05101_00002_nrcb4_cal.fits",
+                        "x": 1243.502,
+                        "y": 1389.335,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 22.1,
+                        "detector": "NRCB4",
+                        "opd": "wss:2022-09-05T20:52:41.800",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01355024001_07101_00001_nrcb1_cal.fits",
+                        "x": -1221.14,
+                        "y": -1052.909,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 8.0
+                    },
+                    {
+                        "file": "jw01355024001_07101_00001_nrcb2_cal.fits",
+                        "x": -1214.435,
+                        "y": 1140.874,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 7.9
+                    },
+                    {
+                        "file": "jw01355024001_07101_00001_nrcb3_cal.fits",
+                        "x": 991.019,
+                        "y": -1055.638,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 8.0
+                    },
+                    {
+                        "file": "jw01355024001_07101_00001_nrcb4_cal.fits",
+                        "x": 981.913,
+                        "y": 1127.163,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 7.9,
+                        "detector": "NRCB4",
+                        "opd": "wss:2022-09-05T20:45:32.296",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01355024001_07101_00002_nrcb1_cal.fits",
+                        "x": -959.502,
+                        "y": -790.882,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 15.8
+                    },
+                    {
+                        "file": "jw01355024001_07101_00002_nrcb2_cal.fits",
+                        "x": -950.169,
+                        "y": 1401.063,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 15.9
+                    },
+                    {
+                        "file": "jw01355024001_07101_00002_nrcb3_cal.fits",
+                        "x": 1251.055,
+                        "y": -793.077,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 15.8
+                    },
+                    {
+                        "file": "jw01355024001_07101_00002_nrcb4_cal.fits",
+                        "x": 1242.532,
+                        "y": 1389.093,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 15.8,
+                        "detector": "NRCB4",
+                        "opd": "wss:2022-09-05T20:52:41.800",
+                        "flux_on_frame": 1.0
+                    }
+                ],
+                "tweakreg": "relative",
+                "lens_star_ra": 326.82921014,
+                "lens_star_dec": -50.59847637,
+                "star_fwhm_arcsec": [
+                    0.0736,
+                    0.0744,
+                    0.076
+                ],
+                "centroid_offset_mas": [
+                    -0.41,
+                    -0.54
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 119,
+                "seconds": 62.5,
+                "fwhm_pix": 2.4864,
+                "fwhm_arcsec": 0.0746,
+                "pedestal_frac": 4.3e-05,
+                "compared_with": "empirical",
+                "compared_fwhm_arcsec": 0.0753
+            },
+            "F277W": {
+                "n_frames": 2,
+                "n_injected": 2,
+                "n_stars": 25,
+                "star_spacing_px": 61,
+                "frames": [
+                    {
+                        "file": "jw01355024001_07101_00001_nrcblong_cal.fits",
+                        "x": 450.407,
+                        "y": 535.095,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCB5",
+                        "opd": "wss:2022-09-05T21:13:48.753",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01355024001_07101_00002_nrcblong_cal.fits",
+                        "x": 578.965,
+                        "y": 663.894,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 7.0,
+                        "detector": "NRCB5",
+                        "opd": "wss:2022-09-05T21:18:49.361",
+                        "flux_on_frame": 1.0
+                    }
+                ],
+                "tweakreg": "relative",
+                "lens_star_ra": 326.82920357,
+                "lens_star_dec": -50.59848053,
+                "star_fwhm_arcsec": [
+                    0.1191,
+                    0.1291,
+                    0.1385
+                ],
+                "centroid_offset_mas": [
+                    -3.45,
+                    -0.6
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 59,
+                "seconds": 14.9,
+                "fwhm_pix": 2.1543,
+                "fwhm_arcsec": 0.1293,
+                "pedestal_frac": 0.000135,
+                "compared_with": "empirical",
+                "compared_fwhm_arcsec": 0.1315
+            },
+            "F356W": {
+                "n_frames": 2,
+                "n_injected": 2,
+                "n_stars": 25,
+                "star_spacing_px": 61,
+                "frames": [
+                    {
+                        "file": "jw01355024001_03101_00001_nrcblong_cal.fits",
+                        "x": 450.486,
+                        "y": 535.11,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCB5",
+                        "opd": "wss:2022-09-05T20:45:32.296",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01355024001_03101_00002_nrcblong_cal.fits",
+                        "x": 578.881,
+                        "y": 663.858,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 7.3,
+                        "detector": "NRCB5",
+                        "opd": "wss:2022-09-05T20:52:41.800",
+                        "flux_on_frame": 1.0
+                    }
+                ],
+                "tweakreg": "relative",
+                "lens_star_ra": 326.82920357,
+                "lens_star_dec": -50.59848053,
+                "star_fwhm_arcsec": [
+                    0.1405,
+                    0.1446,
+                    0.1503
+                ],
+                "centroid_offset_mas": [
+                    -1.91,
+                    -0.7
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 59,
+                "seconds": 15.0,
+                "fwhm_pix": 2.418,
+                "fwhm_arcsec": 0.1451,
+                "pedestal_frac": 0.000236,
+                "compared_with": "empirical",
+                "compared_fwhm_arcsec": 0.1501
+            },
+            "F444W": {
+                "n_frames": 2,
+                "n_injected": 2,
+                "n_stars": 25,
+                "star_spacing_px": 61,
+                "frames": [
+                    {
+                        "file": "jw01355024001_05101_00001_nrcblong_cal.fits",
+                        "x": 450.516,
+                        "y": 535.493,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 0.0,
+                        "detector": "NRCB5",
+                        "opd": "wss:2022-09-05T21:02:32.341",
+                        "flux_on_frame": 1.0
+                    },
+                    {
+                        "file": "jw01355024001_05101_00002_nrcblong_cal.fits",
+                        "x": 578.82,
+                        "y": 664.324,
+                        "tweakreg": "COMPLETE",
+                        "tweak_shift_mas": 15.8,
+                        "detector": "NRCB5",
+                        "opd": "wss:2022-09-05T21:06:50.004",
+                        "flux_on_frame": 1.0
+                    }
+                ],
+                "tweakreg": "relative",
+                "lens_star_ra": 326.82920357,
+                "lens_star_dec": -50.59848053,
+                "star_fwhm_arcsec": [
+                    0.1616,
+                    0.1639,
+                    0.1661
+                ],
+                "centroid_offset_mas": [
+                    -0.11,
+                    -0.11
+                ],
+                "stpsf_version": "2.2.0",
+                "stpsf_fov_pixels": 59,
+                "seconds": 15.3,
+                "fwhm_pix": 2.7326,
+                "fwhm_arcsec": 0.164,
+                "pedestal_frac": 0.000303,
+                "compared_with": "empirical",
+                "compared_fwhm_arcsec": 0.1697
+            }
+        }
+    }
+}

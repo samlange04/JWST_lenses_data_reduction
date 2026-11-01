@@ -161,6 +161,17 @@ signal_to_noise = image / noise
 - **The COWLS PSFs are shared**: each filter's PSF is built from the stars of all 17 COWLS
   fields together (31–70 stars), because a single field holds only 0–11. Every COWLS lens in a
   filter therefore has the same `psf.fits` (`PSFMETH = empirical_pooled`).
+- **The star-built PSFs have known biases, measured but not yet corrected.** Measured against
+  model stars injected into the same exposures:
+  - the way the kernel is binned to the image pixels broadens it by 2–6% in FWHM, and by up to
+    16% in F115W;
+  - a few faint compact galaxies pass the star selection and broaden it further (mostly COWLS
+    F444W);
+  - in the undersampled bands (F115W–F200W, F277W), the bright stars it is built from come out
+    narrower than a faint arc would, by up to 10–20%.
+
+  These partly cancel. In F356W and F444W the PSFs are good to a few per cent. Details are in
+  AGENTS.md (*PSF*).
 - **COWLS depth varies from lens to lens**, because it depends on where each lens fell in
   COSMOS-Web's dither pattern: 2–4 exposures per filter, and COSJ100028+021928 has a single
   SW exposure, so its F115W/F150W cosmic rays were caught on the ramp alone. COSJ095917+015424
@@ -190,8 +201,9 @@ non-destructive readouts (a *ramp*), takes several exposures shifted slightly be
    centred on the lens, at 0.03″ (SW) and 0.06″ (LW).
 5. **Cuts out** the stamp around the deflector and writes the noise map from the mosaic's
    propagated error, times the measured correction above.
-6. **Measures the PSF** from stars in the same mosaic (STScI's STPSF model is the fallback
-   where there are too few stars; no product uses it). For the COWLS lenses, whose small
+6. **Measures the PSF** from stars in the same mosaic. Where there are too few stars, the
+   fallback is STScI's STPSF model, put into every exposure and resampled exactly as the data
+   were; no product uses it. For the COWLS lenses, whose small
    fields hold few stars, one PSF per filter is built from the stars of all 17 fields.
 7. **Masks and marks** — the masks and image positions are drawn and clicked by hand in
    small interactive tools.

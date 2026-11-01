@@ -16,9 +16,12 @@ writes:
 
 the second being the amplitude-trimmed modelling kernel beside the science stamp. With too
 few usable stars (< --min-stars, default 3) or a poor empirical build, --method auto falls
-back to the STPSF model at the lens's detector position (scripts/psf_models.py), rotated to
-North-up through a contributing _cal file's WCS and broadened by the analytic drop box --
-tagged PSFMETH='model_stpsf', PSFBROAD='analytic'. The PSF error map (bootstrap over stars,
+back to the STPSF model: injected into every cal frame at the lens and resampled exactly as
+the science frames were (scripts/make_psf_inject.py), tagged PSFMETH='inject_stpsf',
+PSFBROAD='injection'. If the injection fails, the STPSF PSF rotated to North-up through a
+contributing _cal file's WCS and broadened by the analytic drop box is shipped instead
+(scripts/psf_models.py; PSFMETH='model_stpsf', PSFBROAD='analytic'), which is too narrow:
+5-11% in FWHM against the COWLS empirical PSFs. The PSF error map (bootstrap over stars,
 jackknife below 6) is the empirical tier's only. Per-lens overrides live in
 info/overrides/psf_stars.json (include/exclude stars, method, any tunable), as in the HST repo.
 
@@ -987,6 +990,9 @@ def main():
             use_model = True
 
     broadened_box = None
+    if method_used is None and a.pool:
+        raise SystemExit(f'ERROR: the pooled {filt} build has no empirical PSF ({n_stars} stars), and a pool has '
+                         f'no model tier (the model is per lens: make_psf.py --lens L --method model).')
     if method_used is None:
         tag = 'forced' if method == 'model' else (f'{n_stars} stars < {params["min_stars"]}' if too_few else 'empirical failed')
         print(f'  method: MODEL (STPSF)  [{tag}]')
@@ -1001,13 +1007,26 @@ def main():
 
     kernel = oversampled_to_kernel(epsf_data, oversample, star_size)
     if method_used == 'model_stpsf':
-        # STPSF omits the resample step's drop broadening: apply the analytic box (see
-        # psf_models.analytic_drop_broaden; the injection route is the honest fix).
+        # STPSF omits the resample step's broadening. The kernel shipped is the model injected
+        # into the cal frames and resampled as the science was (make_psf_inject.py); the
+        # analytic drop box is its fallback, and too narrow (COWLS 2026-10-30), so it is kept
+        # beside the product as psf_kernel_analytic.fits for comparison only.
         native = mast_target_names.NATIVE_SCALE[inst_key.split('/')[1]]
         n_frames = int(phdr.get('NDRIZIM', hdr.get('NDRIZIM', 1)) or 1)
         kernel, broadened_box = psf_models.analytic_drop_broaden(kernel, float(hdr.get('PIXFRAC', 1.0)),
                                                                  native, scale, n_frames=n_frames)
         print(f'  analytic drop broadening: box {broadened_box:.2f} px ({n_frames} frames)')
+        try:
+            import make_psf_inject
+            injected, inject_info = make_psf_inject.injected_kernel(sample, a.lens, filt, star_size, a.variant)
+        except Exception as exc:
+            print(f'  WARNING: injection failed ({exc.__class__.__name__}: {exc}); shipping the analytic box')
+        else:
+            ahdr = fits.Header()
+            ahdr['PSFMETH'] = ('model_stpsf', 'STPSF + analytic drop box (comparison only)')
+            ahdr['PSFFWHM'] = (round(measure_fwhm(kernel) or 0.0, 4), 'fitted kernel FWHM (pixels)')
+            write_fits(subtract_pedestal(kernel)[0], ahdr, os.path.join(output_dir, 'psf_kernel_analytic.fits'))
+            kernel, method_used, model_info = injected, 'inject_stpsf', dict(model_info, injection=inject_info)
     kernel, pedestal_frac = subtract_pedestal(kernel)
     if abs(pedestal_frac) >= 1e-4:
         print(f'  pedestal removed: {pedestal_frac:.2e} of peak')
@@ -1036,7 +1055,7 @@ def main():
             err_method = err_source = None
 
     khdr = fits.Header()
-    khdr['PSFMETH'] = (method_used, 'empirical ePSF or STPSF model')
+    khdr['PSFMETH'] = (method_used, 'empirical, or STPSF injected/analytic')
     khdr['PSFNSTAR'] = (n_stars, 'stars used (0 for model)')
     khdr['PSFOVSMP'] = (oversample, 'ePSF build oversampling factor')
     khdr['PSFPXSCL'] = (round(scale, 5), 'kernel pixel scale (arcsec)')
@@ -1049,10 +1068,15 @@ def main():
     khdr['PSFPED'] = (round(pedestal_frac, 6), 'ePSF-wing pedestal removed (fraction of peak)')
     khdr['PSFVAR'] = (a.variant or 'standard', 'reduction variant the PSF was built from')
     if method_used == 'model_stpsf':
-        khdr['PSFBROAD'] = ('analytic', 'drop broadening: analytic box (not injection)')
+        khdr['PSFBROAD'] = ('analytic', 'drop broadening: analytic box (injection failed)')
         khdr['PSFBOX'] = (round(broadened_box, 4), 'drop box width, output px')
         khdr['PSFOPD'] = (str(model_info.get('opd')), 'STPSF OPD used')
         khdr['PSFDET'] = (str(model_info.get('detector')), 'STPSF detector')
+    elif method_used == 'inject_stpsf':
+        khdr['PSFBROAD'] = ('injection', 'injected into the cal frames + resampled')
+        khdr['PSFINJ'] = (True, 'built by artificial-star injection + resample')
+        khdr['PSFNINJ'] = (model_info['injection']['n_injected'], 'frames holding the lens star')
+        khdr['PSFNSTI'] = (model_info['injection']['n_stars'], 'injected stars averaged')
     write_fits(kernel, khdr, os.path.join(output_dir, 'psf_kernel.fits'))
     plot_psf(kernel, epsf_data, star_stamps, scale, fwhm_pix, os.path.join(output_dir, 'psf.png'),
              title=f'{label}  {filt}  [{method_used}]  ({n_stars} stars)')
@@ -1069,7 +1093,8 @@ def main():
         'fwhm_pix_err': round(fwhm_err, 4) if fwhm_err is not None else None,
         'psf_err_frac': round(err_frac, 8) if err_frac is not None else None,
         'err_method': err_method, 'err_source': err_source, 'n_boot_valid': n_boot_valid,
-        'variant': a.variant or 'standard', 'broadening': 'analytic' if broadened_box else None,
+        'variant': a.variant or 'standard',
+        'broadening': {'model_stpsf': 'analytic', 'inject_stpsf': 'injection'}.get(method_used),
         'model_info': model_info or None, **({'pool': fld['pool']} if a.pool else {}),
     })
     print('  done')
