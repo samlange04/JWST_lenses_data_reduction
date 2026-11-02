@@ -295,7 +295,7 @@ def injected_kernel(sample, lens, filt, size, variant='', work_dir=None, keep_wo
         r.save_results = False
         r.in_memory = True
         # Pass 1 is the grid as placed. A star is used when it lies wholly on exactly the frames
-        # the lens lies on. Near detector edges few do (one on lens K), and one star is one
+        # the lens lies on. Near detector edges few do (one on COSJ100024+015334), and one star is one
         # sub-pixel phase, so passes with the grid shifted by whole output pixels follow until
         # MIN_PHASE_STARS stars are averaged; every pass's star at the lens stays on its frames.
         for dx, dy in [(0, 0)] + PHASE_SHIFTS:
@@ -314,7 +314,7 @@ def injected_kernel(sample, lens, filt, size, variant='', work_dir=None, keep_wo
                    if np.array_equal(on[:, s_] > 0, lens_frames) and np.all(on[lens_frames, s_] > 0.999)]
             if centre not in use and (first or np.array_equal(on[:, centre] > 0, lens_frames)):
                 use.append(centre)        # the star at the lens, whatever its coverage (it may sit near
-                                          # a detector edge, as on lens K), if on the lens's frames
+                                          # a detector edge, as on COSJ100024+015334), if on the lens's frames
             result = r.run(library)
             data = np.nan_to_num(np.asarray(result.data, float))
             n_passes += 1
@@ -367,13 +367,13 @@ def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--lens', required=True)
     p.add_argument('--filt', required=True)
-    p.add_argument('--sample', default=None)
+    p.add_argument('--sample', type=lens_samples.sample_arg, default=None, help='default: the sample --lens is in')
     p.add_argument('--variant', default='', choices=('',) + stamp_paths.VARIANT_COMPONENTS)
     p.add_argument('--keep-work', action='store_true',
                    help='keep data/psf/<sample>/<lens>/<FILT>/_inject_work (the asn) for inspection')
     a = p.parse_args()
     import make_psf
-    sample = a.sample or lens_samples.sample_of(a.lens)
+    sample = lens_samples.resolve_sample(p, a)
     filt = lens_samples.canonical_filter(a.filt)
     ch = lens_samples.channel(filt)
     size = int(make_psf._INSTR[f'NIRCAM/{ch}']['star_size']) | 1

@@ -113,7 +113,7 @@ def representative_cal(sample, lens, filt):
     import glob
     from astropy.io import fits
     from astropy.wcs import WCS
-    coord = lens_samples.coord(lens, sample)
+    coord = lens_samples.deflector_coord(lens, sample) or lens_samples.coord(lens, sample)   # the measured lens centre
     cal_dir = os.path.join(ws_path, 'data', 'stage2', sample, lens, filt)
     for f in sorted(glob.glob(os.path.join(cal_dir, '*_cal.fits'))):
         with fits.open(f) as h:

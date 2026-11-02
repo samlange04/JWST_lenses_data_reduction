@@ -173,7 +173,7 @@ def load_checks(snr_min=CAL_MIN_SNR):
         filt = os.path.basename(os.path.dirname(f))
         z = np.load(f)
         for i in range(len(z['real'])):
-            # extended (a galaxy), or much NARROWER than its twin (a defect: lens B's F277W stars
+            # extended (a galaxy), or much NARROWER than its twin (a defect: COSJ095917+015424's F277W stars
             # at the survey edge come out at 0.59), or too faint to constrain the core
             if (z['extended'][i] or not np.isfinite(z['ratio'][i]) or z['ratio'][i] < 1 / EXTENDED_RATIO
                     or z['peak_snr'][i] < snr_min):
@@ -288,7 +288,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--lens')
     p.add_argument('--filt')
-    p.add_argument('--sample')
+    p.add_argument('--sample', type=lens_samples.sample_arg, default=None, help='default: the sample --lens is in')
     p.add_argument('--charge-diffusion', default=None,
                    help="'default' for STPSF's own width, a value in arcsec, or none for the calibrated one")
     p.add_argument('--calibrate', action='store_true')
@@ -304,7 +304,7 @@ def main():
     cd = a.charge_diffusion
     if cd not in (None, 'default'):
         cd = float(cd)
-    band(a.sample or lens_samples.sample_of(a.lens), a.lens, lens_samples.canonical_filter(a.filt), cd)
+    band(lens_samples.resolve_sample(p, a), a.lens, lens_samples.canonical_filter(a.filt), cd)
 
 
 if __name__ == '__main__':

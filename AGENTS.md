@@ -43,7 +43,7 @@ query, and a second `run_reduce_all.sh` pass picked them up. **Disk on macOS:** 
 hourly local snapshots keep pruned or deleted files' blocks until they are purged, so `df`
 falls faster than the kept size suggests; macOS purges them under pressure.
 Stamps cut 2026-10-30 at the default 12", with their own measured noise factors (*Noise*).
-**COSJ095917+015424 (B) sits ~2" from COSMOS-Web's southern edge:** its lens is covered,
+**COSJ095917+015424 sits ~2" from COSMOS-Web's southern edge:** its lens is covered,
 but 16% of each SW and 30% of each LW stamp is off the survey (noise 1e8, `n_bad` in
 `lens_stamp_qc.json`); every other COWLS stamp has 0–4 bad pixels. No masks or positions yet.
 
@@ -457,7 +457,7 @@ EFFEXPTM), `lens_instrument.json` (`NIRCAM/SW` or `NIRCAM/LW`). No data → `nul
 - **The HST repo's empirical PSF tier has the binning bias, not fixed there** (*PSF*, finding
   1: ACS/WFC +8–21% FWHM). The same goes for the pedestal subtraction, and the galaxy gate needs a
   resampled-model reference there too.
-- **COSJ100028+021928 (N) F115W's empirical check is broken** (a single SW exposure); the shipped
+- **COSJ100028+021928 F115W's empirical check is broken** (a single SW exposure); the shipped
   model is unaffected.
 - **Tweakreg on the other samples** is unchanged. They were not hit by the file-order trap: the
   injection re-runs show SPT frames moving 0–45 mas and B1938+666 F115W's lens frames 0–20 mas.
@@ -725,12 +725,12 @@ Against the previous shipped PSFs (empirical, or COWLS pooled), new/old FWHM:
   crval/scale/rotation, crpix moved by whole pixels; checked to 1e-3 px for every star). The kernel
   is the MEAN of the stars that lie wholly on exactly the frames the lens does.
 - **At least 12 stars (`MIN_PHASE_STARS`).** Near detector edges few grid stars share the lens's
-  frames: before 2026-11-01, 20 of 80 kernels averaged 1–11 stars, and 7 of them (lenses E, J and K
-  in SW, and all of K) were a SINGLE star, i.e. one phase. Now passes follow with the whole grid
+  frames: before 2026-11-01, 20 of 80 kernels averaged 1–11 stars, and 7 of them (COSJ095950+022057,
+  COSJ100018+022138 and COSJ100024+015334 in SW, and all of COSJ100024+015334) were a SINGLE star, i.e. one phase. Now passes follow with the whole grid
   shifted by 1–3 output pixels (`PHASE_SHIFTS`) until 12 stars are averaged. Each pass puts the star
   at the lens at a new phase on every detector while keeping it on the lens's frames; it is accepted
   whatever its coverage, as the lens star always was, since the lens itself can sit near a detector
-  edge (lens K: 12 passes). `n_stars`/`n_passes` are recorded per band. The bands that already had
+  edge (COSJ100024+015334: 12 passes). `n_stars`/`n_passes` are recorded per band. The bands that already had
   12 stars are bit-identical.
 - Why a grid: with 2–4 dithers an undersampled star's resampled shape depends on its sub-pixel
   phase on the detectors. Single injected stars a pixel or two apart on SPT0418-47 F115W gave
@@ -799,7 +799,7 @@ The question: does a bright, compact lens core need a different PSF from the fai
 - **The weights do not.** Across all 80 bands the WHT at the lens peak is a median 0.99 of the
   1–3" annulus around it, so lens cores are not in the saturating-star regime and are resampled
   as the arcs are. A few LW bands dip to 0.23–0.7 (SPT0418-47 F277W 0.23, SPT2147-50 LW ~0.7,
-  lens K LW 0.6, lens A F277W 0.7), where one frame's core pixels look flagged by jump or
+  COSJ100024+015334 LW 0.6, COSJ095914+021219 F277W 0.7), where one frame's core pixels look flagged by jump or
   outlier detection.
 - **The test, for the phase.** A Sérsic lens galaxy (n = 4, R_e = 0.5", q = 0.8) is injected into
   the real frames at the 3×3 central grid positions: rendered on a 4× detector grid, convolved with
@@ -863,7 +863,7 @@ The empirical checks on the bands with ≥ 6 stars agree with the model to core 
 closure test's noise level predicts. Two exceptions:
 - **In undersampled bands the ePSF is narrower than the model**, as finding 4 predicts: B1938+666
   F115W 0.051" vs 0.059"; SPT0418-47 F277W 0.124" vs 0.131".
-- **COSJ100028+021928 (N) F115W gives a broken ePSF** (L1 1.47). Its SW rests on one exposure,
+- **COSJ100028+021928 F115W gives a broken ePSF** (L1 1.47). Its SW rests on one exposure,
   whose cosmic rays only `jump` caught.
 
 **The audit that led here (2026-10-30; scratch scripts in `diagnostics/psf_closure/`, the numbers
@@ -1184,7 +1184,7 @@ per-sample `mosaic_field`/`prune_intermediates`, neighbour hard-linking of pool 
 
 Exercised 2026-10-30: the STPSF model tier of `make_psf.py`, the pooled empirical tier,
 `make_psf_inject.py` (24 bands standalone, including both B1938+666 bands and the `from_lw` SW
-route; through `make_psf.py --method model --output` on COWLS C F444W; see *PSF*), and the COWLS
+route; through `make_psf.py --method model --output` on COSJ095920+015851 F444W; see *PSF*), and the COWLS
 tweakreg settings `tweakreg_lens_first` / `tweakreg_sw_from_lw` (all 68 bands).
 Exercised 2026-10-31: the injected tier as the shipped PSF on all 80 bands, `--method empirical`,
 `--pool` as a check, and `psf_star_check.py` (three passes over all 80 bands, `--calibrate`,

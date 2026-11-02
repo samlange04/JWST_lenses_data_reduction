@@ -184,7 +184,7 @@ def instrument_key(hdr):
     if ch in ('SHORT', 'LONG'):
         return 'NIRCAM/SW' if ch == 'SHORT' else 'NIRCAM/LW'
     filt = str(hdr.get('FILTER', '')).strip().upper()
-    return f'NIRCAM/{lens_samples.channel(filt)}'
+    return f'NIRCAM/{mast_target_names.channel(filt)}'
 
 
 def resolve_params(inst_key, json_entry, cli):
