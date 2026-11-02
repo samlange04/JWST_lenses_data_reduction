@@ -15,7 +15,9 @@
                 "stamp_size": 7.0,
                 "stamp_size_note": "2026-10-04: 7\" (232 SW / 116 LW px, 6.96\") instead of 12\". The ring is 0.45\" and the lens light reaches ~2\"; at 12\" a third of the stamp was two detector streaks and a galaxy group to mask.",
                 "redshift_lens": 0.881,
+                "redshift_lens_kind": "spec (Keck, Tonry & Kochanek 2000)",
                 "redshift_source": 2.059,
+                "redshift_source_kind": "spec (CO, Riechers+11)",
                 "best_band_visual": "F115W",
                 "best_band_visual_note": "Set by eye (2026-11-01): F115W, over the measured F277W, for its 0.03\" pixels and sharper PSF on a 0.45\" ring."
             }
@@ -32,7 +34,9 @@
                 "theta_e": 1.207,
                 "theta_e_ref": "Cathey+24",
                 "redshift_lens": 0.263,
+                "redshift_lens_kind": "spec (optical/NIR, Rotermund et al. in prep, via Spilker+16 Table 1)",
                 "redshift_source": 4.22,
+                "redshift_source_kind": "spec (CO, Weiss+13)",
                 "deflector_ra": 64.66533624,
                 "deflector_dec": -47.8646396,
                 "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F200W, F277W, F356W, F444W, which agree to 20 mas; +17 mas E, -23 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
@@ -44,7 +48,9 @@
                 "theta_e": 1.195,
                 "theta_e_ref": "Spilker+16",
                 "redshift_lens": 0.845,
+                "redshift_lens_kind": "spec (optical/NIR, Rotermund et al. in prep, via Spilker+16 Table 1)",
                 "redshift_source": 3.76,
+                "redshift_source_kind": "spec (CO, Weiss+13)",
                 "deflector_ra": 326.82905952,
                 "deflector_dec": -50.5985216,
                 "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F200W, F277W, F356W, F444W, which agree to 8 mas; -359 mas E, -178 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
@@ -52,7 +58,7 @@
         }
     },
     "cowls_spectacular": {
-        "description": "The 17 'spectacular' lenses of COWLS II (Mahler et al. 2025, MNRAS 544, L8, Table 1): the top tier of the COSMOS-Web Lens Survey, JWST GO 1727 COSMOS-Web (PI Kartaltepe & Casey), NIRCam F115W + F277W and F150W + F444W, 4 dithers x 258 s per filter (SHALLOW4, 5 groups) per tile, more where tiles overlap. The F770W MIRI parallels are deliberately not reduced (NIRCam only). Lens keys are the COWLS IDs; cowls_letter is the paper's A-Q. ra/dec are the COSMOS-Web catalogue positions of the lens galaxies (Shuntov+24), so they are the mosaics' CRVAL and the stamp centre. theta_e (arcsec) is from the COWLS I PyAutoLens models (Nightingale+25), for orientation only. Redshifts are COWLS II's, with their source in redshift_*_kind; null where the paper has none (P has no lens redshift; only J, K and L have source redshifts).",
+        "description": "The 17 'spectacular' lenses of COWLS II (Mahler et al. 2025, MNRAS 544, L8, Table 1): the top tier of the COSMOS-Web Lens Survey, JWST GO 1727 COSMOS-Web (PI Kartaltepe & Casey), NIRCam F115W + F277W and F150W + F444W, 4 dithers x 258 s per filter (SHALLOW4, 5 groups) per tile, more where tiles overlap. The F770W MIRI parallels are deliberately not reduced (NIRCam only). Lens keys are the COWLS IDs; cowls_letter is the paper's A-Q. ra/dec are the COSMOS-Web catalogue positions of the lens galaxies (Shuntov+24), so they are the mosaics' CRVAL and the stamp centre. theta_e (arcsec) is from the COWLS I PyAutoLens models (Nightingale+25), for orientation only. Redshifts are COWLS II's, with their source and method in redshift_*_kind (spec or photo-z; only spectroscopic ones count as confirmed); null where the paper has none (COSJ100119+014849 has no lens redshift; only COSJ100018+022138, COSJ100024+015334 and COSJ100024+021749 have source redshifts).",
         "proposal_id": "1727",
         "mast_query": "position",
         "mast_query_note": "COSMOS-Web targets are survey tiles (CWEBTILE-*), not lenses, so a lens is found by position: every NIRCam/IMAGE observation of GO 1727 within the mosaic field, then only the detector files whose MAST footprint overlaps the field (download_nircam.query_position).",

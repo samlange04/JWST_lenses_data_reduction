@@ -33,7 +33,7 @@ tools drew the masks and marked the positions.
 | `b1938` | B1938+666 | GO 8281 (PI Vegetti) | F115W, F277W (21 dithers, ~24 h per filter) | 0.881 / 2.059 |
 | `spt` | SPT0418-47 | ERS 1355 TEMPLATES (PI Rigby) | F115W, F150W, F200W, F277W, F356W, F444W | 0.263 / 4.22 |
 | `spt` | SPT2147-50 | ERS 1355 TEMPLATES (PI Rigby) | F200W, F277W, F356W, F444W | 0.845 / 3.76 |
-| `cowls_spectacular` | the 17 "spectacular" COWLS lenses of Mahler et al. (2025), `COSJ095914+021219` … `COSJ100121+022740` | GO 1727 COSMOS-Web (PIs Kartaltepe & Casey) | F115W, F150W, F277W, F444W (2–4 exposures of 258 s per filter at the lens) | per lens in `lens_samples.json`; most have no source redshift |
+| `cowls_spectacular` | the 17 "spectacular" COWLS lenses of Mahler et al. (2025), `COSJ095914+021219` … `COSJ100121+022740` | GO 1727 COSMOS-Web (PIs Kartaltepe & Casey) | F115W, F150W, F277W, F444W (2–4 exposures of 258 s per filter at the lens) | per lens in `lens_samples.json`: 11 spectroscopic and 5 photometric lens redshifts, 3 spectroscopic source redshifts |
 
 That is 80 lens-and-filter images in total (12 + 68 COWLS). A filter name gives its approximate central
 wavelength in hundredths of a micron: F115W is centred near 1.15 μm and F444W near 4.4 μm,
@@ -172,8 +172,12 @@ signal_to_noise = image / noise
   SW exposure, so its F115W/F150W cosmic rays were caught on the ramp alone. COSJ095917+015424
   sits at the survey's southern edge: its lens is covered, but part of its stamp is not
   (noise 10⁸ there).
-- **Redshifts** for every lens are in `info/samples/lens_samples.json`, with their source for
-  the COWLS lenses (spectroscopic or photometric); a missing value is `null`.
+- **Redshifts** for every lens are in `info/samples/lens_samples.json`, each with its source and
+  method. Only a spectroscopic redshift counts as confirmed here. A photometric one is always
+  labelled: "photo-z" on the figures, and `redshift_*_kind: "photometric"` in the exported
+  `info.json`. A missing value is `null`. All B1938+666 and SPT redshifts are spectroscopic. For
+  the COWLS lenses, both redshifts are spectroscopic only for COSJ100018+022138 and
+  COSJ100024+021749.
 
 [`AGENTS.md`](AGENTS.md) has the measurements behind each of these.
 
@@ -277,7 +281,7 @@ Please also credit the programs and papers for the lenses you use: GO 8281 (PI V
 B1938+666, the TEMPLATES program (Rigby et al. 2025) for the SPT lenses, and COSMOS-Web
 (Casey et al. 2023) and the COSMOS-Web Lens Survey (Nightingale et al. 2025; Mahler et al. 2025)
 for the COWLS lenses. The redshifts come from Tonry & Kochanek (2000) and Riechers (2011) for
-B1938+666, Weiß et al. (2013) and Reuter et al. (2020) for the SPT lenses, and, for the COWLS
+B1938+666, Weiß et al. (2013), Reuter et al. (2020) and Spilker et al. (2016) for the SPT lenses, and, for the COWLS
 lenses, Mahler et al. (2025) Table 1 (from DESI, the COSMOS-Web catalogue of Shuntov et al.
 2024, Shuntov et al. 2025, van der Wel et al. 2013 and Jin et al. 2024). Please acknowledge the JWST data, e.g. *"This
 work is based on observations made with the NASA/ESA/CSA James Webb Space Telescope. The data
