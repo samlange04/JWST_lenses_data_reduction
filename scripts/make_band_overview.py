@@ -191,14 +191,14 @@ def build_figure(sample, lens, fig=None):
             ink = 'black' if i == 2 else 'white'
             ax.plot([bx, bx - 1.0], [by, by], color=ink, lw=2)
             ax.text(bx - 0.5, by + 0.04 * wy, '1"', color=ink, ha='center', fontsize=8)
-            if i == 0 and j == 0:                         # compass, top left: N up, E left
-                ox, oy, L = xa - 0.45 * wx, yb - 0.55 * wy, 0.16 * wx
-                ax.annotate('', xy=(ox, oy + L), xytext=(ox, oy),
-                            arrowprops=dict(arrowstyle='->', color='white', lw=1.2))
-                ax.annotate('', xy=(ox + L, oy), xytext=(ox, oy),
-                            arrowprops=dict(arrowstyle='->', color='white', lw=1.2))
-                ax.text(ox, oy + L * 1.12, 'N', color='white', ha='center', va='bottom', fontsize=8)
-                ax.text(ox + L * 1.12, oy, 'E', color='white', ha='right', va='center', fontsize=8)
+    # compass in the figure's top-left margin, clear of every panel: N up, E left
+    from matplotlib.patches import FancyArrowPatch
+    W, H = fig.get_size_inches()
+    ox, oy, L = 0.07, 0.93, 0.035                      # figure fractions; L along x
+    for dx, dy, lab, ha, va in ((0.0, L * W / H, 'N', 'center', 'bottom'), (-L, 0.0, 'E', 'right', 'center')):
+        fig.add_artist(FancyArrowPatch((ox, oy), (ox + dx, oy + dy), transform=fig.transFigure,
+                                       arrowstyle='->', mutation_scale=12, color='black', lw=1.3))
+        fig.text(ox + 1.15 * dx, oy + 1.15 * dy, lab, ha=ha, va=va, fontsize=9)
     zl_s = f'{zl:.3f}' if zl is not None else '?'
     zs_s = f'{zs:.3f}' if zs is not None else '?'
     te_s = f'{te:.2f}"' if te else '?'

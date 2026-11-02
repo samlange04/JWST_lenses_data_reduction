@@ -210,17 +210,19 @@ def stamp_size(lens, sample=None):
     return entry(lens, sample).get('stamp_size')
 
 
-def set_primary_band(lens, band, note, sample=None):
-    """Record a REVIEWED primary band for `lens` in lens_samples.json (choose_best_band.py), with a
-    note saying how it was chosen. The file is rewritten in its own format (4-space JSON, non-ASCII
-    kept), so a reviewed band is an ordinary one-line diff."""
+def set_best_band_visual(lens, band, note, sample=None):
+    """Record the band chosen BY EYE for `lens` as `best_band_visual` in lens_samples.json
+    (choose_best_band.py), with a note saying how. Visual inspection only: not necessarily the
+    band with the highest arc S/N (that is `best_band_arc_snr` in lens_primary_band.json). The
+    file is rewritten in its own format (4-space JSON, non-ASCII kept), so a choice is an
+    ordinary one-line diff."""
     global _cache
     sample = sample or sample_of(lens)
     with open(SAMPLES_JSON) as f:
         data = json.load(f)
     e = data[sample]['lenses'][lens]
-    e['primary_band'] = canonical_filter(band)
-    e['primary_band_note'] = note
+    e['best_band_visual'] = canonical_filter(band)
+    e['best_band_visual_note'] = note
     with open(SAMPLES_JSON, 'w') as f:
         f.write(json.dumps(data, indent=4, ensure_ascii=False) + '\n')
     _cache = None
@@ -236,22 +238,22 @@ def primary_band(lens, sample=None):
     """(band, source): the lens's PRIMARY band -- the one the mask and arc-mask GUIs draw first
     (the other bands start from its mask), the one positions are clicked on, and the one to
     model first. `source` says where it came from:
-      'reviewed'  `primary_band` in lens_samples.json, set by hand after looking (always wins);
-      'measured'  the suggestion of choose_primary_band.py in lens_primary_band.json (the band
-                  where a lensed image's position is best defined: arc S/N, discounted where
-                  the band's PSF under-resolves theta_E);
+      'visual'   `best_band_visual` in lens_samples.json, chosen by eye with choose_best_band.py
+                 (always wins). A visual inspection, not necessarily the highest arc S/N;
+      'arc_snr'  `best_band_arc_snr`, choose_primary_band.py's measurement in lens_primary_band.json
+                 (arc S/N in the ring annulus, discounted where the PSF under-resolves theta_E);
       (None, None) when neither exists, and callers fall back to their fixed band order."""
     e = entry(lens, sample)
-    if e.get('primary_band'):
-        return canonical_filter(e['primary_band']), 'reviewed'
+    if e.get('best_band_visual'):
+        return canonical_filter(e['best_band_visual']), 'visual'
     sample = sample or sample_of(lens)
     try:
         with open(PRIMARY_BAND_JSON) as f:
             rec = json.load(f).get(sample, {}).get(lens, {})
     except FileNotFoundError:
         rec = {}
-    if rec.get('suggested'):
-        return rec['suggested'], 'measured'
+    if rec.get('best_band_arc_snr'):
+        return rec['best_band_arc_snr'], 'arc_snr'
     return None, None
 
 

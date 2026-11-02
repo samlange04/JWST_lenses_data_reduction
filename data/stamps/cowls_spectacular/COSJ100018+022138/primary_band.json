@@ -2,8 +2,9 @@
     "lens": "COSJ100018+022138",
     "sample": "cowls_spectacular",
     "primary_band": "F150W",
-    "primary_band_source": "reviewed",
-    "suggested": "F277W",
+    "primary_band_source": "visual",
+    "best_band_visual": "F150W",
+    "best_band_arc_snr": "F277W",
     "theta_e": 0.38,
     "scores": {
         "F115W": {
@@ -25,15 +26,15 @@
             "psf_fwhm_arcsec": 0.1246,
             "resolution_factor": 0.61,
             "score": 106.46,
-            "contaminant_mask": true
+            "contaminant_mask": false
         },
         "F444W": {
             "arc_snr": 181.93,
             "psf_fwhm_arcsec": 0.1666,
             "resolution_factor": 0.456,
             "score": 82.99,
-            "contaminant_mask": true
+            "contaminant_mask": false
         }
     },
-    "how": "scripts/choose_primary_band.py (docstring); reviewed choices via choose_best_band.py"
+    "how": "best_band_arc_snr: choose_primary_band.py (measured); best_band_visual: choose_best_band.py (by eye)"
 }

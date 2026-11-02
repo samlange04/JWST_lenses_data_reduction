@@ -78,15 +78,15 @@ lens side by side, North up and East left:
 
 **Which band is best.** Each lens also has `data/stamps/<sample>/<lens>/primary_band.json`,
 naming its **primary band**: the filter where the lensed images are best defined, so the one
-to look at or model first. It was chosen from the arc's measured signal-to-noise in every band,
-discounted where the band's resolution is coarse for the size of the Einstein ring.
-- `primary_band_source` says whether the choice was checked by eye (`reviewed`) or is the
-  measurement (`measured`).
-- The file lists every band's numbers.
-- The same choice is in `info/provenance/lens_primary_band.json` and in every exported
-  `info.json`.
-- Three COWLS lenses (COSJ095914+021219, COSJ100013+023424, COSJ100028+021928) have arcs too
-  faint to measure, and have none yet.
+to look at or model first.
+- `best_band_visual` is the band chosen by eye from the band overview. It is a visual
+  inspection, not necessarily the band with the highest arc signal-to-noise.
+- `best_band_arc_snr` is that measurement: the arc's signal-to-noise in every band, discounted
+  where the band's resolution is coarse for the size of the Einstein ring. The file lists every
+  band's numbers.
+- `primary_band` is the visual choice where there is one (`primary_band_source: visual`), else
+  the measurement (`arc_snr`).
+- The same is in `info/provenance/lens_primary_band.json` and in every exported `info.json`.
 
 `<S>` is the stamp size in arcseconds: `stamp7_*` for B1938+666, `stamp12_*` for the SPT
 and COWLS lenses. A stamp cut at another size (`make_stamps.py --size 20`) is written beside these as

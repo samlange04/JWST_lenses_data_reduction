@@ -226,7 +226,7 @@ measure_corr_factor.py  blank-sky block-sum / ACF ratios on every stamp (shallow
 make_stamps.py     i2d SCI/ERR/WHT -> stamp<S>_sci.fits, stamp<S>_noise.fits, stamp<S>.png
 make_psf.py         i2d field stars -> ePSF -> psf.fits  (STPSF fallback)
 measure_lens_centres.py the lens core per band (LW-anchored) -> deflector_ra/dec, which make_stamps centres on
-choose_best_band.py     GUI over the band overview: choose each lens's primary band by eye (reviewed)
+choose_best_band.py     GUI over the band overview: choose each lens's best band by eye -> best_band_visual
 choose_primary_band.py  arc S/N per band, discounted below 5 PSF widths across theta_E -> each lens's primary band
 make_masks.py / make_arc_masks.py / make_positions.py   GUIs, one draw per band (primary first), broadcast by WCS
 make_dataset_subplots.py / make_qc_grids.py              QC
@@ -666,8 +666,10 @@ always answers `stamp<S>` for the lens's modelling size). The semantics are unch
 - **Each lens has a PRIMARY band** (`choose_primary_band.py`, 2026-11-01). It is drawn first
   (every other band starts from its mask), positions are clicked on it, it seeds the arc-mask
   proposals, and it is the band to model first. `lens_samples.primary_band(lens)` resolves it:
-  - **`reviewed`**: `primary_band` on the lens in `lens_samples.json`, set by hand, always wins;
-  - **`measured`**: the script's suggestion;
+  - **`visual`**: `best_band_visual` (+ `best_band_visual_note`) on the lens in `lens_samples.json`,
+    chosen by eye in `choose_best_band.py`, always wins. The name says what it is: a visual
+    inspection, not necessarily the band with the highest arc S/N.
+  - **`arc_snr`**: `best_band_arc_snr`, the script's measurement;
   - otherwise the fixed fallback `_BAND_PRIORITY` (F444W > F356W > F277W > … > F115W), which
     alone picked the wrong band for 13 of 20 lenses.
 
@@ -693,17 +695,19 @@ always answers `stamp<S>` for the lens's modelling size). The semantics are unch
     COSJ100121+022740;
   - F150W: COSJ100024+021749;
   - none: COSJ095914+021219, COSJ100013+023424, COSJ100028+021928. No band reaches arc S/N 15 there; their arcs are too faint against the
-    lens-profile error, so set `primary_band` by eye. (The re-cut on measured centres made
+    lens-profile error, so set `best_band_visual` by eye. (The re-cut on measured centres made
     COSJ100028+021928 measurable, F444W; see *Stamps*.)
 
-  **The choice is the reviewer's: `choose_best_band.py --sample S [--unreviewed]`** (2026-11-01).
+  **The choice is the reviewer's: `choose_best_band.py --sample S [--unreviewed]`** (2026-11-01;
+  `best_band_visual` since 2026-11-02, before which the key was `primary_band`).
   For each lens it opens the band overview with every band's arc S/N and score; click a column
-  or press 1–N, and Enter writes the reviewed `primary_band` (with a note) and refreshes the
+  or press 1–N, and Enter writes `best_band_visual` (with a note) and refreshes the
   records and PNG (`choose_primary_band.record`). The measured suggestion only pre-selects. It
   was wrong on B1938+666 and COSJ100018+022138, and after the re-cut its arc S/N for compact
   lenses drops sharply (COSJ095920+015851 632 → 22), so it is a guide.
 
-  **Reviewed** (`primary_band` set by hand, 2026-11-01), overriding the measurement:
+  **Visual** choices (`best_band_visual`; by 2026-11-02 every COWLS lens has one, chosen in the
+  GUI), among them, overriding the measurement:
   - COSJ095914+021219 F277W and COSJ100013+023424 F444W, which were unmeasurable;
   - B1938+666 F115W over the measured F277W. Its 0.03" pixels and sharper PSF matter more on a
     0.45" ring than F277W's S/N.
@@ -716,8 +720,9 @@ always answers `stamp<S>` for the lens's modelling size). The semantics are unch
   **Where it ships.** Every band's scores and the resolved choice are in
   `info/provenance/lens_primary_band.json`. A copy travels with the stamps as
   `data/stamps/<sample>/<lens>/primary_band.json`, and `export_dataset.py` writes `primary_band`,
-  `primary_band_source` and `is_primary_band` into each band's `info.json`. Re-run the script
-  after setting a reviewed band, so both records carry it. θ_E for SPT and B1938+666 is now in
+  `primary_band_source`, `best_band_visual` and `is_primary_band` into each band's `info.json`.
+  The records carry `best_band_visual` and `best_band_arc_snr` separately, so a downstream user
+  sees both. θ_E for SPT and B1938+666 is now in
   `lens_samples.json` too (`theta_e`, `theta_e_ref`).
 - **Per-lens band overview** (`make_band_overview.py`, 2026-11-01): `data/stamps/<sample>/<lens>/
   stamp<S>_bands.png`, tracked. Columns are the bands in wavelength order. The rows are the full
@@ -828,7 +833,7 @@ uv run python scripts/export_dataset.py --lens SPT2147-50 --dest <modelling-proj
 Copies each band's stamp, noise map and PSF to `<dest>/<lens>/<FILT>/{data,noise_map,psf}.fits`,
 the contaminant mask as `mask_extra_galaxies.fits` and the positions as `positions.json` when
 they exist, and writes `info.json` with `pixel_scale`, `mask_radius`, the redshifts, the
-lens's primary band (`primary_band`, `primary_band_source`, `is_primary_band`; *Masks*) and the
+lens's primary band (`primary_band`, `primary_band_source`, `best_band_visual`, `is_primary_band`; *Masks*) and the
 provenance (i2d path, variant, jwst version, `NOISECOR`). This is the layout a PyAutoLens
 SLaM-style dataset loader expects (`data`/`noise_map`/`psf` + `info.json`; mask and positions
 optional). `mask_radius` is a modelling choice and lives only here.

@@ -2,8 +2,9 @@
     "lens": "COSJ100013+023424",
     "sample": "cowls_spectacular",
     "primary_band": "F444W",
-    "primary_band_source": "reviewed",
-    "suggested": null,
+    "primary_band_source": "visual",
+    "best_band_visual": "F444W",
+    "best_band_arc_snr": null,
     "theta_e": 1.45,
     "scores": {
         "F115W": {
@@ -35,5 +36,5 @@
             "contaminant_mask": true
         }
     },
-    "how": "scripts/choose_primary_band.py (docstring)"
+    "how": "best_band_arc_snr: choose_primary_band.py (measured); best_band_visual: choose_best_band.py (by eye)"
 }

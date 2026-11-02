@@ -18,11 +18,11 @@ stamp, zoom, isophote-subtracted zoom), with each band's measured arc S/N and sc
 name and the current choice outlined.
   * click a band's column, or press 1-N (bands in wavelength order), to select it;
   * Enter accepts the selection: it is written to info/samples/lens_samples.json as the
-    lens's reviewed `primary_band`, with a note naming this script and the measured
-    suggestion, then the records and the overview PNG are refreshed
-    (choose_primary_band.record);
+    lens's `best_band_visual`, a visual inspection and not necessarily the highest arc S/N, with
+    a note naming this script and the best arc-S/N band, then the records and the overview PNG
+    are refreshed (choose_primary_band.record);
   * s (or closing the window) skips the lens, leaving it as it was; q quits.
---unreviewed shows only lenses without a reviewed band.
+--unreviewed shows only lenses without a best_band_visual.
 """
 import argparse
 import datetime
@@ -50,13 +50,13 @@ def choose(sample, lens):
         plt.close('all')
         return 'skip', None
     filts, axes = info['filts'], info['axes']
-    state = dict(sel=current if current in filts else (meas['suggested'] or filts[-1]), action='skip')
+    state = dict(sel=current if current in filts else (meas['best_band_arc_snr'] or filts[-1]), action='skip')
 
     for j, f in enumerate(filts):
         sc = meas['scores'].get(f) or {}
         tag = ''
-        if f == meas['suggested']:
-            tag = '  [measured best]'
+        if f == meas['best_band_arc_snr']:
+            tag = '  [best arc S/N]'
         axes[0][j].set_title(f'{j + 1}: {axes[0][j].get_title()}\narc S/N {sc.get("arc_snr")}  score {sc.get("score")}{tag}',
                              fontsize=9)
 
@@ -68,7 +68,7 @@ def choose(sample, lens):
                     sp.set_edgecolor(PICK if on else 'black')
                     sp.set_linewidth(3.5 if on else 0.8)
         fig.texts[-1].set_text(f'selected: {state["sel"]}    (current: {current or "none"}'
-                               f'{f", {source}" if current else ""}; measured best: {meas["suggested"] or "none"})    '
+                               f'{f", {source}" if current else ""}; best arc S/N: {meas["best_band_arc_snr"] or "none"})    '
                                f'click a column or press 1-{len(filts)}; Enter accepts, s skips, q quits')
         fig.canvas.draw_idle()
 
@@ -107,13 +107,13 @@ def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--sample', type=lens_samples.sample_arg, required=True)
     p.add_argument('--lens', default=None)
-    p.add_argument('--unreviewed', action='store_true', help='only lenses without a reviewed primary band')
+    p.add_argument('--unreviewed', action='store_true', help='only lenses without a best_band_visual')
     a = p.parse_args()
     warnings.simplefilter('ignore')
     lenses = [a.lens] if a.lens else lens_samples.lenses(a.sample)
     for lens in lenses:
         current, source = lens_samples.primary_band(lens, a.sample)
-        if a.unreviewed and source == 'reviewed':
+        if a.unreviewed and source == 'visual':
             continue
         print(f'{lens}: current {current} ({source}) -- choose in the window')
         action, band = choose(a.sample, lens)
@@ -125,10 +125,10 @@ def main():
             continue
         meas = choose_primary_band.measure(a.sample, lens)
         note = (f'Chosen by eye with choose_best_band.py ({datetime.date.today().isoformat()}); '
-                f'the measured best band was {meas["suggested"] or "none (arcs too faint to measure)"}.')
-        lens_samples.set_primary_band(lens, band, note, a.sample)
+                f'the best arc-S/N band (choose_primary_band.py) was {meas["best_band_arc_snr"] or "none (arcs too faint to measure)"}.')
+        lens_samples.set_best_band_visual(lens, band, note, a.sample)
         choose_primary_band.record(a.sample, lens)
-        print(f'  primary band {band} (reviewed)')
+        print(f'  best_band_visual {band}')
 
 
 if __name__ == '__main__':

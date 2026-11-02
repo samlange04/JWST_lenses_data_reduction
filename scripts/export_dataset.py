@@ -74,8 +74,10 @@ def export_band(sample, lens, filt, dest, mask_radius, size):
         'mask_radius': float(mask_radius),
         'redshift_lens': zl, 'redshift_source': zs,
         # the band where the lensed images are best defined (choose_primary_band.py): the one to
-        # model first; 'reviewed' = set by hand, 'measured' = the script's suggestion
+        # model first; 'visual' = chosen by eye (choose_best_band.py, best_band_visual),
+        # 'arc_snr' = the measured best arc S/N (choose_primary_band.py)
         'primary_band': primary, 'primary_band_source': primary_source, 'is_primary_band': filt == primary,
+        'best_band_visual': lens_samples.entry(lens, sample).get('best_band_visual'),
         'bunit': hdr.get('BUNIT'), 'photmjsr': hdr.get('PHOTMJSR'), 'pixar_sr': hdr.get('PIXAR_SR'),
         'variant': hdr.get('REDUCVAR', 'standard'), 'jwst_version': hdr.get('CAL_VER'),
         'noise_corr_factor': nhdr.get('NOISECOR'), 'noise_corr_scale_arcsec': nhdr.get('NOISESCL'),

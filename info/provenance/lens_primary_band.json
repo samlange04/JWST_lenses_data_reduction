@@ -1,10 +1,12 @@
 {
     "b1938": {
         "B1938+666": {
+            "best_band_arc_snr": "F277W",
+            "best_band_visual": "F115W",
             "measurable": true,
             "min_arc_snr": 15.0,
             "primary_band": "F115W",
-            "primary_band_source": "reviewed",
+            "primary_band_source": "visual",
             "r0": 5.0,
             "scores": {
                 "F115W": {
@@ -22,16 +24,17 @@
                     "contaminant_mask": true
                 }
             },
-            "suggested": "F277W",
             "theta_e": 0.45
         }
     },
     "cowls_spectacular": {
         "COSJ095914+021219": {
+            "best_band_arc_snr": null,
+            "best_band_visual": "F277W",
             "measurable": false,
             "min_arc_snr": 15.0,
             "primary_band": "F277W",
-            "primary_band_source": "reviewed",
+            "primary_band_source": "visual",
             "r0": 5.0,
             "scores": {
                 "F115W": {
@@ -49,28 +52,29 @@
                     "contaminant_mask": false
                 },
                 "F277W": {
-                    "arc_snr": -12.27,
+                    "arc_snr": -12.84,
                     "psf_fwhm_arcsec": 0.1246,
                     "resolution_factor": 1.0,
-                    "score": -12.27,
-                    "contaminant_mask": false
+                    "score": -12.84,
+                    "contaminant_mask": true
                 },
                 "F444W": {
                     "arc_snr": -7.38,
                     "psf_fwhm_arcsec": 0.1666,
                     "resolution_factor": 1.0,
                     "score": -7.38,
-                    "contaminant_mask": true
+                    "contaminant_mask": false
                 }
             },
-            "suggested": null,
             "theta_e": 1.48
         },
         "COSJ095917+015424": {
+            "best_band_arc_snr": "F444W",
+            "best_band_visual": "F444W",
             "measurable": true,
             "min_arc_snr": 15.0,
             "primary_band": "F444W",
-            "primary_band_source": "measured",
+            "primary_band_source": "visual",
             "r0": 5.0,
             "scores": {
                 "F115W": {
@@ -102,14 +106,15 @@
                     "contaminant_mask": true
                 }
             },
-            "suggested": "F444W",
             "theta_e": 0.58
         },
         "COSJ095920+015851": {
+            "best_band_arc_snr": "F277W",
+            "best_band_visual": "F150W",
             "measurable": true,
             "min_arc_snr": 15.0,
-            "primary_band": "F277W",
-            "primary_band_source": "measured",
+            "primary_band": "F150W",
+            "primary_band_source": "visual",
             "r0": 5.0,
             "scores": {
                 "F115W": {
@@ -138,17 +143,18 @@
                     "psf_fwhm_arcsec": 0.1666,
                     "resolution_factor": 0.54,
                     "score": 14.9,
-                    "contaminant_mask": true
+                    "contaminant_mask": false
                 }
             },
-            "suggested": "F277W",
             "theta_e": 0.45
         },
         "COSJ095921+020638": {
+            "best_band_arc_snr": "F277W",
+            "best_band_visual": "F115W",
             "measurable": true,
             "min_arc_snr": 15.0,
-            "primary_band": "F277W",
-            "primary_band_source": "measured",
+            "primary_band": "F115W",
+            "primary_band_source": "visual",
             "r0": 5.0,
             "scores": {
                 "F115W": {
@@ -177,17 +183,18 @@
                     "psf_fwhm_arcsec": 0.1666,
                     "resolution_factor": 0.852,
                     "score": 40.72,
-                    "contaminant_mask": true
+                    "contaminant_mask": false
                 }
             },
-            "suggested": "F277W",
             "theta_e": 0.71
         },
         "COSJ095950+022057": {
+            "best_band_arc_snr": "F277W",
+            "best_band_visual": "F277W",
             "measurable": true,
             "min_arc_snr": 15.0,
             "primary_band": "F277W",
-            "primary_band_source": "measured",
+            "primary_band_source": "visual",
             "r0": 5.0,
             "scores": {
                 "F115W": {
@@ -209,24 +216,25 @@
                     "psf_fwhm_arcsec": 0.1246,
                     "resolution_factor": 1.0,
                     "score": 64.57,
-                    "contaminant_mask": false
+                    "contaminant_mask": true
                 },
                 "F444W": {
                     "arc_snr": 51.33,
                     "psf_fwhm_arcsec": 0.1666,
                     "resolution_factor": 1.0,
                     "score": 51.33,
-                    "contaminant_mask": true
+                    "contaminant_mask": false
                 }
             },
-            "suggested": "F277W",
             "theta_e": 1.04
         },
         "COSJ095953+023319": {
+            "best_band_arc_snr": "F444W",
+            "best_band_visual": "F444W",
             "measurable": true,
             "min_arc_snr": 15.0,
             "primary_band": "F444W",
-            "primary_band_source": "measured",
+            "primary_band_source": "visual",
             "r0": 5.0,
             "scores": {
                 "F115W": {
@@ -258,14 +266,15 @@
                     "contaminant_mask": true
                 }
             },
-            "suggested": "F444W",
             "theta_e": 1.44
         },
         "COSJ095955+021900": {
+            "best_band_arc_snr": "F277W",
+            "best_band_visual": "F277W",
             "measurable": true,
             "min_arc_snr": 15.0,
             "primary_band": "F277W",
-            "primary_band_source": "measured",
+            "primary_band_source": "visual",
             "r0": 5.0,
             "scores": {
                 "F115W": {
@@ -283,28 +292,29 @@
                     "contaminant_mask": false
                 },
                 "F277W": {
-                    "arc_snr": 182.18,
+                    "arc_snr": 187.15,
                     "psf_fwhm_arcsec": 0.1246,
                     "resolution_factor": 1.0,
-                    "score": 182.18,
-                    "contaminant_mask": false
+                    "score": 187.15,
+                    "contaminant_mask": true
                 },
                 "F444W": {
-                    "arc_snr": 144.38,
+                    "arc_snr": 134.29,
                     "psf_fwhm_arcsec": 0.1666,
                     "resolution_factor": 1.0,
-                    "score": 144.38,
-                    "contaminant_mask": true
+                    "score": 134.29,
+                    "contaminant_mask": false
                 }
             },
-            "suggested": "F277W",
             "theta_e": 2.11
         },
         "COSJ100012+022015": {
+            "best_band_arc_snr": "F277W",
+            "best_band_visual": "F115W",
             "measurable": true,
             "min_arc_snr": 15.0,
-            "primary_band": "F277W",
-            "primary_band_source": "measured",
+            "primary_band": "F115W",
+            "primary_band_source": "visual",
             "r0": 5.0,
             "scores": {
                 "F115W": {
@@ -333,17 +343,18 @@
                     "psf_fwhm_arcsec": 0.1666,
                     "resolution_factor": 0.9,
                     "score": 45.3,
-                    "contaminant_mask": true
+                    "contaminant_mask": false
                 }
             },
-            "suggested": "F277W",
             "theta_e": 0.75
         },
         "COSJ100013+023424": {
+            "best_band_arc_snr": null,
+            "best_band_visual": "F444W",
             "measurable": false,
             "min_arc_snr": 15.0,
             "primary_band": "F444W",
-            "primary_band_source": "reviewed",
+            "primary_band_source": "visual",
             "r0": 5.0,
             "scores": {
                 "F115W": {
@@ -375,14 +386,15 @@
                     "contaminant_mask": true
                 }
             },
-            "suggested": null,
             "theta_e": 1.45
         },
         "COSJ100018+022138": {
+            "best_band_arc_snr": "F277W",
+            "best_band_visual": "F150W",
             "measurable": true,
             "min_arc_snr": 15.0,
             "primary_band": "F150W",
-            "primary_band_source": "reviewed",
+            "primary_band_source": "visual",
             "r0": 5.0,
             "scores": {
                 "F115W": {
@@ -404,24 +416,25 @@
                     "psf_fwhm_arcsec": 0.1246,
                     "resolution_factor": 0.61,
                     "score": 106.46,
-                    "contaminant_mask": true
+                    "contaminant_mask": false
                 },
                 "F444W": {
                     "arc_snr": 181.93,
                     "psf_fwhm_arcsec": 0.1666,
                     "resolution_factor": 0.456,
                     "score": 82.99,
-                    "contaminant_mask": true
+                    "contaminant_mask": false
                 }
             },
-            "suggested": "F277W",
             "theta_e": 0.38
         },
         "COSJ100024+015334": {
+            "best_band_arc_snr": "F444W",
+            "best_band_visual": "F444W",
             "measurable": true,
             "min_arc_snr": 15.0,
             "primary_band": "F444W",
-            "primary_band_source": "measured",
+            "primary_band_source": "visual",
             "r0": 5.0,
             "scores": {
                 "F115W": {
@@ -453,14 +466,15 @@
                     "contaminant_mask": true
                 }
             },
-            "suggested": "F444W",
             "theta_e": 0.77
         },
         "COSJ100024+021749": {
+            "best_band_arc_snr": "F150W",
+            "best_band_visual": "F444W",
             "measurable": true,
             "min_arc_snr": 15.0,
-            "primary_band": "F150W",
-            "primary_band_source": "measured",
+            "primary_band": "F444W",
+            "primary_band_source": "visual",
             "r0": 5.0,
             "scores": {
                 "F115W": {
@@ -492,14 +506,15 @@
                     "contaminant_mask": true
                 }
             },
-            "suggested": "F150W",
             "theta_e": 0.73
         },
         "COSJ100025+015245": {
+            "best_band_arc_snr": "F444W",
+            "best_band_visual": "F444W",
             "measurable": true,
             "min_arc_snr": 15.0,
             "primary_band": "F444W",
-            "primary_band_source": "measured",
+            "primary_band_source": "visual",
             "r0": 5.0,
             "scores": {
                 "F115W": {
@@ -531,14 +546,15 @@
                     "contaminant_mask": true
                 }
             },
-            "suggested": "F444W",
             "theta_e": 0.53
         },
         "COSJ100028+021928": {
+            "best_band_arc_snr": "F444W",
+            "best_band_visual": "F444W",
             "measurable": true,
             "min_arc_snr": 15.0,
             "primary_band": "F444W",
-            "primary_band_source": "measured",
+            "primary_band_source": "visual",
             "r0": 5.0,
             "scores": {
                 "F115W": {
@@ -570,14 +586,15 @@
                     "contaminant_mask": true
                 }
             },
-            "suggested": "F444W",
             "theta_e": 0.66
         },
         "COSJ100047+015023": {
+            "best_band_arc_snr": "F277W",
+            "best_band_visual": "F277W",
             "measurable": true,
             "min_arc_snr": 15.0,
             "primary_band": "F277W",
-            "primary_band_source": "measured",
+            "primary_band_source": "visual",
             "r0": 5.0,
             "scores": {
                 "F115W": {
@@ -595,28 +612,29 @@
                     "contaminant_mask": false
                 },
                 "F277W": {
-                    "arc_snr": 94.03,
+                    "arc_snr": 114.64,
                     "psf_fwhm_arcsec": 0.1246,
                     "resolution_factor": 1.0,
-                    "score": 94.03,
-                    "contaminant_mask": false
+                    "score": 114.64,
+                    "contaminant_mask": true
                 },
                 "F444W": {
-                    "arc_snr": 91.54,
+                    "arc_snr": 73.33,
                     "psf_fwhm_arcsec": 0.1666,
                     "resolution_factor": 1.0,
-                    "score": 91.54,
-                    "contaminant_mask": true
+                    "score": 73.33,
+                    "contaminant_mask": false
                 }
             },
-            "suggested": "F277W",
             "theta_e": 1.62
         },
         "COSJ100119+014849": {
+            "best_band_arc_snr": "F444W",
+            "best_band_visual": "F277W",
             "measurable": true,
             "min_arc_snr": 15.0,
-            "primary_band": "F444W",
-            "primary_band_source": "measured",
+            "primary_band": "F277W",
+            "primary_band_source": "visual",
             "r0": 5.0,
             "scores": {
                 "F115W": {
@@ -641,21 +659,22 @@
                     "contaminant_mask": false
                 },
                 "F444W": {
-                    "arc_snr": 171.54,
+                    "arc_snr": 160.44,
                     "psf_fwhm_arcsec": 0.1666,
                     "resolution_factor": 1.0,
-                    "score": 171.54,
-                    "contaminant_mask": true
+                    "score": 160.44,
+                    "contaminant_mask": false
                 }
             },
-            "suggested": "F444W",
             "theta_e": 1.14
         },
         "COSJ100121+022740": {
+            "best_band_arc_snr": "F277W",
+            "best_band_visual": "F444W",
             "measurable": true,
             "min_arc_snr": 15.0,
-            "primary_band": "F277W",
-            "primary_band_source": "measured",
+            "primary_band": "F444W",
+            "primary_band_source": "visual",
             "r0": 5.0,
             "scores": {
                 "F115W": {
@@ -687,16 +706,17 @@
                     "contaminant_mask": true
                 }
             },
-            "suggested": "F277W",
             "theta_e": 0.86
         }
     },
     "spt": {
         "SPT0418-47": {
+            "best_band_arc_snr": "F444W",
+            "best_band_visual": null,
             "measurable": true,
             "min_arc_snr": 15.0,
             "primary_band": "F444W",
-            "primary_band_source": "measured",
+            "primary_band_source": "arc_snr",
             "r0": 5.0,
             "scores": {
                 "F115W": {
@@ -742,14 +762,15 @@
                     "contaminant_mask": false
                 }
             },
-            "suggested": "F444W",
             "theta_e": 1.207
         },
         "SPT2147-50": {
+            "best_band_arc_snr": "F444W",
+            "best_band_visual": null,
             "measurable": true,
             "min_arc_snr": 15.0,
             "primary_band": "F444W",
-            "primary_band_source": "measured",
+            "primary_band_source": "arc_snr",
             "r0": 5.0,
             "scores": {
                 "F200W": {
@@ -781,7 +802,6 @@
                     "contaminant_mask": false
                 }
             },
-            "suggested": "F444W",
             "theta_e": 1.195
         }
     }

@@ -28,14 +28,14 @@ and COSJ100028+021928 (2026-11-01). It is
 also biased toward the red bands for bright, compact lenses (theta_E < ~0.6"), where lens light
 leaks into the annulus.
 
-So the suggestion is a default, not a verdict. Set `primary_band` on the lens in
-info/samples/lens_samples.json after looking at the GUIs; it always wins, and re-running this
-script records it. lens_samples.primary_band() resolves reviewed > measured > none (the GUIs
-then fall back to their fixed order).
+So the measurement (`best_band_arc_snr`) is a guide, not a verdict. The band chosen by eye with
+choose_best_band.py is `best_band_visual` in info/samples/lens_samples.json and always wins.
+lens_samples.primary_band() resolves visual > arc_snr > none (the GUIs then fall back to their
+fixed order).
 
 Writes:
-  * info/provenance/lens_primary_band.json: per lens, the suggestion, the resolved choice and
-    its source, theta_E, and every band's arc S/N, FWHM and score;
+  * info/provenance/lens_primary_band.json: per lens, best_band_arc_snr, best_band_visual, the
+    resolved primary_band and its source, theta_E, and every band's arc S/N, FWHM and score;
   * data/stamps/<sample>/<lens>/primary_band.json: the resolved choice, so it travels with the
     lens's stamps.
 export_dataset.py writes `primary_band`, `primary_band_source` and `is_primary_band` into each
@@ -117,12 +117,12 @@ def measure(sample, lens):
     valid = {f: v for f, v in scores.items() if v['score'] is not None}
     best = max(valid, key=lambda f: valid[f]['score']) if valid else None
     measurable = bool(valid) and max(v['arc_snr'] for v in valid.values()) >= MIN_ARC_SNR
-    return dict(theta_e=te, scores=scores, suggested=best if measurable else None,
+    return dict(theta_e=te, scores=scores, best_band_arc_snr=best if measurable else None,
                 measurable=measurable, min_arc_snr=MIN_ARC_SNR, r0=R0)
 
 
 def record(sample, lens, rerender=True):
-    """Measure the lens, resolve its primary band (reviewed > measured), and write both records
+    """Measure the lens, resolve its primary band (visual > arc_snr), and write both records
     (lens_primary_band.json, data/stamps/<sample>/<lens>/primary_band.json) and, with `rerender`,
     the band overview. Returns the record, or None without stamps or theta_E."""
     rec = measure(sample, lens)
@@ -134,10 +134,12 @@ def record(sample, lens, rerender=True):
     band, source = lens_samples.primary_band(lens, sample)
     info_json.update(out_json, sample, lens, 'primary_band', band)
     info_json.update(out_json, sample, lens, 'primary_band_source', source)
+    info_json.update(out_json, sample, lens, 'best_band_visual', lens_samples.entry(lens, sample).get('best_band_visual'))
     rec.update(primary_band=band, primary_band_source=source)
     stamp_rec = dict(lens=lens, sample=sample, primary_band=band, primary_band_source=source,
-                     suggested=rec['suggested'], theta_e=rec['theta_e'], scores=rec['scores'],
-                     how='scripts/choose_primary_band.py (docstring); reviewed choices via choose_best_band.py')
+                     best_band_visual=lens_samples.entry(lens, sample).get('best_band_visual'),
+                     best_band_arc_snr=rec['best_band_arc_snr'], theta_e=rec['theta_e'], scores=rec['scores'],
+                     how='best_band_arc_snr: choose_primary_band.py (measured); best_band_visual: choose_best_band.py (by eye)')
     with open(os.path.join(ws_path, 'data', 'stamps', sample, lens, 'primary_band.json'), 'w') as f:
         json.dump(stamp_rec, f, indent=4)
     if rerender:
@@ -162,9 +164,9 @@ def main():
                 continue
             band, source = rec['primary_band'], rec['primary_band_source']
             row = '  '.join(f'{f} {v["arc_snr"]}/{v["score"]}' for f, v in rec['scores'].items())
-            flag = ('' if rec['measurable'] or source == 'reviewed'
+            flag = ('' if rec['measurable'] or source == 'visual'
                     else f'  [no band reaches arc S/N {MIN_ARC_SNR:g}: set primary_band by eye]')
-            print(f'{lens:18s} theta_E {rec["theta_e"]:.2f}"  suggested {rec["suggested"]}  -> primary {band} ({source})'
+            print(f'{lens:18s} theta_E {rec["theta_e"]:.2f}"  arc-S/N best {rec["best_band_arc_snr"]}  -> primary {band} ({source})'
                   f'{flag}\n    arc S/N/score: {row}')
     print(f"wrote {info_json.path(ws_path, 'lens_primary_band.json')} and data/stamps/<sample>/<lens>/primary_band.json")
 
