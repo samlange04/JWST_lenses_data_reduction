@@ -143,10 +143,10 @@ def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--lens', required=True)
     p.add_argument('--filt', required=True)
-    p.add_argument('--sample', default=None)
+    p.add_argument('--sample', type=lens_samples.sample_arg, default=None)
     p.add_argument('--analyse-only', action='store_true')
     a = p.parse_args()
-    sample = a.sample or lens_samples.sample_of(a.lens)
+    sample = lens_samples.resolve_sample(p, a)
     filt = lens_samples.canonical_filter(a.filt)
     ch = lens_samples.channel(filt)
     scale = reduce_nircam.DEFAULT_SCALE[ch]
@@ -157,8 +157,9 @@ def main():
     half_a, half_b, n_exp = split_halves(cals)
     print(f'=== {sample}/{a.lens} {filt}: {len(cals)} cals, {n_exp} exposures -> A {len(half_a)} / B {len(half_b)}')
     i2d = {}
+    field = lens_samples.mosaic_field(sample) or reduce_nircam.DEFAULT_FIELD
     for tag, cl in (('splitA', half_a), ('splitB', half_b)):
-        i2d[tag] = build_half(cl, sample, a.lens, filt, tag, coord, scale, reduce_nircam.DEFAULT_FIELD) if not a.analyse_only \
+        i2d[tag] = build_half(cl, sample, a.lens, filt, tag, coord, scale, field) if not a.analyse_only \
             else os.path.join(stamp_paths.mosaic_dir(WS, sample, a.lens, filt, tag), f'{a.lens.replace("+", "p")}_{filt}'.lower() + '_i2d.fits')
     ang = detector_row_angle(cals[0])
     res = analyse(i2d['splitA'], i2d['splitB'], scale, stamp_paths.DEFAULT_SIZE, ang)

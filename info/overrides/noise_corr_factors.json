@@ -6,6 +6,71 @@
         "NIRCAM/SW": 1.3,
         "NIRCAM/LW": 1.03
     },
+    "factors_samples": [
+        "spt"
+    ],
+    "_factors_samples_why": "`factors` is the median over the SPT stamps (TEMPLATES BRIGHT2/SHALLOW2 ramps), so make_stamps applies it to these samples only. Any other sample needs its own `sample_factors[sample]` (same keys as `factors`) or per-lens `lens_overrides`; make_stamps refuses a sample with neither: the factor depends on the readout pattern (see `_overrides_why`).",
+    "sample_factors": {
+        "cowls_spectacular": {
+            "F115W": 1.25,
+            "F150W": 1.22,
+            "F277W": 1.03,
+            "F444W": 0.95,
+            "_how": "measure_corr_factor.py on all 68 COWLS stamps, 2026-10-30 (diagnostics/corr_factor/corr_factor_measurements_cowls_spectacular.json): the same quantity as `factors` (blank-sky block-sum ratio at 0.2\", thr3 mask, +-30\" region, each stamp's curve interpolated to the scales below), but the median over the 17 lenses PER FILTER, not per channel: F277W exceeds F444W in all 17 lenses and F115W exceeds F150W in 16 of 17, a split larger than the lens-to-lens scatter (16-84%: F115W 1.22-1.26, F150W 1.20-1.24, F277W 1.01-1.06, F444W 0.94-0.97). No dependence on depth: lens N's single SW exposure gives the same factor as the 4-exposure lenses. Per-pixel C(0) 0.42-0.58. SW sits below the SPT channel's 1.30 (5-group SHALLOW4 vs TEMPLATES' 2-3 group ramps), LW brackets its 1.03.",
+            "block_ratio_curve": {
+                "scale_arcsec": [
+                    0.1,
+                    0.15,
+                    0.2,
+                    0.3,
+                    0.5,
+                    1.0,
+                    2.0,
+                    3.0
+                ],
+                "F115W": [
+                    1.0,
+                    1.14,
+                    1.25,
+                    1.46,
+                    1.9,
+                    3.0,
+                    5.73,
+                    9.37
+                ],
+                "F150W": [
+                    0.99,
+                    1.12,
+                    1.22,
+                    1.42,
+                    1.81,
+                    3.0,
+                    5.36,
+                    8.26
+                ],
+                "F277W": [
+                    0.82,
+                    0.95,
+                    1.03,
+                    1.16,
+                    1.38,
+                    1.89,
+                    2.82,
+                    3.65
+                ],
+                "F444W": [
+                    0.77,
+                    0.89,
+                    0.95,
+                    1.05,
+                    1.21,
+                    1.6,
+                    2.65,
+                    3.8
+                ]
+            }
+        }
+    },
     "block_ratio_curve": {
         "scale_arcsec": [
             0.1,

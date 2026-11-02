@@ -2,18 +2,20 @@
 """
 Interactive GUI for marking multiply-imaged (lensed) source positions, per lens.
 
-For each lens in a sample this launches PyAutoLens's `al.Clicker` GUI over the lens's
-best-available stamp -- the same tool as
-autolens_workspace:scripts/imaging/data_preparation/gui/positions.py -- so you can
-DOUBLE-CLICK each lensed image of the source (2 for a double, 4 for a quad, ...). Each
-click snaps to the brightest pixel within `--search-box-size` and is recorded in
+For each lens in a sample this opens a clicking GUI over the lens's primary-band stamp (the
+role of autolens_workspace:scripts/imaging/data_preparation/gui/positions.py's al.Clicker, whose
+snap it replaced on 2026-11-02) so you can DOUBLE-CLICK each lensed image of the source (2 for a
+double, 4 for a quad, ...); 'z' undoes the last click. Each click snaps to the brightest pixel
+within `--snap-radius` px (default 1) and is recorded in
 arcsec relative to the stamp centre; the collected clicks are saved as an
 `al.Grid2DIrregular` in `stamp12_positions.json` (via `al.output_to_json`), the file a
 modelling script loads to build a positions likelihood penalty (`al.PositionsLH`) that
 rejects mass models mapping the images too far apart in the source plane.
 
-WHAT IS ON SCREEN. Two panels by default -- the deflector's radial profile subtracted on
-the LEFT, the band as observed on the RIGHT -- because each answers a different question: the
+WHAT IS ON SCREEN. Two panels by default -- the band as observed on the LEFT, and on the
+RIGHT the band with the deflector removed by an ISOPHOTE model (since 2026-11-01, smoothed on a
+red-blue map: red is light the model lacks; `--subtract radial` restores the old radial-median
+panel) -- because each answers a different question: the
 subtracted panel is where an image buried in the galaxy envelope shows up at all, the
 as-observed panel is where you judge whether that blob is really there or is a subtraction
 artefact. They are separate axes over the same arcsec extent, so DOUBLE-CLICK EITHER and the
@@ -71,6 +73,7 @@ import numpy as np
 from astropy.io import fits
 from astropy.wcs import WCS
 from matplotlib import pyplot as plt
+from matplotlib import patheffects
 
 import autolens as al
 # The same display helpers al.Scribbler uses internally (make_masks.py / make_arc_masks.py
@@ -82,6 +85,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import lens_samples as mast_target_names
 import info_json
 import stamp_paths
+import positions_io
+import isophote_model
 # Reuse make_masks' display/tree/discovery helpers so the two GUIs stay in lock-step
 # (same pass-prefix rule, same tree discovery, same stretched display).
 import make_masks
@@ -104,6 +109,31 @@ def pixel_to_arcsec(row, col, shape, pixel_scales):
     """Inverse of arcsec_to_pixel."""
     n_y, n_x = shape
     return ((n_y - 1) / 2.0 - row) * pixel_scales, (col - (n_x - 1) / 2.0) * pixel_scales
+
+
+def snap_click(sci_native, pixel_scales, y, x, radius):
+    """The click at (y, x) arcsec moved to the centre of the brightest pixel (true flux) within
+    `radius` px of the clicked pixel, a DISC, so no direction is favoured; radius 0 keeps the
+    clicked pixel. Returns (y, x) arcsec.
+
+    Replaces al.Clicker's snap (2026-11-02), which rounded the click to a pixel CORNER on these
+    even-sided stamps before picking a pixel, and searched an asymmetric box (-b .. b-1 px), so
+    with the old default of 2 a click could move 2.8 px, further one way than the other. The
+    COWLS positions marked with it moved 0.5-2.5 px (up to 0.15" on LW)."""
+    img = np.asarray(sci_native, dtype=float)
+    row, col = arcsec_to_pixel(y, x, img.shape, pixel_scales)
+    r0, c0 = int(round(row)), int(round(col))
+    best, br, bc = -np.inf, r0, c0
+    rad = int(max(radius, 0))
+    for dr in range(-rad, rad + 1):
+        for dc in range(-rad, rad + 1):
+            r_, c_ = r0 + dr, c0 + dc
+            if dr * dr + dc * dc > radius * radius or not (0 <= r_ < img.shape[0] and 0 <= c_ < img.shape[1]):
+                continue
+            v = img[r_, c_]
+            if np.isfinite(v) and v > best:
+                best, br, bc = v, r_, c_
+    return pixel_to_arcsec(br, bc, img.shape, pixel_scales)
 
 
 def reproject_positions(positions, src_hdr, dst_hdr):
@@ -238,45 +268,118 @@ def band_tie(marked_dir, marked_prefix, band_dir, band_prefix):
             'n': len(offsets), 'method': 'lens core (fallback)'}
 
 
-def save_overlay_png(sci_native, pixel_scales, positions, out_path,
-                     stretch='asinh', vmin_percent=5.0, vmax_percent=99.5, asinh_a=0.1,
-                     vmax_value=None):
-    """QC overlay: the (stretched) science image with the marked positions scattered on
-    top, in the same arcsec frame the Clicker used. Written per band so you can confirm the
-    shared positions land on the lensed images in EVERY band, not just the marked one.
+# One colour per position set (source 1, 2, ...), each drawn with a black edge so it reads
+# on the colour display as well as on a light or dark patch of it.
+STROKE = [patheffects.withStroke(linewidth=4, foreground='black')]
+MARK_STROKE = [patheffects.withStroke(linewidth=2.5, foreground='black')]  # the GUI's click crosses
+SET_COLOURS = ['white', 'magenta', 'lime', 'orange', 'cyan', 'yellow', 'red', 'deepskyblue', 'pink']
+import display_look
+OBSERVED_CMAP = display_look.CMAP     # the mask GUIs' and dataset subplots' look
 
-    `vmax_value` (--vmax-value) saturates the bright core here too, so the arcs the
-    positions sit on are as visible in the QC PNG as they were in the GUI. The central
-    blank (--mask-center) is deliberately NOT applied: the QC image should still show the
-    deflector, so you can judge the positions against the whole system.
+
+def observed_display(values, exclude=None, vmax_value=None):
+    """An as-observed (or radial-subtracted) panel on the repo's one look (display_look.py:
+    the dataset subplots' PercentileInterval(99) + AsinhStretch(0.1), on [0, 1] for OBSERVED_CMAP,
+    inferno), as the mask GUIs show it. Until 2026-11-02 a percentile asinh on 'jet', with
+    --stretch, --asinh-a and --vmin/--vmax-percent. `exclude` pixels are dropped from the
+    limits and shown at the floor; `vmax_value` (--vmax-value, in the base array's units)
+    saturates everything brighter."""
+    return display_look.normalised(values, exclude=exclude, vmax=vmax_value)
+
+
+def north_up(ax):
+    """North up, East left, like every other figure in the repo (2026-11-02). The panels are
+    in autoarray (y, x) arcsec, where +y is toward row 0, which is SOUTH in these stamps
+    (rows run South -> North), and +x is toward higher columns, which is WEST. So the y axis
+    is inverted (+y at the bottom) and x is left as is (East = -x on the left). Every overlay
+    is drawn in the same data coordinates, and a click still returns autoarray (y, x), so
+    nothing saved changes. Only the tick LABELS are negated, so the axes read arcsec East and
+    North, as on the band overview."""
+    from matplotlib.ticker import FuncFormatter
+    lo, hi = sorted(ax.get_ylim())
+    ax.set_ylim(hi, lo)
+    negated = FuncFormatter(lambda v, _: f'{-v + 0.0:g}')
+    ax.xaxis.set_major_formatter(negated)
+    ax.yaxis.set_major_formatter(negated)
+    ax.set_xlabel('arcsec East')
+    ax.set_ylabel('arcsec North')
+
+
+def save_overlay_png(sci_native, pixel_scales, sets, out_path,
+                     vmax_value=None, subtract='isophote'):
+    """QC overlay: the marked positions over the band's AS-OBSERVED S/N (left) and its
+    ISOPHOTE-SUBTRACTED view (right), the same two panels the GUI shows (standard since
+    2026-11-01; `subtract=None` gives the as-observed panel alone). Written per band so you
+    can confirm the shared positions land on the lensed images in EVERY band.
+
+    The S/N base and the contaminant mask are read from the stamp directory `out_path` sits
+    in (`{prefix}_noise.fits`, `{prefix}_mask.fits`), so every caller gets the same picture
+    without passing them. Contaminants are blanked in the subtracted panel and outlined in
+    both, and kept out of the isophote fit and the stretch. `vmax_value` (--vmax-value)
+    saturates the bright core of the as-observed panel; the central blank (--mask-center) is
+    deliberately NOT applied, so the deflector stays visible.
     """
-    disp = make_masks.stretched_display(sci_native, pixel_scales, stretch=stretch,
-                                         vmin_percent=vmin_percent, vmax_percent=vmax_percent,
-                                         asinh_a=asinh_a, vmax_value=vmax_value)
-    n_y, n_x = disp.shape_native
+    stamp_dir = os.path.dirname(out_path)
+    prefix = os.path.basename(out_path)[:-len('_positions.png')]
+    base = sci_native
+    if stamp_paths.find_stamp(stamp_dir, prefix, 'noise') is not None:
+        base, _ = make_masks.load_display_base(stamp_dir, prefix, 'snr', pixel_scales)
+    mask_path = os.path.join(stamp_dir, f'{prefix}_mask.fits')
+    cont = (np.asarray(fits.getdata(mask_path), dtype=bool) if os.path.exists(mask_path)
+            else np.zeros(np.asarray(base).shape, bool))
+
+    n_y, n_x = np.asarray(base).shape
     hw = int(n_x / 2) * pixel_scales
     ext = [-hw, hw, -hw, hw]
-    fig = plt.figure(figsize=(7, 7))
-    plt.imshow(np.asarray(disp.native), cmap='jet', extent=ext)
-    if len(positions) > 0:
-        ys = [p[0] for p in positions]
-        xs = [p[1] for p in positions]
-        plt.scatter(xs, ys, marker='+', c='white', s=180, linewidths=1.5)
-        for i, (y, x) in enumerate(positions):
-            plt.annotate(str(i), (x, y), color='white', fontsize=9,
-                         xytext=(4, 4), textcoords='offset points')
-    plt.xlabel('arcsec'); plt.ylabel('arcsec')
-    plt.tight_layout()
+    panels = [('as-observed (S/N)', None)]
+    if subtract == 'isophote':
+        res, vmax_div = isophote_model.isophote_display(base, pixel_scales,
+                                                        exclude=cont if cont.any() else None)
+        panels.append(('isophote-subtracted (smoothed)', (res, vmax_div)))
+    fig, axes = plt.subplots(1, len(panels), figsize=(7 * len(panels), 7), squeeze=False)
+    for ax, (name, sub) in zip(axes[0], panels):
+        if sub is None:
+            disp = observed_display(base, exclude=cont if cont.any() else None,
+                                    vmax_value=vmax_value)
+            ax.imshow(disp, cmap=OBSERVED_CMAP, vmin=0.0, vmax=1.0, extent=ext)
+        else:
+            res, vmax_div = sub
+            disp = np.array(res, dtype=float)
+            disp[cont] = np.nan
+            ax.imshow(disp, cmap='RdBu_r', vmin=-vmax_div, vmax=vmax_div, extent=ext)
+        if cont.any():
+            ax.contour(cont, levels=[0.5], colors='black', linewidths=0.8, extent=ext,
+                       origin='upper')
+        for k, positions in enumerate(sets):
+            if not positions:
+                continue
+            colour = SET_COLOURS[k % len(SET_COLOURS)]
+            ax.scatter([p[1] for p in positions], [p[0] for p in positions], marker='+',
+                       c=colour, s=80, linewidths=1.2, path_effects=MARK_STROKE, zorder=5)
+            for i, (y, x) in enumerate(positions):
+                label = str(i) if len(sets) == 1 else f's{k + 1}.{i}'
+                ax.annotate(label, (x, y), color=colour, fontsize=9, xytext=(4, 4),
+                            textcoords='offset points', path_effects=MARK_STROKE, zorder=5)
+        ax.set_title(name if len(panels) > 1 else '', fontsize=10)
+        north_up(ax)
+    fig.tight_layout()
     fig.savefig(out_path, dpi=110)
     plt.close(fig)
 
 
 def mark_positions_gui(sci_native, pixel_scales, lens, filt, search_box_size,
-                       display='snr', display_base=None, stretch='asinh',
-                       vmin_percent=5.0, vmax_percent=99.5, asinh_a=0.1,
-                       mask_center=0.0, vmax_value=None, subtract_radial=True,
-                       side_by_side=True, contaminants=None):
-    """Run the Clicker GUI once and return the clicked positions as a list of (y, x) arcsec.
+                       display='snr', display_base=None,
+                       mask_center=0.0, vmax_value=None, subtract='isophote',
+                       side_by_side=True, contaminants=None, prompt=None):
+    """Run the Clicker GUI once and return the clicked position SETS, [[(y, x), ...], ...]
+    arcsec, one list per source. `prompt` replaces the window title's marking instruction
+    (make_extra_galaxies.py clicks galaxy centres with this same GUI).
+
+    NUMBER KEYS SELECT THE SOURCE BEING MARKED (2026-11-01): the window opens on source 1;
+    press 2 and every following double-click goes to source 2, press 1 to go back. Use a set
+    per source plane (or per distinct source), because each set's images must map to their
+    OWN source-plane point; the title names the active set and each set is drawn in its own
+    colour. Empty sets are dropped, so pressing 3 and marking nothing changes nothing.
 
     `sci_native` (REAL flux) is handed to al.Clicker so its brightest-pixel snap uses true
     counts; `display_base` (raw signal, or S/N -- see load_display_base) is what we STRETCH
@@ -291,7 +394,11 @@ def mark_positions_gui(sci_native, pixel_scales, lens, filt, search_box_size,
     Nothing is translated, so what you click is what gets snapped, on either panel, and the
     single-panel path is the pre-existing one unchanged.
 
-    `side_by_side` (default True, only meaningful with subtract_radial) shows both views at
+    `subtract` picks the deflector-removed panel: 'isophote' (default since 2026-11-01, an
+    elliptical-isophote model, isophote_model.py, shown smoothed on a red-blue map), 'radial'
+    (the radial median) or None (as-observed only).
+
+    `side_by_side` (default True, only meaningful with a subtraction) shows both views at
     once -- subtracted LEFT, as-observed RIGHT -- because each answers a different question:
     the subtracted panel is where a faint image inside the galaxy envelope is visible at all,
     the as-observed panel is where you judge whether that blob is really there. CLICK EITHER;
@@ -311,19 +418,18 @@ def mark_positions_gui(sci_native, pixel_scales, lens, filt, search_box_size,
         region is outlined so you can see what is behind the blank.
       * `vmax_value` clips the display at an absolute value in the base array's units (S/N
         by default), saturating everything brighter.
-      * `subtract_radial` removes the deflector's azimuthally-averaged radial profile,
+      * `subtract` removes the deflector (isophote model by default; 'radial' is the
+        azimuthally-averaged radial profile described here),
         which is the strongest of the three -- it reaches the images buried INSIDE the
         galaxy envelope, where a central blank would hide them too. The blanked regions are
         excluded from that profile too, so a masked neighbour cannot stamp a dark ring
         across the arcs at its own radius.
-    None of them touches `sci_native`, so al.Clicker still snaps on true flux and the saved
-    positions are identical whatever is on screen. Do note the snap is flux-based: a click
-    placed inside/adjacent to a blanked region can still snap onto a hidden pixel within
-    `search_box_size` -- process_lens checks the result and warns if one did.
+    None of them touches `sci_native`, so the snap (snap_click) still uses true flux and the
+    saved positions are identical whatever is on screen. Do note the snap is flux-based: a
+    click placed inside/adjacent to a blanked region can still snap onto a hidden pixel within
+    `search_box_size` (the snap radius, px) -- process_lens checks the result and warns if one
+    did. 'z' (or Backspace) UNDOES the last click, whichever source it was for.
     """
-    clicker = al.Clicker(image=sci_native, pixel_scales=pixel_scales,
-                         search_box_size=search_box_size)
-
     base = display_base if display_base is not None else sci_native
     # Everything hidden from the display, and from the stretch and radial statistics with it.
     exclude = make_masks.central_disc(np.asarray(base).shape, pixel_scales, mask_center)
@@ -331,11 +437,18 @@ def mark_positions_gui(sci_native, pixel_scales, lens, filt, search_box_size,
         cont = np.asarray(contaminants, dtype=bool)
         exclude = cont if exclude is None else (exclude | cont)
 
+    # Each panel is (title, values, diverging vmax or None). The subtracted panel is the
+    # deflector-removed view: since 2026-11-01 an ISOPHOTE model by default (isophote_model.py),
+    # shown smoothed on a diverging map (red = light the model lacks); 'radial' keeps the old
+    # radial-median view on the usual stretch.
     panels = []
-    if subtract_radial:
-        panels.append(('radial-subtracted', radial_median_subtract(base, exclude=exclude)))
-    if not subtract_radial or side_by_side:
-        panels.append(('as-observed', base))
+    if not subtract or side_by_side:
+        panels.append(('as-observed', base, None))
+    if subtract == 'isophote':
+        res, vmax = isophote_model.isophote_display(base, pixel_scales, exclude=exclude)
+        panels.append(('isophote-subtracted (smoothed)', res, vmax))
+    elif subtract == 'radial':
+        panels.append(('radial-subtracted', radial_median_subtract(base, exclude=exclude), None))
 
     n_y, n_x = np.asarray(base).shape
     hw = int(n_x / 2) * pixel_scales
@@ -343,65 +456,139 @@ def mark_positions_gui(sci_native, pixel_scales, lens, filt, search_box_size,
 
     fig, axes = plt.subplots(1, len(panels), figsize=(12 * len(panels), 12), squeeze=False)
     axes = list(axes[0])
-    for ax, (name, values) in zip(axes, panels):
-        disp = np.asarray(make_masks.stretched_display(
-            values, pixel_scales, stretch=stretch, vmin_percent=vmin_percent,
-            vmax_percent=vmax_percent, asinh_a=asinh_a, exclude=exclude,
-            vmax_value=vmax_value).native)
-        if contaminants is not None and cont.any():
-            # Outline ON the masked pixels (mask_boundary is an INNER boundary), so the
-            # outline survives the interior being blanked to the colourmap floor.
-            disp[mask_boundary(cont)] = 1.0
-        im = ax.imshow(disp, cmap='jet', extent=ext)
+    for ax, (name, values, vmax_div) in zip(axes, panels):
+        if vmax_div is not None:
+            disp = np.array(values, dtype=float)
+            if contaminants is not None and cont.any():
+                disp[cont] = np.nan                         # blanked, like the other panels
+            im = ax.imshow(disp, cmap='RdBu_r', vmin=-vmax_div, vmax=vmax_div, extent=ext)
+            if contaminants is not None and cont.any():
+                ax.contour(cont, levels=[0.5], colors='black', linewidths=0.8,
+                           extent=ext, origin='upper')
+        else:
+            disp = observed_display(values, exclude=exclude, vmax_value=vmax_value)
+            if contaminants is not None and cont.any():
+                # Outline ON the masked pixels (mask_boundary is an INNER boundary), so the
+                # outline survives the interior being blanked to the colourmap floor.
+                disp[mask_boundary(cont)] = 1.0
+            im = ax.imshow(disp, cmap=OBSERVED_CMAP, vmin=0.0, vmax=1.0, extent=ext)
         fig.colorbar(im, ax=ax, fraction=0.046)
         if mask_center and mask_center > 0:
             ax.add_patch(plt.Circle((0.0, 0.0), mask_center, fill=False, color='white',
                                     lw=1.0, ls='--'))
         ax.set_title(name if len(panels) > 1 else '')
-        ax.set_xlabel('arcsec')
-        ax.set_ylabel('arcsec')
+        north_up(ax)
 
     where = ' on either panel' if len(panels) > 1 else ''
-    fig.suptitle(f"{lens}  {filt}  --  DOUBLE-CLICK each lensed image{where}, "
-                 f"then close the window")
+    sets = [[]]                       # sets[k] = clicks of source k+1
+    active = [0]                      # boxed so the key handler can rebind it
 
+    def title():
+        colour = SET_COLOURS[active[0] % len(SET_COLOURS)]
+        fig.suptitle(f"{lens}  {filt}  --  " + (prompt or
+                     f"marking SOURCE {active[0] + 1} ({colour}): "
+                     f"DOUBLE-CLICK each of its images{where}.  Keys 1-9 switch source; "
+                     f"z undoes; Esc (or close the window) when done") + "   [North up, East left]")
+        fig.canvas.draw_idle()
+
+    title()
     axes_set = set(axes)
     moved = []
+    history = []                      # (set index, artists) per click, newest last, for undo
 
     def onclick(event):
         # Every panel is the same sky on the same arcsec extent, so a click on any of them
-        # is already in the single-band frame Clicker expects. Clicks outside the panels
-        # (margins, colourbars) are dropped rather than snapped to a nonsense pixel.
-        if event.inaxes not in axes_set:
+        # is already in the band's (y, x) arcsec frame. Clicks outside the panels (margins,
+        # colourbars) are dropped rather than snapped to a nonsense pixel.
+        if event.inaxes not in axes_set or not event.dblclick:
             return
-        before = len(clicker.click_list)
-        clicker.onclick(event)
-        if len(clicker.click_list) > before:
-            # How far the brightest-pixel snap moved the click. Printed because the snap is
-            # the one step between what you aimed at and what gets saved, and a large jump
-            # usually means the box reached a brighter neighbour, not a better centre.
-            sy, sx = clicker.click_list[-1]
-            d_as = float(np.hypot(sy - event.ydata, sx - event.xdata))
-            moved.append(d_as)
-            note = ('   <-- LARGE, check it'
-                    if d_as > 1.5 * search_box_size * pixel_scales else '')
-            print(f"    snap moved {d_as/pixel_scales:4.1f} px ({d_as:.3f}\") "
-                  f"-> ({sy:+.3f}, {sx:+.3f})\"{note}")
+        sy, sx = snap_click(sci_native, pixel_scales, event.ydata, event.xdata, search_box_size)
+        sets[active[0]].append((sy, sx))
+        colour = SET_COLOURS[active[0] % len(SET_COLOURS)]
+        artists = []
+        for ax in axes:
+            artists += ax.plot(sx, sy, '+', color=colour, ms=9, mew=1.5, zorder=5,
+                               path_effects=MARK_STROKE)
+            artists.append(ax.annotate(f'{active[0] + 1}.{len(sets[active[0]]) - 1}', (sx, sy),
+                                       color=colour, fontsize=10, xytext=(6, 6),
+                                       textcoords='offset points', zorder=5, path_effects=MARK_STROKE))
+        history.append((active[0], artists))
+        fig.canvas.draw_idle()
+        # How far the brightest-pixel snap moved the click. Printed because the snap is the
+        # one step between what you aimed at and what gets saved.
+        d_as = float(np.hypot(sy - event.ydata, sx - event.xdata))
+        moved.append(d_as)
+        note = '   <-- LARGE, check it' if d_as > (search_box_size + 0.75) * pixel_scales else ''
+        print(f"    snap moved {d_as/pixel_scales:4.1f} px ({d_as:.3f}\") "
+              f"-> ({sy:+.3f}, {sx:+.3f})\"{note}")
+
+    def undo():
+        if not history:
+            print("    nothing to undo")
+            return
+        k, artists = history.pop()
+        y_, x_ = sets[k].pop()
+        moved.pop()
+        for a_ in artists:
+            a_.remove()
+        print(f"    undone: source {k + 1} image {len(sets[k])} at ({y_:+.3f}, {x_:+.3f})\"")
+        fig.canvas.draw_idle()
+
+    def onkey(event):
+        if event.key == 'escape':     # finish, as Esc does in the mask GUI
+            plt.close(fig)
+            return
+        if event.key in ('z', 'backspace', 'ctrl+z', 'cmd+z'):    # 'z' undoes in the mask GUI too
+            undo()
+            return
+        if event.key is not None and event.key in '123456789' and len(event.key) == 1:
+            active[0] = int(event.key) - 1
+            while len(sets) <= active[0]:
+                sets.append([])
+            print(f"    -> now marking SOURCE {active[0] + 1}")
+            title()
 
     cid = fig.canvas.mpl_connect('button_press_event', onclick)
+    kid = fig.canvas.mpl_connect('key_press_event', onkey)
     plt.show()
     fig.canvas.mpl_disconnect(cid)
+    fig.canvas.mpl_disconnect(kid)
     plt.close(fig)
 
     if moved:
         print(f"  snap distances: max {max(moved)/pixel_scales:.1f} px, "
               f"mean {sum(moved)/len(moved)/pixel_scales:.1f} px "
-              f"(--search-box-size {search_box_size})")
-    return list(clicker.click_list), moved  # each entry (y_arcsec, x_arcsec)
+              f"(--snap-radius {search_box_size})")
+    return [s for s in sets if s], moved  # each set a list of (y_arcsec, x_arcsec)
 
 
-def rebuild_overlays(lens, filt_dirs, drizzle_pass, stretch, vmin_percent,
-                     vmax_percent, asinh_a, vmax_value=None):
+def background_renders(sample, lenses, vmax_value=None):
+    """Draw the changed lenses' positions QC overlays (--overlays-only) in ONE detached
+    background process, at the end of the run, so the GUI never waits on them
+    (make_masks.rerender_overviews explains the frozen-window problem). Log in data/run_logs/.
+    The band overview does not show positions (2026-11-02), so it is not re-rendered."""
+    if not lenses:
+        return
+    import shlex
+    import subprocess
+    import time
+    plt.close('all')
+    here = os.path.dirname(os.path.abspath(__file__))
+    py = shlex.quote(sys.executable)
+    steps = [f'{py} {shlex.quote(os.path.join(here, "make_positions.py"))} --sample {sample} '
+             f'--lens {shlex.quote(l)} --overlays-only'
+             + (f' --vmax-value {vmax_value}' if vmax_value is not None else '') for l in lenses]
+    log = os.path.join(ws_path, 'data', 'run_logs', f'positions_renders_{sample}_{time.strftime("%Y%m%d_%H%M%S")}.log')
+    os.makedirs(os.path.dirname(log), exist_ok=True)
+    with open(log, 'w') as fh:
+        subprocess.Popen(['/bin/sh', '-c', '; '.join(steps) + '; echo "=== renders done"'],
+                         stdout=fh, stderr=subprocess.STDOUT, start_new_session=True,
+                         env=dict(os.environ, MPLBACKEND='Agg'))
+    print(f"\npositions overlays of {len(lenses)} lens(es) rendering IN THE BACKGROUND "
+          f"(~20 s each); log: {os.path.relpath(log, ws_path)}")
+
+
+def rebuild_overlays(lens, filt_dirs, drizzle_pass, vmax_value=None):
     """Re-draw each band's `{prefix}_positions.png` from its tracked `_positions.json`.
 
     The PNG is a QC view of the JSON, not a product in its own right, so it is gitignored
@@ -418,24 +605,21 @@ def rebuild_overlays(lens, filt_dirs, drizzle_pass, stretch, vmin_percent,
         json_path = os.path.join(stamp_dir, f'{prefix}_positions.json')
         if not os.path.exists(json_path):
             continue
-        grid = al.from_json(file_path=json_path)
-        positions = [(float(y), float(x)) for (y, x) in np.asarray(grid)]
+        sets = positions_io.read_sets(json_path)
         sci_path = stamp_paths.find_stamp(stamp_dir, prefix, 'sci')
         ps = make_masks.pixel_scale_from_header(fits.getheader(sci_path))
         sci_native = al.Array2D.from_fits(file_path=sci_path, pixel_scales=ps).native
         out_png = os.path.join(stamp_dir, f'{prefix}_positions.png')
-        save_overlay_png(sci_native, ps, positions, out_png, stretch=stretch,
-                         vmin_percent=vmin_percent, vmax_percent=vmax_percent,
-                         asinh_a=asinh_a, vmax_value=vmax_value)
-        print(f"  rebuilt {out_png}  ({len(positions)} positions)")
+        save_overlay_png(sci_native, ps, sets, out_png, vmax_value=vmax_value)
+        print(f"  rebuilt {out_png}  ({len(positions_io.flatten(sets))} positions"
+              f"{f', {len(sets)} sets' if len(sets) > 1 else ''})")
         n += 1
     if not n:
         print(f"{lens}: no positions JSON on any band -- nothing to rebuild")
     return n
 
 
-def rebroadcast(lens, filt_dirs, sample, drizzle_pass, stretch, vmin_percent,
-                vmax_percent, asinh_a, vmax_value=None):
+def rebroadcast(lens, filt_dirs, sample, drizzle_pass, vmax_value=None):
     """Re-derive every band's positions from the MARKED band's, without re-clicking.
 
     The marked band's JSON is the hand-made measurement and is never touched; every other
@@ -449,7 +633,7 @@ def rebroadcast(lens, filt_dirs, sample, drizzle_pass, stretch, vmin_percent,
     # a lens was re-marked on another band, take the highest-priority one, as the GUI would.
     prov = info_json.load(POSITIONS_JSON).get(sample, {}).get(lens, {})
     candidates = [k for k in prov if k in filt_dirs]
-    marked_filt = pick_display_filt(sorted(candidates), None) if candidates else None
+    marked_filt = pick_display_filt(sorted(candidates), None, lens, sample) if candidates else None
     if marked_filt is None:
         return 0                      # simply not marked yet -- nothing to say
     marked_dir = filt_dirs[marked_filt]
@@ -466,10 +650,10 @@ def rebroadcast(lens, filt_dirs, sample, drizzle_pass, stretch, vmin_percent,
               f"    The clicks survive in {os.path.basename(POSITIONS_JSON)} "
               f"('positions_arcsec'). Re-mark with --force, or restore from there.")
         return 0
-    positions = [(float(y), float(x))
-                 for (y, x) in np.asarray(al.from_json(file_path=marked_json))]
+    sets = positions_io.read_sets(marked_json)
     marked_hdr = fits.getheader(stamp_paths.find_stamp(marked_dir, marked_prefix, 'sci'))
-    print(f"\n{lens}: re-deriving {len(positions)} position(s) from {marked_filt}")
+    print(f"\n{lens}: re-deriving {len(positions_io.flatten(sets))} position(s) "
+          f"({len(sets)} set(s)) from {marked_filt}")
     n = 0
     for filt in sorted(filt_dirs):
         if filt == marked_filt:
@@ -481,18 +665,17 @@ def rebroadcast(lens, filt_dirs, sample, drizzle_pass, stretch, vmin_percent,
         band_sci = stamp_paths.find_stamp(stamp_dir, prefix, 'sci')
         band_hdr = fits.getheader(band_sci)
         band_ps = make_masks.pixel_scale_from_header(band_hdr)
-        new = reproject_positions(positions, marked_hdr, band_hdr)
+        new_sets = [reproject_positions(s_, marked_hdr, band_hdr) for s_ in sets]
+        new = positions_io.flatten(new_sets)
         json_path = os.path.join(stamp_dir, f'{prefix}_positions.json')
         old = None
         if os.path.exists(json_path):
-            old = [(float(y), float(x))
-                   for (y, x) in np.asarray(al.from_json(file_path=json_path))]
-        al.output_to_json(obj=al.Grid2DIrregular(values=new), file_path=json_path)
+            old = positions_io.flatten(positions_io.read_sets(json_path))
+        positions_io.write_sets(new_sets, json_path)
         band_native = al.Array2D.from_fits(file_path=band_sci, pixel_scales=band_ps).native
-        save_overlay_png(band_native, band_ps, new,
+        save_overlay_png(band_native, band_ps, new_sets,
                          os.path.join(stamp_dir, f'{prefix}_positions.png'),
-                         stretch=stretch, vmin_percent=vmin_percent,
-                         vmax_percent=vmax_percent, asinh_a=asinh_a, vmax_value=vmax_value)
+                         vmax_value=vmax_value)
         moved = ('' if old is None or len(old) != len(new) or not new else
                  f"  moved {1000*max(np.hypot(a-c, b-d) for (a, b), (c, d) in zip(new, old)):.1f} mas"
                  f" ({max(np.hypot(a-c, b-d) for (a, b), (c, d) in zip(new, old))/band_ps:.2f} px)")
@@ -502,8 +685,8 @@ def rebroadcast(lens, filt_dirs, sample, drizzle_pass, stretch, vmin_percent,
 
 
 def process_lens(lens, filt_dirs, sample, requested_filt, drizzle_pass, force,
-                 search_box_size, display, stretch, vmin_percent, vmax_percent, asinh_a,
-                 mask_center=0.0, vmax_value=None, subtract_radial=True,
+                 search_box_size, display,
+                 mask_center=0.0, vmax_value=None, subtract='isophote',
                  side_by_side=True, hide_masked=True):
     """Mark positions once for one lens and broadcast the result to every band.
 
@@ -511,7 +694,7 @@ def process_lens(lens, filt_dirs, sample, requested_filt, drizzle_pass, force,
     Returns True if positions were written.
     """
     filts = sorted(filt_dirs)
-    display_filt = pick_display_filt(filts, requested_filt)
+    display_filt = pick_display_filt(filts, requested_filt, lens, sample)
     if display_filt is None:
         print(f"{lens}: requested --filt {requested_filt} not present "
               f"(have {', '.join(filts)}), skipping")
@@ -555,41 +738,48 @@ def process_lens(lens, filt_dirs, sample, requested_filt, drizzle_pass, force,
             print(f"  NOTE: no {display_prefix}_mask.fits on this band -- nothing to hide "
                   f"(draw one with make_masks.py)")
 
-    source_label += (', radial-subtracted + as-observed' if subtract_radial and side_by_side
-                     else ', radial-subtracted' if subtract_radial else '')
+    source_label += (f', as-observed + {subtract}-subtracted' if subtract and side_by_side
+                     else f', {subtract}-subtracted' if subtract else '')
     if contaminants is not None:
         source_label += ' (contaminants blanked)'
 
-    print(f"  display: {source_label}, {stretch} stretch  |  snap search box "
+    print(f"  display: {source_label}, arcsinh stretch, North up  |  snap search box "
           f"= {search_box_size}px")
     if mask_center and mask_center > 0:
         print(f"  central {mask_center:g}\" blanked in the DISPLAY (deflector light hidden "
-              f"and dropped from the stretch percentiles); snap still uses true flux")
+              f"and dropped from the stretch statistics); snap still uses true flux")
     if vmax_value is not None:
         print(f"  display saturated above {vmax_value:g} ({source_label})")
-    if subtract_radial:
+    if subtract == 'isophote':
+        print("  deflector's ISOPHOTE model subtracted from the DISPLAY, smoothed, red = light "
+              "the model lacks (finding aid only)")
+    elif subtract == 'radial':
         print("  deflector's radial-median profile subtracted from the DISPLAY "
               "(finding aid only -- expect a quadrupole residual on an elliptical)")
-        if side_by_side:
-            print("  side by side: radial-subtracted LEFT, as-observed RIGHT -- click "
-                  "either, they are the same sky")
+    if subtract and side_by_side:
+        print(f"  side by side: as-observed LEFT, {subtract}-subtracted RIGHT -- click "
+              "either, they are the same sky")
     print("  DOUBLE-CLICK each lensed image of the source (2 for a double, 4 for a quad).")
     print("  Each click snaps to the brightest nearby pixel. Close the window when done.")
 
-    positions, moved = mark_positions_gui(
+    sets, moved = mark_positions_gui(
         sci_native, pixel_scales, lens, display_filt, search_box_size,
-        display=display, display_base=base, stretch=stretch,
-        vmin_percent=vmin_percent, vmax_percent=vmax_percent, asinh_a=asinh_a,
+        display=display, display_base=base,
         mask_center=mask_center, vmax_value=vmax_value,
-        subtract_radial=subtract_radial, side_by_side=side_by_side,
+        subtract=subtract, side_by_side=side_by_side,
         contaminants=contaminants)
 
+    positions = positions_io.flatten(sets)
     if len(positions) == 0:
         print(f"  no positions clicked -- nothing written for {lens}")
         return False
-    if len(positions) < 2:
-        print(f"  WARNING: only {len(positions)} position clicked -- a lensed source has "
-              f">=2 images. Re-run with --force if this was a mis-click.")
+    for k, s_ in enumerate(sets):
+        if len(s_) < 2:
+            print(f"  WARNING: source {k + 1} has only {len(s_)} position -- a lensed source "
+                  f"has >=2 images. Re-run with --force if this was a mis-click.")
+    if len(sets) > 1:
+        print(f"  {len(sets)} position sets: " + ', '.join(
+            f'source {k + 1} = {len(s_)}' for k, s_ in enumerate(sets)))
 
     # The snap uses true flux, so a click at the edge of a blanked region can still land
     # inside it -- the one way a display-only lever can reach the saved product. Check rather
@@ -621,11 +811,12 @@ def process_lens(lens, filt_dirs, sample, requested_filt, drizzle_pass, force,
         band_hdr = fits.getheader(band_sci)
         band_ps = make_masks.pixel_scale_from_header(band_hdr)
         if filt == display_filt:
-            band_positions, shift_mas = positions, 0.0
+            band_sets, shift_mas = sets, 0.0
         else:
-            band_positions = reproject_positions(positions, marked_hdr, band_hdr)
+            band_sets = [reproject_positions(s_, marked_hdr, band_hdr) for s_ in sets]
             shift_mas = 1000.0 * max(np.hypot(by - y, bx - x)
-                                     for (by, bx), (y, x) in zip(band_positions, positions))
+                                     for (by, bx), (y, x) in zip(positions_io.flatten(band_sets),
+                                                                 positions))
 
         # Does this band's own image actually sit where the marked band says it does? A
         # broadcast cannot fix a misregistered band; it can only be honest about it.
@@ -649,13 +840,10 @@ def process_lens(lens, filt_dirs, sample, requested_filt, drizzle_pass, force,
                       f"({tie['mas']/(band_ps*1000.0):.2f} px; {how})")
 
         json_path = os.path.join(stamp_dir, f'{prefix}_positions.json')
-        al.output_to_json(obj=al.Grid2DIrregular(values=band_positions), file_path=json_path)
-        band_native = al.Array2D.from_fits(file_path=band_sci, pixel_scales=band_ps).native
-        save_overlay_png(band_native, band_ps, band_positions,
-                         os.path.join(stamp_dir, f'{prefix}_positions.png'),
-                         stretch=stretch, vmin_percent=vmin_percent,
-                         vmax_percent=vmax_percent, asinh_a=asinh_a,
-                         vmax_value=vmax_value)
+        positions_io.write_sets(band_sets, json_path)
+        # The {prefix}_positions.png QC overlays are drawn at the END of the run, in the
+        # background (background_renders): each needs an isophote fit (~7 s a SW band), and
+        # done here they kept the closed window frozen for ~20 s a lens (2026-11-02).
         written.append({'filt': filt, 'prefix': prefix,
                         'reprojection_shift_mas': round(shift_mas, 2),
                         'band_tie_mas': (None if tie is None or tie['mas'] is None
@@ -671,20 +859,26 @@ def process_lens(lens, filt_dirs, sample, requested_filt, drizzle_pass, force,
 
     info_json.update(POSITIONS_JSON, sample, lens, display_filt, {
         'n_positions': len(positions),
+        # Every position, flattened, so one-set records read exactly as before; a multi-set
+        # lens also carries the split (the JSON file holds one Grid2DIrregular per set).
         'positions_arcsec': [[round(y, 6), round(x, 6)] for (y, x) in positions],
+        **({'n_sets': len(sets),
+            'positions_arcsec_by_set': [[[round(y, 6), round(x, 6)] for (y, x) in s_]
+                                        for s_ in sets]} if len(sets) > 1 else {}),
         'marked_filt': display_filt,
         'marked_prefix': display_prefix,
         'drizzle_pass': 'single',
         'pixel_scale_arcsec': round(pixel_scales, 6),
-        'search_box_size': search_box_size,
+        'snap_radius_px': search_box_size,
         'snap_moved_px_max': (round(max(moved)/pixel_scales, 2) if moved else None),
         'snap_moved_px_mean': (round(sum(moved)/len(moved)/pixel_scales, 2) if moved else None),
         'broadcast': 'sky (WCS pixel->world->pixel per band)',
         'display': source_label,
         'display_mask_center_arcsec': mask_center or None,
         'display_vmax_value': vmax_value,
-        'display_subtract_radial': bool(subtract_radial),
-        'display_side_by_side': bool(subtract_radial and side_by_side),
+        'display_subtract': subtract or None,
+        'display_subtract_radial': subtract == 'radial',
+        'display_side_by_side': bool(subtract and side_by_side),
         'display_hidden_contaminant_px': (int(contaminants.sum())
                                           if contaminants is not None else None),
         'n_positions_on_contaminant': n_on_mask,
@@ -696,9 +890,9 @@ def process_lens(lens, filt_dirs, sample, requested_filt, drizzle_pass, force,
 def main():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--sample', default=mast_target_names.DEFAULT_SAMPLE,
-                   help=f'sample subdirectory of data/stamps/ (default '
-                        f'{mast_target_names.DEFAULT_SAMPLE})')
+    p.add_argument('--sample', type=mast_target_names.sample_arg, default=None,
+                   help='sample subdirectory of data/stamps/ (default: the sample --lens is in, '
+                        f'else {mast_target_names.DEFAULT_SAMPLE})')
     p.add_argument('--lens', default=None,
                    help='restrict to one lens; default every lens with stamps in --sample')
     p.add_argument('--filt', default=None,
@@ -718,28 +912,16 @@ def main():
                         '(--overlays-only), so it is gitignored)')
     p.add_argument('--force', action='store_true', default=False,
                    help='re-mark a lens that already has positions (default: skip it)')
-    p.add_argument('--search-box-size', type=int, default=2,
-                   help='half-width in pixels of the brightest-pixel snap around each click '
-                        '(al.Clicker search_box_size; default 2, lowered from 5 on '
-                        '2026-09-17). 5 let a click move up to ~0.25" on ACS -- far enough '
-                        'to jump onto the deflector envelope or a neighbouring knot instead '
-                        'of the image you aimed at. 2 still catches the peak of an image you '
-                        'clicked squarely; use 1 to snap only to the immediate neighbours, '
-                        'or 0 to take the click as-is. Each click prints how far it actually '
-                        'moved, and the per-lens max is recorded in the provenance')
+    p.add_argument('--snap-radius', '--search-box-size', dest='search_box_size', type=int, default=1,
+                   help='each double-click snaps to the brightest pixel (true flux) within this many '
+                        'px of the clicked pixel, a disc (default 1: the clicked pixel or one of its '
+                        '4 neighbours; 0 = no snap). Lowered from 2 on 2026-11-02, when the old '
+                        'al.Clicker box (asymmetric, up to 2.8 px) was replaced. Each click prints '
+                        'how far it moved. --search-box-size is the old name')
     p.add_argument('--display', choices=['snr', 'sci'], default='snr',
                    help="image to click on: 'snr' (default) = signal/noise (tracks "
                         "significance given the non-uniform noise map); 'sci' = raw signal. "
                         "Snap always uses true flux; choice does not affect saved positions")
-    p.add_argument('--stretch', choices=list(make_masks._STRETCHES), default='asinh',
-                   help='intensity stretch for the DISPLAYED image only (asinh default shows '
-                        'bright cores and faint arcs together)')
-    p.add_argument('--asinh-a', type=float, default=0.1,
-                   help='asinh softening (smaller = stronger stretch; --stretch asinh only)')
-    p.add_argument('--vmin-percent', type=float, default=5.0,
-                   help='lower clip percentile for the display stretch (default 5.0)')
-    p.add_argument('--vmax-percent', type=float, default=99.5,
-                   help='upper clip percentile for the display stretch (default 99.5)')
     p.add_argument('--mask-center', type=float, default=0.0, metavar='ARCSEC',
                    help='blank a disc of this radius (arcsec) at the stamp centre in the '
                         'DISPLAYED image, to hide the deflector light that otherwise drowns '
@@ -783,15 +965,21 @@ def main():
                         'Display only -- the snap still uses true flux, and a position that '
                         'lands on a masked pixel anyway is reported. --no-hide-masked shows '
                         'the band untouched; silently inactive where the band has no mask')
-    p.add_argument('--subtract-radial', action=argparse.BooleanOptionalAction, default=True,
+    p.add_argument('--subtract', choices=['isophote', 'radial', 'none'], default=None,
+                   help='how the deflector is removed in the subtracted panel: isophote '
+                        '(DEFAULT since 2026-11-01: elliptical isophotes free in ellipticity '
+                        'and PA, shown smoothed on a red-blue map), radial (the old '
+                        'radial-median profile) or none (the raw image only). Display only')
+    p.add_argument('--subtract-radial', action=argparse.BooleanOptionalAction, default=None,
                    help="subtract the deflector's azimuthally-averaged radial profile from "
                         'the DISPLAYED image (DEFAULT ON -- it is what makes the images '
                         'clickable at all on most lenses). The strongest of the three '
                         'arc-finding levers: unlike --mask-center it reveals images buried '
                         'inside the galaxy envelope rather than hiding them. Expect a '
                         'quadrupole residual (the deflector is elliptical, not circular) '
-                        'and treat it as a finding aid, not photometry. Display only -- pass '
-                        '--no-subtract-radial to click on the raw image instead')
+                        'and treat it as a finding aid, not photometry. Display only. Kept for '
+                        'old command lines: --subtract-radial = --subtract radial, '
+                        '--no-subtract-radial = --subtract none')
     p.add_argument('--include-ignored', action='store_true', default=False,
                    help='also offer bands whose stamp directory is GITIGNORED. Off by '
                         'default: such a band is not a science product (the three 420 s '
@@ -801,6 +989,7 @@ def main():
                         'was MARKED on its SNAP f814W band and broadcast from there across a '
                         '688 mas (13.8 px) misregistration; both copies were deleted 2026-09-22.')
     a = p.parse_args()
+    mast_target_names.resolve_sample(p, a, default=mast_target_names.DEFAULT_SAMPLE)
 
     make_masks.STAMP_SIZE = a.size
     root = stamp_paths.stamps_root(ws_path)
@@ -819,11 +1008,14 @@ def main():
 
     print(f"{len(lens_filts)} lens(es) to process")
 
+    changed = []                      # lenses whose positions overlays to draw at the end
     if a.rebroadcast:
         total = 0
         for lens in sorted(lens_filts):
-            total += rebroadcast(lens, lens_filts[lens], a.sample, a.drizzle_pass, a.stretch,
-                                 a.vmin_percent, a.vmax_percent, a.asinh_a, a.vmax_value)
+            n = rebroadcast(lens, lens_filts[lens], a.sample, a.drizzle_pass, a.vmax_value)
+            total += n
+            if n:
+                changed.append(lens)
         print(f"\nDone: {total} band(s) re-derived through the WCS")
         return
 
@@ -831,24 +1023,28 @@ def main():
         total = 0
         for lens in sorted(lens_filts):
             print(f"\n{lens}")
-            total += rebuild_overlays(lens, lens_filts[lens], a.drizzle_pass, a.stretch,
-                                      a.vmin_percent, a.vmax_percent, a.asinh_a,
-                                      a.vmax_value)
+            total += rebuild_overlays(lens, lens_filts[lens], a.drizzle_pass, a.vmax_value)
         print(f"\nDone: {total} QC overlay(s) rebuilt from the positions JSONs")
         return
 
+    # --subtract wins; the old --(no-)subtract-radial still maps onto it; default isophote.
+    subtract = (a.subtract if a.subtract is not None
+                else 'radial' if a.subtract_radial is True
+                else 'none' if a.subtract_radial is False else 'isophote')
+    subtract = None if subtract == 'none' else subtract
     made = skipped = 0
     for lens in sorted(lens_filts):
         if process_lens(lens, lens_filts[lens], a.sample, a.filt, a.drizzle_pass, a.force,
-                        a.search_box_size, a.display, a.stretch,
-                        a.vmin_percent, a.vmax_percent, a.asinh_a,
-                        a.mask_center, a.vmax_value, a.subtract_radial,
+                        a.search_box_size, a.display,
+                        a.mask_center, a.vmax_value, subtract,
                         a.side_by_side, a.hide_masked):
             made += 1
+            changed.append(lens)
         else:
             skipped += 1
 
     print(f"\nDone: {made} lens(es) marked, {skipped} skipped")
+    background_renders(a.sample, changed, a.vmax_value)
 
 
 if __name__ == '__main__':

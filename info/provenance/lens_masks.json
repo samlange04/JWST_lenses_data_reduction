@@ -32,5 +32,297 @@
                 "n_erased_px": 0
             }
         }
+    },
+    "cowls_spectacular": {
+        "COSJ095914+021219": {
+            "F277W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "pixel_scale_arcsec": 0.06,
+                "display": "S/N, radial-subtracted + as-observed (F444W mask outlined)",
+                "variant": "standard",
+                "source": "edited_from_F444W",
+                "n_excluded_px": 11648,
+                "brush_width": 0.03,
+                "brush_radius_px": 4,
+                "proposal_from": "F444W",
+                "proposal_px": 10032,
+                "n_added_px": 1788,
+                "n_erased_px": 0
+            }
+        },
+        "COSJ095917+015424": {
+            "F444W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "pixel_scale_arcsec": 0.06,
+                "display": "S/N, radial-subtracted + as-observed",
+                "variant": "standard",
+                "source": "drawn",
+                "n_excluded_px": 19992,
+                "brush_width": 0.03,
+                "brush_radius_px": 15,
+                "recut_2026_11_01": {
+                    "shift_px_col_row": [
+                        -3,
+                        6
+                    ],
+                    "n_masked_px_before": 19992,
+                    "n_masked_px_after": 18756,
+                    "how": "shifted by the whole-pixel move of the stamp grid when the stamps were re-cut on the measured lens centre; newly exposed edge pixels copy the edge"
+                }
+            }
+        },
+        "COSJ095920+015851": {
+            "F150W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "pixel_scale_arcsec": 0.03,
+                "display": "S/N, radial-subtracted + as-observed",
+                "variant": "standard",
+                "source": "drawn",
+                "n_excluded_px": 2192,
+                "brush_width": 0.015,
+                "brush_radius_px": 11
+            }
+        },
+        "COSJ095921+020638": {
+            "F115W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "pixel_scale_arcsec": 0.03,
+                "display": "S/N, radial-subtracted + as-observed",
+                "variant": "standard",
+                "source": "drawn",
+                "n_excluded_px": 17608,
+                "brush_width": 0.015,
+                "brush_radius_px": 11
+            }
+        },
+        "COSJ095950+022057": {
+            "F277W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "pixel_scale_arcsec": 0.06,
+                "display": "S/N, radial-subtracted + as-observed (F444W mask outlined)",
+                "variant": "standard",
+                "source": "edited_from_F444W",
+                "n_excluded_px": 5409,
+                "brush_width": 0.03,
+                "brush_radius_px": 11,
+                "proposal_from": "F444W",
+                "proposal_px": 4124,
+                "n_added_px": 2421,
+                "n_erased_px": 0
+            }
+        },
+        "COSJ095953+023319": {
+            "F444W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "pixel_scale_arcsec": 0.06,
+                "display": "S/N, radial-subtracted + as-observed (F444W mask outlined)",
+                "variant": "standard",
+                "source": "edited_from_F444W",
+                "n_excluded_px": 6035,
+                "brush_width": 0.03,
+                "brush_radius_px": 6,
+                "proposal_from": "F444W",
+                "proposal_px": 5927,
+                "n_added_px": 108,
+                "n_erased_px": 0
+            }
+        },
+        "COSJ095955+021900": {
+            "F277W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "pixel_scale_arcsec": 0.06,
+                "display": "S/N, radial-subtracted + as-observed",
+                "variant": "standard",
+                "source": "drawn",
+                "n_excluded_px": 11898,
+                "brush_width": 0.03,
+                "brush_radius_px": 8
+            }
+        },
+        "COSJ100012+022015": {
+            "F115W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "pixel_scale_arcsec": 0.03,
+                "display": "S/N, radial-subtracted + as-observed",
+                "variant": "standard",
+                "source": "drawn",
+                "n_excluded_px": 43798,
+                "brush_width": 0.015,
+                "brush_radius_px": 15
+            }
+        },
+        "COSJ100013+023424": {
+            "F444W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "pixel_scale_arcsec": 0.06,
+                "display": "S/N, radial-subtracted + as-observed (F444W mask outlined)",
+                "variant": "standard",
+                "source": "edited_from_F444W",
+                "n_excluded_px": 9041,
+                "brush_width": 0.03,
+                "brush_radius_px": 8,
+                "proposal_from": "F444W",
+                "proposal_px": 9070,
+                "n_added_px": 0,
+                "n_erased_px": 202
+            }
+        },
+        "COSJ100018+022138": {
+            "F150W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "pixel_scale_arcsec": 0.03,
+                "display": "S/N, radial-subtracted + as-observed",
+                "variant": "standard",
+                "source": "drawn",
+                "n_excluded_px": 13360,
+                "brush_width": 0.015,
+                "brush_radius_px": 21
+            }
+        },
+        "COSJ100024+015334": {
+            "F444W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "pixel_scale_arcsec": 0.06,
+                "display": "S/N, radial-subtracted + as-observed (F444W mask outlined)",
+                "variant": "standard",
+                "source": "edited_from_F444W",
+                "n_excluded_px": 9053,
+                "brush_width": 0.03,
+                "brush_radius_px": 6,
+                "proposal_from": "F444W",
+                "proposal_px": 8880,
+                "n_added_px": 173,
+                "n_erased_px": 0
+            }
+        },
+        "COSJ100024+021749": {
+            "F444W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "pixel_scale_arcsec": 0.06,
+                "display": "S/N, radial-subtracted + as-observed",
+                "variant": "standard",
+                "source": "drawn",
+                "n_excluded_px": 5119,
+                "brush_width": 0.03,
+                "brush_radius_px": 8,
+                "recut_2026_11_01": {
+                    "shift_px_col_row": [
+                        0,
+                        0
+                    ],
+                    "n_masked_px_before": 5119,
+                    "n_masked_px_after": 5119,
+                    "how": "shifted by the whole-pixel move of the stamp grid when the stamps were re-cut on the measured lens centre; newly exposed edge pixels copy the edge"
+                }
+            }
+        },
+        "COSJ100025+015245": {
+            "F444W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "pixel_scale_arcsec": 0.06,
+                "display": "S/N, radial-subtracted + as-observed",
+                "variant": "standard",
+                "source": "drawn",
+                "n_excluded_px": 10398,
+                "brush_width": 0.03,
+                "brush_radius_px": 11,
+                "recut_2026_11_01": {
+                    "shift_px_col_row": [
+                        -1,
+                        0
+                    ],
+                    "n_masked_px_before": 10398,
+                    "n_masked_px_after": 10356,
+                    "how": "shifted by the whole-pixel move of the stamp grid when the stamps were re-cut on the measured lens centre; newly exposed edge pixels copy the edge"
+                }
+            }
+        },
+        "COSJ100028+021928": {
+            "F444W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "pixel_scale_arcsec": 0.06,
+                "display": "S/N, radial-subtracted + as-observed",
+                "variant": "standard",
+                "source": "drawn",
+                "n_excluded_px": 17722,
+                "brush_width": 0.03,
+                "brush_radius_px": 11,
+                "recut_2026_11_01": {
+                    "shift_px_col_row": [
+                        1,
+                        0
+                    ],
+                    "n_masked_px_before": 17722,
+                    "n_masked_px_after": 17668,
+                    "how": "shifted by the whole-pixel move of the stamp grid when the stamps were re-cut on the measured lens centre; newly exposed edge pixels copy the edge"
+                }
+            }
+        },
+        "COSJ100047+015023": {
+            "F277W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "pixel_scale_arcsec": 0.06,
+                "display": "S/N, radial-subtracted + as-observed (F444W mask outlined)",
+                "variant": "standard",
+                "source": "accepted_from_F444W",
+                "n_excluded_px": 25034,
+                "brush_width": 0.03,
+                "brush_radius_px": 6,
+                "proposal_from": "F444W",
+                "proposal_px": 25034,
+                "n_added_px": 0,
+                "n_erased_px": 0
+            }
+        },
+        "COSJ100119+014849": {
+            "F277W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "pixel_scale_arcsec": 0.06,
+                "display": "S/N, radial-subtracted + as-observed",
+                "variant": "standard",
+                "source": "drawn",
+                "n_excluded_px": 9667,
+                "brush_width": 0.03,
+                "brush_radius_px": 15
+            }
+        },
+        "COSJ100121+022740": {
+            "F444W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "pixel_scale_arcsec": 0.06,
+                "display": "S/N, radial-subtracted + as-observed",
+                "variant": "standard",
+                "source": "drawn",
+                "n_excluded_px": 6111,
+                "brush_width": 0.03,
+                "brush_radius_px": 6,
+                "recut_2026_11_01": {
+                    "shift_px_col_row": [
+                        0,
+                        0
+                    ],
+                    "n_masked_px_before": 6111,
+                    "n_masked_px_after": 6111,
+                    "how": "shifted by the whole-pixel move of the stamp grid when the stamps were re-cut on the measured lens centre; newly exposed edge pixels copy the edge"
+                }
+            }
+        }
     }
 }

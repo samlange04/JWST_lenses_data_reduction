@@ -102,7 +102,10 @@ def build_group(stamps_dir, precedence):
     F606W is itself far noisier than ACS F555W), so those mosaics split the colourbar
     per instrument rather than share one."""
     entries = []
-    for lens_dir in sorted(glob.glob(os.path.join(stamps_dir, '*'))):
+    root, sample = os.path.split(os.path.normpath(stamps_dir))
+    lens_dirs = sorted({os.path.dirname(d) for d in stamp_paths.band_dirs(root, sample)},
+                       key=os.path.basename)                 # every layout, incl. category dirs
+    for lens_dir in lens_dirs:
         lens = os.path.basename(lens_dir)
         for filt in precedence:
             band_dir = os.path.join(lens_dir, filt)
@@ -401,7 +404,7 @@ def plot_mosaic(entries, arrays, title_key, out_path, panel_label, split_by=None
 def main():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--sample', default=mast_target_names.DEFAULT_SAMPLE,
+    p.add_argument('--sample', type=mast_target_names.sample_arg, default=mast_target_names.DEFAULT_SAMPLE,
                    help='sample subdirectory under data/stamps/ to mosaic. Defined in '
                         f'info/samples/lens_samples.json (default {mast_target_names.DEFAULT_SAMPLE})')
     p.add_argument('--size', type=float, default=None,

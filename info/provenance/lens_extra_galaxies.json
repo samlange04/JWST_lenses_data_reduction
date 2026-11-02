@@ -1,0 +1,125 @@
+{
+    "cowls_spectacular": {
+        "COSJ095955+021900": {
+            "extra_galaxies": {
+                "marked_on": "F277W",
+                "prefix": "stamp12",
+                "n": 5,
+                "centres_arcsec_yx": [
+                    [
+                        -3.27,
+                        -2.61
+                    ],
+                    [
+                        -2.31,
+                        -1.29
+                    ],
+                    [
+                        0.15,
+                        -1.23
+                    ],
+                    [
+                        0.87,
+                        0.27
+                    ],
+                    [
+                        3.57,
+                        -1.53
+                    ]
+                ],
+                "centres_arcsec_east_north": [
+                    [
+                        2.61,
+                        3.27
+                    ],
+                    [
+                        1.29,
+                        2.31
+                    ],
+                    [
+                        1.23,
+                        -0.15
+                    ],
+                    [
+                        -0.27,
+                        -0.87
+                    ],
+                    [
+                        1.53,
+                        -3.57
+                    ]
+                ],
+                "bands": [
+                    "F115W",
+                    "F150W",
+                    "F277W",
+                    "F444W"
+                ],
+                "date": "2026-11-02",
+                "convention": "autoarray (y, x) arcsec from the stamp centre: +y South, +x West"
+            }
+        },
+        "COSJ100013+023424": {
+            "extra_galaxies": {
+                "marked_on": "F444W",
+                "prefix": "stamp12",
+                "n": 2,
+                "centres_arcsec_yx": [
+                    [
+                        0.69,
+                        -0.15
+                    ],
+                    [
+                        -0.63,
+                        -0.51
+                    ]
+                ],
+                "centres_arcsec_east_north": [
+                    [
+                        0.15,
+                        -0.69
+                    ],
+                    [
+                        0.51,
+                        0.63
+                    ]
+                ],
+                "bands": [
+                    "F115W",
+                    "F150W",
+                    "F277W",
+                    "F444W"
+                ],
+                "date": "2026-11-02",
+                "convention": "autoarray (y, x) arcsec from the stamp centre: +y South, +x West"
+            }
+        },
+        "COSJ100119+014849": {
+            "extra_galaxies": {
+                "marked_on": "F277W",
+                "prefix": "stamp12",
+                "n": 1,
+                "centres_arcsec_yx": [
+                    [
+                        1.29,
+                        -1.11
+                    ]
+                ],
+                "centres_arcsec_east_north": [
+                    [
+                        1.11,
+                        -1.29
+                    ]
+                ],
+                "bands": [
+                    "F115W",
+                    "F150W",
+                    "F277W",
+                    "F444W"
+                ],
+                "date": "2026-11-02",
+                "convention": "autoarray (y, x) arcsec from the stamp centre: +y South, +x West"
+            }
+        }
+    }
+}

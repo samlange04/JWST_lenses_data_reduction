@@ -4,6 +4,8 @@ same contract, JWST vocabulary).
 **One tree, the size in the filename (2026-10-26).** Every stamp lives in
 
     data/stamps/<sample>/<lens>/<FILT>/
+    data/stamps/<sample>/<category>/<lens>/<FILT>/     a sample with lens_categories (COWLS:
+                                                       prime, multi_galaxy; 2026-11-02)
 
 and its filenames start `stamp<S>_`, where S is the stamp's nominal size in arcsec. Each lens
 has one MODELLING size -- its `stamp_size` in info/samples/lens_samples.json, else
@@ -73,9 +75,14 @@ def modelling_size(lens, sample=None):
 
 
 def _band_identity(stamp_dir):
-    """(sample, lens) from a data/stamps/<sample>/<lens>/<FILT> dir."""
+    """(sample, lens) from a data/stamps/<sample>/[<category>/]<lens>/<FILT> dir."""
+    import lens_samples
     lens_dir = os.path.dirname(os.path.normpath(stamp_dir))
-    return os.path.basename(os.path.dirname(lens_dir)), os.path.basename(lens_dir)
+    parent = os.path.dirname(lens_dir)
+    sample = os.path.basename(parent)
+    if sample not in lens_samples.samples() and os.path.basename(os.path.dirname(parent)) in lens_samples.samples():
+        sample = os.path.basename(os.path.dirname(parent))         # parent is a category dir
+    return sample, os.path.basename(lens_dir)
 
 
 def resolve_size(stamp_dir, size=None):
@@ -204,8 +211,36 @@ def qc_json_path(ws_path, size=None):
     return os.path.join(ws_path, 'info', 'provenance', f'lens_stamp_qc{size_tag(size)}.json')
 
 
+def lens_dir_in(root, sample, lens):
+    """<root>/<sample>/[<category>/]<lens>: the lens's dir in a stamp tree rooted at `root`. The
+    category level exists only for a sample with lens_categories (lens_samples.category); a lens
+    the roster does not know (a scratch dir) gets none."""
+    import lens_samples
+    try:
+        cat = lens_samples.category(lens, sample)
+    except (KeyError, SystemExit):
+        cat = None
+    return os.path.join(root, sample, *([cat] if cat else []), lens)
+
+
+def lens_stamp_dir(ws_path, sample, lens):
+    return lens_dir_in(stamps_root(ws_path), sample, lens)
+
+
+def band_dirs(root, sample, lens=None, filt=None):
+    """Every existing <lens>/<FILT> band dir of `sample` under `root`, sorted; `lens`/`filt`
+    restrict (filt may be a glob). Lenses come from the roster, so every layout is found."""
+    import glob
+    import lens_samples
+    names = [lens] if lens else lens_samples.lenses(sample)
+    out = []
+    for l in names:
+        out += [d for d in glob.glob(os.path.join(lens_dir_in(root, sample, l), filt or '*')) if os.path.isdir(d)]
+    return sorted(out)
+
+
 def stamp_dir(ws_path, sample, lens, filt):
-    return os.path.join(stamps_root(ws_path), sample, lens, filt)
+    return os.path.join(lens_stamp_dir(ws_path, sample, lens), filt)
 
 
 # The PSF sits in the same band dir as every stamp size.

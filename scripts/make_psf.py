@@ -772,48 +772,19 @@ def lens_products_rootnames(sample, lens, filt_key):
 
 
 # ── Main ────────────────────────────────────────────────────────────────────────
-def main():
-    p = argparse.ArgumentParser(description=__doc__,
-                                formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--lens', required=True)
-    p.add_argument('--filt', required=True)
-    p.add_argument('--sample', default=None)
-    p.add_argument('--variant', default='', choices=('',) + stamp_paths.VARIANT_COMPONENTS,
-                   help="which reduction's mosaic to build from (default standard)")
-    p.add_argument('--method', choices=['auto', 'empirical', 'model'], default='auto',
-                   help="'auto' (default) builds an empirical ePSF and falls back to the "
-                        "STPSF model only when usable stars < --min-stars; 'empirical' "
-                        "forces the star build (fails if too few); 'model' forces STPSF.")
-    p.add_argument('--trim-threshold', dest='trim_threshold', type=float, default=3e-4,
-                   help="amplitude fraction of peak at which the trimmed modelling kernel "
-                        "(psf.fits) is cut. Default 3e-4 -- an amplitude criterion; 1e-3 kept only "
-                        "95% of the F115W flux (2026-10-04).")
-    p.add_argument('--n-boot', dest='n_boot', type=int, default=None,
-                   help='bootstrap resamples for the empirical PSF error map (default 100; '
-                        'jackknife below %d stars).' % JACKKNIFE_MAX_STARS)
-    p.add_argument('--no-psf-err', dest='no_psf_err', action='store_true', default=False)
-    for name in ('threshold_scale', 'fwhm', 'psf_fwhm', 'min_sep', 'crowd_sep_frac', 'lens_mask_radius'):
-        p.add_argument('--' + name.replace('_', '-'), dest=name, type=float, default=None)
-    for name in ('max_stars', 'min_stars', 'star_size', 'oversample', 'kernel_size'):
-        p.add_argument('--' + name.replace('_', '-'), dest=name, type=int, default=None)
-    p.add_argument('--output', default=None, help='output dir, default data/psf/<sample>/<lens>/<FILT>')
-    a = p.parse_args()
+POOL_DEDUP_ARCSEC = 0.3      # one star seen in two neighbouring lenses' mosaics
 
-    sample = a.sample or mast_target_names.sample_of(a.lens)
-    filt = mast_target_names.canonical_filter(a.filt)
-    a.filt = filt
-    mdir = stamp_paths.mosaic_dir(ws_path, sample, a.lens, filt, a.variant)
+
+def prepare_field(sample, lens, filt, a):
+    """One lens's mosaic, background-subtracted, with its PSF stars selected. None if the
+    band has no mosaic. Everything the build needs is returned in a dict."""
+    mdir = stamp_paths.mosaic_dir(ws_path, sample, lens, filt, a.variant)
     i2d = stamp_paths.find_i2d(mdir)
-    output_dir = a.output or os.path.join(ws_path, 'data', 'psf', sample, a.lens, filt)
-    psf_json = os.path.join(ws_path, 'info', 'provenance', 'lens_psf.json')
     if i2d is None:
-        print(f'=== NO DATA: {a.lens} {filt} (no i2d in {mdir})')
-        info_json.update(psf_json, sample, a.lens, filt, None)
-        sys.exit(0)
-    os.makedirs(output_dir, exist_ok=True)
-    overrides = info_json.load(os.path.join(ws_path, 'info', 'overrides', 'psf_stars.json')).get(sample, {}).get(a.lens, {}).get(filt, {})
+        return None
+    overrides = info_json.load(os.path.join(ws_path, 'info', 'overrides', 'psf_stars.json')).get(sample, {}).get(lens, {}).get(filt, {})
 
-    print(f'{a.lens} {filt}  [{os.path.basename(i2d)}]')
+    print(f'{lens} {filt}  [{os.path.basename(i2d)}]')
     with fits.open(i2d) as hdul:
         phdr = hdul[0].header
         sci_hdr = hdul['SCI'].header
@@ -836,9 +807,7 @@ def main():
     params = resolve_params(inst_key, overrides, a)
     params['max_peak'] = saturation_peak(inst_key, hdr, overrides)
     star_size = int(params['star_size']) | 1
-    oversample = int(params['oversample'])
-    kernel_size = int(params['kernel_size']) | 1
-    catalogue_coord = mast_target_names.coord(a.lens, sample)
+    catalogue_coord = mast_target_names.coord(lens, sample)
 
     # NaN (no coverage) pixels break DAOStarFinder / Background2D: zero them and mask them.
     nan_mask = ~np.isfinite(sci_data)
@@ -856,15 +825,139 @@ def main():
         data = sci_data - med
 
     stars_tbl, qa = select_stars(data, mask, params, overrides, star_size)
-    n_stars = len(stars_tbl)
     print(f'  stars: {qa["n_detected"]} detected -> {qa["n_auto"]} auto-kept'
-          f' + {qa["n_included"]} forced = {n_stars}'
+          f' + {qa["n_included"]} forced = {len(stars_tbl)}'
           f' ({qa["n_crowded_rejected"]} dropped as crowded, {qa["n_saturated_rejected"]} saturated)')
+    return dict(i2d=i2d, phdr=phdr, hdr=hdr, wcs=wcs, inst_key=inst_key, scale=scale,
+                method=method, params=params, overrides=overrides, data=data,
+                stars_tbl=stars_tbl, qa=qa)
+
+
+def pooled_field(sample, filt, a):
+    """Every lens's PSF stars in `filt`, pooled into one synthetic field.
+
+    For a survey sample whose lenses each see too few stars (COWLS: 0-11 per 90" field, 35
+    of 68 bands under 3, 2026-10-30) but share one PSF: the same filter, readout, output grid
+    and, for COSMOS-Web, two rolls 186 deg apart, under which the diffraction pattern nearly
+    maps onto itself. Each lens's mosaic is prepared exactly as a single-lens build; a star
+    selected in two neighbouring mosaics is kept once (POOL_DEDUP_ARCSEC, the first lens in
+    roster order); each kept star's background-subtracted cutout is tiled onto a zero
+    image at its sub-pixel offset, so build_epsf and the bootstrap run on it unchanged."""
+    first, tiles, seen, per_lens, n_dup, lenses_with = None, [], [], {}, 0, []
+    for lens in mast_target_names.lenses(sample):
+        fld = prepare_field(sample, lens, filt, a)
+        if fld is None:
+            continue
+        lenses_with.append(lens)
+        first = first or fld
+        T = (int(fld['params']['star_size']) | 1) + 4          # odd tile, 2 px margin
+        half = T // 2
+        tbl = fld['stars_tbl']
+        if len(tbl) == 0:
+            per_lens[lens] = 0
+            continue
+        sky = fld['wcs'].pixel_to_world(np.asarray(tbl['x']), np.asarray(tbl['y']))
+        kept = 0
+        for x, y, c in zip(tbl['x'], tbl['y'], sky):
+            if seen and np.min(c.separation(SkyCoord(seen)).arcsec) < POOL_DEDUP_ARCSEC:
+                n_dup += 1
+                continue
+            ix, iy = int(round(x)), int(round(y))
+            tiles.append((_crop_centered(fld['data'], T, ix, iy), x - ix + half, y - iy + half))
+            seen.append(c)
+            kept += 1
+        per_lens[lens] = kept
+    if first is None:
+        return None
+    n = len(tiles)
+    T = tiles[0][0].shape[0] if tiles else 1
+    ncol = max(1, int(np.ceil(np.sqrt(n))))
+    nrow = max(1, int(np.ceil(n / ncol)))
+    img = np.zeros((nrow * T, ncol * T))
+    xs, ys = [], []
+    for k, (tile, dx, dy) in enumerate(tiles):
+        r, cidx = divmod(k, ncol)
+        img[r * T:(r + 1) * T, cidx * T:(cidx + 1) * T] = tile
+        xs.append(cidx * T + dx)
+        ys.append(r * T + dy)
+    tbl = Table()
+    tbl['x'], tbl['y'] = xs, ys
+    print(f'=== pooled {filt}: {n} stars from {sum(v > 0 for v in per_lens.values())} of '
+          f'{len(lenses_with)} lenses ({n_dup} duplicates dropped)')
+    pool = {'n_lenses': len(lenses_with), 'stars_per_lens': per_lens, 'n_duplicates': n_dup,
+            'dedup_arcsec': POOL_DEDUP_ARCSEC}
+    return dict(first, data=img, stars_tbl=tbl, method='empirical', overrides={},
+                qa=dict(first['qa'], n_crowded_rejected=None), pool=pool, pool_lenses=lenses_with)
+
+
+def main():
+    p = argparse.ArgumentParser(description=__doc__,
+                                formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument('--lens', default=None, help='the lens (not with --pool)')
+    p.add_argument('--filt', required=True)
+    p.add_argument('--sample', type=mast_target_names.sample_arg, default=None)
+    p.add_argument('--variant', default='', choices=('',) + stamp_paths.VARIANT_COMPONENTS,
+                   help="which reduction's mosaic to build from (default standard)")
+    p.add_argument('--method', choices=['auto', 'empirical', 'model'], default='auto',
+                   help="'auto' (default) builds an empirical ePSF and falls back to the "
+                        "STPSF model only when usable stars < --min-stars; 'empirical' "
+                        "forces the star build (fails if too few); 'model' forces STPSF.")
+    p.add_argument('--trim-threshold', dest='trim_threshold', type=float, default=3e-4,
+                   help="amplitude fraction of peak at which the trimmed modelling kernel "
+                        "(psf.fits) is cut. Default 3e-4 -- an amplitude criterion; 1e-3 kept only "
+                        "95% of the F115W flux (2026-10-04).")
+    p.add_argument('--n-boot', dest='n_boot', type=int, default=None,
+                   help='bootstrap resamples for the empirical PSF error map (default 100; '
+                        'jackknife below %d stars).' % JACKKNIFE_MAX_STARS)
+    p.add_argument('--no-psf-err', dest='no_psf_err', action='store_true', default=False)
+    for name in ('threshold_scale', 'fwhm', 'psf_fwhm', 'min_sep', 'crowd_sep_frac', 'lens_mask_radius'):
+        p.add_argument('--' + name.replace('_', '-'), dest=name, type=float, default=None)
+    for name in ('max_stars', 'min_stars', 'star_size', 'oversample', 'kernel_size'):
+        p.add_argument('--' + name.replace('_', '-'), dest=name, type=int, default=None)
+    p.add_argument('--pool', action='store_true',
+                   help='one empirical ePSF from the stars of EVERY lens of --sample in --filt, '
+                        'written to each lens (see pooled_field); for survey samples whose '
+                        'fields are star-poor. Kernel + png in data/psf/<sample>/_pooled/<FILT>')
+    p.add_argument('--output', default=None,
+                   help='scratch dir: write every product here (the trimmed psf.fits too) and leave the '
+                        'stamp tree and info/provenance/lens_psf.json alone. Default: the normal products '
+                        'in data/psf/<sample>/<lens>/<FILT> and the stamp dir')
+    a = p.parse_args()
+
+    if a.pool == (a.lens is not None):
+        p.error('give --lens, or --pool with --sample')
+    if a.pool and not a.sample:
+        p.error('--pool needs --sample')
+    sample = mast_target_names.resolve_sample(p, a)
+    filt = mast_target_names.canonical_filter(a.filt)
+    a.filt = filt
+    psf_json = os.path.join(ws_path, 'info', 'provenance', 'lens_psf.json')
+    if a.pool:
+        fld = pooled_field(sample, filt, a)
+        label = 'pooled'
+        output_dir = a.output or os.path.join(ws_path, 'data', 'psf', sample, '_pooled', filt)
+    else:
+        fld = prepare_field(sample, a.lens, filt, a)
+        label = a.lens
+        output_dir = a.output or os.path.join(ws_path, 'data', 'psf', sample, a.lens, filt)
+    if fld is None:
+        print(f'=== NO DATA: {label} {filt} (no mosaic)')
+        if not a.pool:
+            info_json.update(psf_json, sample, a.lens, filt, None)
+        sys.exit(0)
+    os.makedirs(output_dir, exist_ok=True)
+    phdr, hdr, inst_key, scale = fld['phdr'], fld['hdr'], fld['inst_key'], fld['scale']
+    method, params, overrides = fld['method'], fld['params'], fld['overrides']
+    data, stars_tbl, qa = fld['data'], fld['stars_tbl'], fld['qa']
+    star_size = int(params['star_size']) | 1
+    oversample = int(params['oversample'])
+    kernel_size = int(params['kernel_size']) | 1
+    n_stars = len(stars_tbl)
 
     too_few = n_stars < params['min_stars']
     use_model = (method == 'model') or (method == 'auto' and too_few)
     if method == 'empirical' and too_few:
-        raise SystemExit(f'ERROR: only {n_stars} usable stars for {a.lens} {filt} '
+        raise SystemExit(f'ERROR: only {n_stars} usable stars for {label} {filt} '
                          f'(need >= {params["min_stars"]}). Loosen cuts, add include stars to '
                          f'info/overrides/psf_stars.json, or use --method model.')
     star_stamps, method_used, epsf_data, model_info = [], None, None, {}
@@ -886,9 +979,9 @@ def main():
                           f'(pedestal={ped_frac:.1e}, scatter={scat_frac:.1e})')
                 epsf_data = cand
                 star_stamps = [np.asarray(s.data, dtype=float) for s in stars]
-                method_used = 'empirical'
+                method_used = 'empirical_pooled' if a.pool else 'empirical'
         elif method == 'empirical':
-            raise SystemExit(f'ERROR: the empirical ePSF for {a.lens} {filt} diverged ({n_stars} stars).')
+            raise SystemExit(f'ERROR: the empirical ePSF for {label} {filt} diverged ({n_stars} stars).')
         else:
             print(f'  WARNING: empirical ePSF diverged with {n_stars} stars; falling back to STPSF')
             use_model = True
@@ -927,7 +1020,7 @@ def main():
     err_full = err_trim = err_frac = fwhm_err = err_method = n_boot_valid = err_source = None
     do_psf_err = not a.no_psf_err and overrides.get('psf_err', True)
     trim_half = (trim_size - 1) // 2
-    if do_psf_err and method_used == 'empirical' and n_stars >= 2:
+    if do_psf_err and method_used.startswith('empirical') and n_stars >= 2:
         n_boot = a.n_boot if a.n_boot is not None else int(overrides.get('n_boot', 100))
         mode = 'jackknife' if n_stars < JACKKNIFE_MAX_STARS else f'bootstrap x{n_boot}'
         print(f'  PSF uncertainty: resampling {n_stars} stars ({mode}) ...')
@@ -948,7 +1041,9 @@ def main():
     khdr['PSFOVSMP'] = (oversample, 'ePSF build oversampling factor')
     khdr['PSFPXSCL'] = (round(scale, 5), 'kernel pixel scale (arcsec)')
     khdr['PSFFWHM'] = (round(fwhm_pix, 4) if fwhm_pix is not None else 0.0, 'fitted kernel FWHM (pixels)')
-    khdr['PSFLENS'] = (a.lens, 'lens')
+    khdr['PSFLENS'] = (label, 'lens, or pooled over the sample')
+    if a.pool:
+        khdr['PSFPOOL'] = (fld['pool']['n_lenses'], 'lenses whose mosaics were pooled')
     khdr['PSFFILT'] = (filt, 'filter')
     khdr['PSFKIND'] = ('full', 'full ePSF footprint (trimmed copy in the stamp dir)')
     khdr['PSFPED'] = (round(pedestal_frac, 6), 'ePSF-wing pedestal removed (fraction of peak)')
@@ -960,9 +1055,34 @@ def main():
         khdr['PSFDET'] = (str(model_info.get('detector')), 'STPSF detector')
     write_fits(kernel, khdr, os.path.join(output_dir, 'psf_kernel.fits'))
     plot_psf(kernel, epsf_data, star_stamps, scale, fwhm_pix, os.path.join(output_dir, 'psf.png'),
-             title=f'{a.lens}  {filt}  [{method_used}]  ({n_stars} stars)')
+             title=f'{label}  {filt}  [{method_used}]  ({n_stars} stars)')
 
-    stamps_dir = stamp_paths.psf_stamp_dir(ws_path, sample, a.lens, filt)
+    targets = fld['pool_lenses'] if a.pool else [a.lens]
+    for lens in targets:
+        write_band(a, sample, lens, filt, kernel, khdr, trimmed, trim_size, err_full, err_trim,
+                   err_frac, err_method, err_source, n_boot_valid, output_dir, psf_json, {
+        'method': method_used, 'n_stars': n_stars, 'n_crowded_rejected': qa['n_crowded_rejected'],
+        'fwhm_pix': round(fwhm_pix, 4) if fwhm_pix is not None else None,
+        'fwhm_arcsec': round(fwhm_pix * scale, 4) if fwhm_pix is not None else None,
+        'oversample': oversample, 'kernel_size': int(kernel.shape[0]), 'trimmed_kernel_size': int(trim_size),
+        'trim_threshold': a.trim_threshold, 'pedestal_frac': round(pedestal_frac, 6),
+        'fwhm_pix_err': round(fwhm_err, 4) if fwhm_err is not None else None,
+        'psf_err_frac': round(err_frac, 8) if err_frac is not None else None,
+        'err_method': err_method, 'err_source': err_source, 'n_boot_valid': n_boot_valid,
+        'variant': a.variant or 'standard', 'broadening': 'analytic' if broadened_box else None,
+        'model_info': model_info or None, **({'pool': fld['pool']} if a.pool else {}),
+    })
+    print('  done')
+
+
+def write_band(a, sample, lens, filt, kernel, khdr, trimmed, trim_size, err_full, err_trim,
+               err_frac, err_method, err_source, n_boot_valid, output_dir, psf_json, record):
+    """The band's modelling kernel (+ error map) in its stamp dir and its lens_psf.json
+    record; once per lens, so a pooled kernel lands in every lens it was pooled over."""
+    # --output is a scratch run (e.g. a model PSF to compare against the empirical one): it
+    # must not replace the band's psf.fits or its provenance record. Until 2026-10-30 it
+    # redirected only psf_kernel.fits and psf.png, and a comparison run overwrote a real PSF.
+    stamps_dir = a.output or stamp_paths.psf_stamp_dir(ws_path, sample, lens, filt)
     os.makedirs(stamps_dir, exist_ok=True)
     thdr = khdr.copy()
     thdr['PSFKIND'] = ('trimmed', 'amplitude-trimmed modelling kernel')
@@ -978,20 +1098,16 @@ def main():
             ehdr['PSFNVALD'] = (n_boot_valid, 'valid ensemble members')
             ehdr['PSFEFRAC'] = (round(err_frac, 8), 'integrated PSF error fraction')
             write_fits(arr, ehdr, dest)
+    else:
+        stale = os.path.join(stamps_dir, stamp_paths.psf_name('psf_err'))
+        if os.path.exists(stale):              # an earlier build's error map, not this kernel's
+            os.remove(stale)
 
-    info_json.update(psf_json, sample, a.lens, filt, {
-        'method': method_used, 'n_stars': n_stars, 'n_crowded_rejected': qa['n_crowded_rejected'],
-        'fwhm_pix': round(fwhm_pix, 4) if fwhm_pix is not None else None,
-        'fwhm_arcsec': round(fwhm_pix * scale, 4) if fwhm_pix is not None else None,
-        'oversample': oversample, 'kernel_size': int(kernel.shape[0]), 'trimmed_kernel_size': int(trim_size),
-        'trim_threshold': a.trim_threshold, 'pedestal_frac': round(pedestal_frac, 6),
-        'fwhm_pix_err': round(fwhm_err, 4) if fwhm_err is not None else None,
-        'psf_err_frac': round(err_frac, 8) if err_frac is not None else None,
-        'err_method': err_method, 'err_source': err_source, 'n_boot_valid': n_boot_valid,
-        'variant': a.variant or 'standard', 'broadening': 'analytic' if broadened_box else None,
-        'model_info': model_info or None,
-    })
-    print('  done')
+    if a.output:
+        with open(os.path.join(a.output, f'lens_psf_record_{lens}.json'), 'w') as f:
+            json.dump(record, f, indent=1)
+    else:
+        info_json.update(psf_json, sample, lens, filt, record)
 
 
 if __name__ == '__main__':

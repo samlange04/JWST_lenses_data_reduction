@@ -1,0 +1,54 @@
+{
+    "lens": "SPT0418-47",
+    "sample": "spt",
+    "primary_band": "F444W",
+    "primary_band_source": "arc_snr",
+    "best_band_visual": null,
+    "best_band_arc_snr": "F444W",
+    "theta_e": 1.207,
+    "scores": {
+        "F115W": {
+            "arc_snr": 27.57,
+            "psf_fwhm_arcsec": 0.0598,
+            "resolution_factor": 1.0,
+            "score": 27.57,
+            "contaminant_mask": false
+        },
+        "F150W": {
+            "arc_snr": 24.28,
+            "psf_fwhm_arcsec": 0.0667,
+            "resolution_factor": 1.0,
+            "score": 24.28,
+            "contaminant_mask": false
+        },
+        "F200W": {
+            "arc_snr": 45.62,
+            "psf_fwhm_arcsec": 0.0732,
+            "resolution_factor": 1.0,
+            "score": 45.62,
+            "contaminant_mask": false
+        },
+        "F277W": {
+            "arc_snr": 102.53,
+            "psf_fwhm_arcsec": 0.1199,
+            "resolution_factor": 1.0,
+            "score": 102.53,
+            "contaminant_mask": false
+        },
+        "F356W": {
+            "arc_snr": 114.65,
+            "psf_fwhm_arcsec": 0.148,
+            "resolution_factor": 1.0,
+            "score": 114.65,
+            "contaminant_mask": false
+        },
+        "F444W": {
+            "arc_snr": 188.71,
+            "psf_fwhm_arcsec": 0.1689,
+            "resolution_factor": 1.0,
+            "score": 188.71,
+            "contaminant_mask": false
+        }
+    },
+    "how": "best_band_arc_snr: choose_primary_band.py (measured); best_band_visual: choose_best_band.py (by eye)"
+}

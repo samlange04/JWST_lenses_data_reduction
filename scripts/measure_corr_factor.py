@@ -215,7 +215,7 @@ def summarise(results, thr='thr3'):
 def jobs_for(samples):
     root = stamp_paths.stamps_root(WS)
     for sample in samples:
-        for d in sorted(glob.glob(os.path.join(root, sample, '*', '*'))):
+        for d in stamp_paths.band_dirs(root, sample):
             for prefix in (stamp_paths.stamp_prefix(stamp_paths.resolve_size(d)),):
                 stamps = list(stamp_paths.list_stamps(d, prefix).values())
                 if stamps:
@@ -227,12 +227,17 @@ def jobs_for(samples):
 def main():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--sample', nargs='+', default=lens_samples.samples())
+    p.add_argument('--sample', type=lens_samples.sample_arg, nargs='+', default=None,
+                   help='default: the sample --lens is in, else every sample')
     p.add_argument('--lens', default=None, help='restrict to one lens (testing)')
     p.add_argument('--jobs', type=int, default=6)
     p.add_argument('--out', default=os.path.join(WS, 'diagnostics', 'corr_factor',
                                                  'corr_factor_measurements.json'))
     a = p.parse_args()
+    if a.lens:
+        a.sample = [lens_samples.resolve_sample(p, argparse.Namespace(lens=a.lens, sample=None))]
+    elif a.sample is None:
+        a.sample = lens_samples.samples()
     jobs = [j for j in jobs_for(a.sample) if a.lens is None or j[1] == a.lens]
     print(f'{len(jobs)} stamps')
     with ProcessPoolExecutor(a.jobs) as ex:

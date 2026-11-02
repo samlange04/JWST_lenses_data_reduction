@@ -1,0 +1,20 @@
+{
+    "type": "instance",
+    "class_path": "autoarray.structures.grids.irregular_2d.Grid2DIrregular",
+    "arguments": {
+        "values": {
+            "type": "ndarray",
+            "array": [
+                [
+                    0.20999999996863855,
+                    -0.21000000005854894
+                ],
+                [
+                    -0.8099999999755203,
+                    0.4499999999561085
+                ]
+            ],
+            "dtype": "float64"
+        }
+    }
+}

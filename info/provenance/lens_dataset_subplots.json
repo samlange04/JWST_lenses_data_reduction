@@ -22,5 +22,211 @@
                 "output": "data/stamps/b1938/B1938+666/F277W/stamp7_dataset.png"
             }
         }
+    },
+    "cowls_spectacular": {
+        "COSJ095914+021219": {
+            "F277W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "stretch": "asinh",
+                "cmap": "inferno",
+                "pixel_scale_arcsec": 0.06,
+                "frac_masked": 0.2912,
+                "variant": "standard",
+                "output": "data/stamps/cowls_spectacular/prime/COSJ095914+021219/F277W/stamp12_dataset.png"
+            }
+        },
+        "COSJ095917+015424": {
+            "F444W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "stretch": "asinh",
+                "cmap": "inferno",
+                "pixel_scale_arcsec": 0.06,
+                "frac_masked": 0.4689,
+                "variant": "standard",
+                "output": "data/stamps/cowls_spectacular/prime/COSJ095917+015424/F444W/stamp12_dataset.png"
+            }
+        },
+        "COSJ095920+015851": {
+            "F150W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "stretch": "asinh",
+                "cmap": "inferno",
+                "pixel_scale_arcsec": 0.03,
+                "frac_masked": 0.0137,
+                "variant": "standard",
+                "output": "data/stamps/cowls_spectacular/prime/COSJ095920+015851/F150W/stamp12_dataset.png"
+            }
+        },
+        "COSJ095921+020638": {
+            "F115W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "stretch": "asinh",
+                "cmap": "inferno",
+                "pixel_scale_arcsec": 0.03,
+                "frac_masked": 0.11005,
+                "variant": "standard",
+                "output": "data/stamps/cowls_spectacular/prime/COSJ095921+020638/F115W/stamp12_dataset.png"
+            }
+        },
+        "COSJ095950+022057": {
+            "F277W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "stretch": "asinh",
+                "cmap": "inferno",
+                "pixel_scale_arcsec": 0.06,
+                "frac_masked": 0.135225,
+                "variant": "standard",
+                "output": "data/stamps/cowls_spectacular/prime/COSJ095950+022057/F277W/stamp12_dataset.png"
+            }
+        },
+        "COSJ095953+023319": {
+            "F444W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "stretch": "asinh",
+                "cmap": "inferno",
+                "pixel_scale_arcsec": 0.06,
+                "frac_masked": 0.150875,
+                "variant": "standard",
+                "output": "data/stamps/cowls_spectacular/prime/COSJ095953+023319/F444W/stamp12_dataset.png"
+            }
+        },
+        "COSJ095955+021900": {
+            "F277W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "stretch": "asinh",
+                "cmap": "inferno",
+                "pixel_scale_arcsec": 0.06,
+                "frac_masked": 0.29745,
+                "variant": "standard",
+                "output": "data/stamps/cowls_spectacular/multi_galaxy/COSJ095955+021900/F277W/stamp12_dataset.png"
+            }
+        },
+        "COSJ100012+022015": {
+            "F115W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "stretch": "asinh",
+                "cmap": "inferno",
+                "pixel_scale_arcsec": 0.03,
+                "frac_masked": 0.273738,
+                "variant": "standard",
+                "output": "data/stamps/cowls_spectacular/prime/COSJ100012+022015/F115W/stamp12_dataset.png"
+            }
+        },
+        "COSJ100013+023424": {
+            "F444W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "stretch": "asinh",
+                "cmap": "inferno",
+                "pixel_scale_arcsec": 0.06,
+                "frac_masked": 0.226025,
+                "variant": "standard",
+                "output": "data/stamps/cowls_spectacular/multi_galaxy/COSJ100013+023424/F444W/stamp12_dataset.png"
+            }
+        },
+        "COSJ100018+022138": {
+            "F150W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "stretch": "asinh",
+                "cmap": "inferno",
+                "pixel_scale_arcsec": 0.03,
+                "frac_masked": 0.0835,
+                "variant": "standard",
+                "output": "data/stamps/cowls_spectacular/prime/COSJ100018+022138/F150W/stamp12_dataset.png"
+            }
+        },
+        "COSJ100024+015334": {
+            "F444W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "stretch": "asinh",
+                "cmap": "inferno",
+                "pixel_scale_arcsec": 0.06,
+                "frac_masked": 0.226325,
+                "variant": "standard",
+                "output": "data/stamps/cowls_spectacular/prime/COSJ100024+015334/F444W/stamp12_dataset.png"
+            }
+        },
+        "COSJ100024+021749": {
+            "F444W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "stretch": "asinh",
+                "cmap": "inferno",
+                "pixel_scale_arcsec": 0.06,
+                "frac_masked": 0.127975,
+                "variant": "standard",
+                "output": "data/stamps/cowls_spectacular/prime/COSJ100024+021749/F444W/stamp12_dataset.png"
+            }
+        },
+        "COSJ100025+015245": {
+            "F444W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "stretch": "asinh",
+                "cmap": "inferno",
+                "pixel_scale_arcsec": 0.06,
+                "frac_masked": 0.2589,
+                "variant": "standard",
+                "output": "data/stamps/cowls_spectacular/prime/COSJ100025+015245/F444W/stamp12_dataset.png"
+            }
+        },
+        "COSJ100028+021928": {
+            "F444W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "stretch": "asinh",
+                "cmap": "inferno",
+                "pixel_scale_arcsec": 0.06,
+                "frac_masked": 0.4417,
+                "variant": "standard",
+                "output": "data/stamps/cowls_spectacular/prime/COSJ100028+021928/F444W/stamp12_dataset.png"
+            }
+        },
+        "COSJ100047+015023": {
+            "F277W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "stretch": "asinh",
+                "cmap": "inferno",
+                "pixel_scale_arcsec": 0.06,
+                "frac_masked": 0.62585,
+                "variant": "standard",
+                "output": "data/stamps/cowls_spectacular/prime/COSJ100047+015023/F277W/stamp12_dataset.png"
+            }
+        },
+        "COSJ100119+014849": {
+            "F277W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "stretch": "asinh",
+                "cmap": "inferno",
+                "pixel_scale_arcsec": 0.06,
+                "frac_masked": 0.241675,
+                "variant": "standard",
+                "output": "data/stamps/cowls_spectacular/multi_galaxy/COSJ100119+014849/F277W/stamp12_dataset.png"
+            }
+        },
+        "COSJ100121+022740": {
+            "F444W": {
+                "prefix": "stamp12",
+                "drizzle_pass": "single",
+                "stretch": "asinh",
+                "cmap": "inferno",
+                "pixel_scale_arcsec": 0.06,
+                "frac_masked": 0.152775,
+                "variant": "standard",
+                "output": "data/stamps/cowls_spectacular/prime/COSJ100121+022740/F444W/stamp12_dataset.png"
+            }
+        }
     }
 }

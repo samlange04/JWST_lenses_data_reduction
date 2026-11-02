@@ -8,7 +8,9 @@ the mask, and writes a 3x3 `aplt.subplot_imaging_dataset` PNG (data, data-log10,
 PSF, PSF-log10, S/N, and the two over-sample-size panels the mask induces). This is the
 same dataset object and the same subplot a modelling run would build, so the image is a
 direct QC of what will be fed to the fit -- crucially it shows the *mask* laid over the
-data/noise/S/N, which none of the pipeline's other QC PNGs do.
+data/noise/S/N, which none of the pipeline's other QC PNGs do. Drawn North up, East left
+(from top-to-bottom flipped copies of the products; see build_and_plot), like every other
+figure in the repo.
 
 All four inputs must exist for a (lens, filt) or it is skipped with a note listing what is
 missing -- a subplot cannot be built from a partial dataset. In particular the MASK is
@@ -37,13 +39,11 @@ Usage:
 
 import argparse
 import contextlib
-import glob
 import os
 import sys
 
 import numpy as np
 from astropy.io import fits
-from astropy.visualization import AsinhStretch, ImageNormalize, PercentileInterval
 from astropy.wcs import WCS
 from astropy.wcs.utils import proj_plane_pixel_scales
 from matplotlib.colors import LogNorm
@@ -56,6 +56,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import lens_samples as mast_target_names
 import info_json
 import stamp_paths
+import display_look
 
 SUBPLOTS_JSON = os.path.join(ws_path, 'info', 'provenance', 'lens_dataset_subplots.json')
 
@@ -66,8 +67,8 @@ COMPONENTS = ('sci', 'noise', 'psf', 'mask')
 # which use inferno + PercentileInterval(99.0) + AsinhStretch(0.1). PyAutoLens's vendored
 # plot_array only knows linear / LogNorm norms, so the asinh stretch is injected via a
 # context-managed Axes.imshow patch (asinh_norm_patch) rather than a public argument.
-DEFAULT_CMAP = 'inferno'
-ASINH_PCT = 99.0
+DEFAULT_CMAP = display_look.CMAP          # the repo's one look (display_look.py) is defined by these panels
+ASINH_PCT = display_look.PERCENTILE
 
 
 @contextlib.contextmanager
@@ -94,11 +95,8 @@ def asinh_norm_patch(pct=ASINH_PCT):
             or kwargs.get('cmap') == 'Greys'      # array_overlay
         )
         if not skip:
-            finite = arr[np.isfinite(arr)]
-            if finite.size:
-                vmin, vmax = PercentileInterval(pct).get_limits(finite)
-                kwargs['norm'] = ImageNormalize(vmin=vmin, vmax=vmax,
-                                                stretch=AsinhStretch(0.1))
+            if np.isfinite(arr).any():
+                kwargs['norm'] = display_look.norm(arr, pct=pct)
                 kwargs.pop('vmin', None)
                 kwargs.pop('vmax', None)
         return orig_imshow(self, X, *args, **kwargs)
@@ -130,12 +128,11 @@ def discover_targets(root, sample, lens=None, filt=None, include_ignored=False):
     """Yield (lens, filt, stamp_dir) for every band with a stamp under `root`, sorted for
     a reproducible run order.
     """
-    pattern = os.path.join(root, sample, lens or '*', filt or '*')
     found = {}
     # Gitignored stamp dirs are not science products -- see make_masks.discover_targets.
     # This tool only writes a QC PNG, so the cost of touching one is small, but a subplot of
     # a diagnostic band in a tracked-looking place is still a lie; skip them the same way.
-    candidates = [d for d in sorted(glob.glob(pattern)) if os.path.isdir(d)]
+    candidates = stamp_paths.band_dirs(root, sample, lens, filt)
     for stamp_dir in candidates:
         prefix = find_prefix(stamp_dir, 'auto')
         if prefix is None:
@@ -190,14 +187,27 @@ def build_and_plot(lens, filt, sample, prefix, resolved, output_dir, check_noise
     sci_hdr = fits.getheader(sci_path)
     pixel_scales = pixel_scale_from_header(sci_hdr)
 
-    dataset = al.Imaging.from_fits(
-        pixel_scales=pixel_scales,
-        data_path=sci_path,
-        noise_map_path=resolved['noise'],
-        psf_path=resolved['psf'],
-        check_noise_map=check_noise_map,
-    )
-    mask = al.Mask2D.from_fits(file_path=resolved['mask'], pixel_scales=pixel_scales)
+    # NORTH UP (2026-11-02), like every figure in the repo. autolens draws row 0 at the top, and
+    # the stamps' row 0 is SOUTH, so its plot of the products as they are is North DOWN. Flipping
+    # its imshow origin would mirror its own overlays (contours, mask edge) against the image, so
+    # instead the four products are flipped top-to-bottom into a temporary dir and the dataset is
+    # built from those: everything autolens draws then agrees, North is up and East is left (the
+    # columns already run East -> West). Display only; the products themselves are untouched.
+    import tempfile
+    with tempfile.TemporaryDirectory() as tmp:
+        flipped = {}
+        for comp in ('sci', 'noise', 'psf', 'mask'):
+            flipped[comp] = os.path.join(tmp, f'{comp}.fits')
+            fits.writeto(flipped[comp], np.flipud(fits.getdata(resolved[comp])),
+                         fits.getheader(resolved[comp]))
+        dataset = al.Imaging.from_fits(
+            pixel_scales=pixel_scales,
+            data_path=flipped['sci'],
+            noise_map_path=flipped['noise'],
+            psf_path=flipped['psf'],
+            check_noise_map=check_noise_map,
+        )
+        mask = al.Mask2D.from_fits(file_path=flipped['mask'], pixel_scales=pixel_scales)
     frac_masked = float(np.asarray(mask).astype(bool).mean())
     dataset = dataset.apply_mask(mask=mask)
 
@@ -260,9 +270,9 @@ def process(lens, filt, sample, stamp_dir, drizzle_pass, force,
 def main():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--sample', default=mast_target_names.DEFAULT_SAMPLE,
-                   help=f'sample subdirectory of the stamp trees (default '
-                        f'{mast_target_names.DEFAULT_SAMPLE})')
+    p.add_argument('--sample', type=mast_target_names.sample_arg, default=None,
+                   help='sample subdirectory of data/stamps/ (default: the sample --lens is in, '
+                        f'else {mast_target_names.DEFAULT_SAMPLE})')
     p.add_argument('--lens', default=None,
                    help='restrict to one lens; default every lens with stamps in --sample')
     p.add_argument('--filt', default=None,
@@ -292,6 +302,7 @@ def main():
                         "pipeline's ERR/IVM noise maps are legitimate and can trip the "
                         "heuristic at low-coverage edges)")
     a = p.parse_args()
+    mast_target_names.resolve_sample(p, a, default=mast_target_names.DEFAULT_SAMPLE)
 
     global STAMP_SIZE
     STAMP_SIZE = a.size

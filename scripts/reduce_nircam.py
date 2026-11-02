@@ -36,6 +36,9 @@ Non-default pipeline settings, and why (AGENTS.md has the long form):
                skip for a star-poor field). JWST's a-priori WCS is good to ~0.1" absolute
                and dithers within a visit are consistent to a few mas, so a failed tweakreg
                is logged and NOT fatal (jwst leaves the WCS alone and continues).
+               A sample may set tweakreg_lens_first and tweakreg_sw_from_lw (COWLS): the
+               lens frames are aligned first, and the SW frames take the tweakreg offset of
+               their own exposure's LW frames (fitted on LW only); see lens_samples.
              skymatch.skymethod=global+match    one sky per mosaic, matched across dithers,
                                                 subtracted by resample (stcal resample
                                                 subtracts meta.background.level itself)
@@ -69,7 +72,9 @@ a time; no multiprocessing (ramp_fit maximum_cores stays 'none').
 import argparse
 import glob
 import json
+import logging
 import os
+import shutil
 import sys
 import time
 import warnings
@@ -173,14 +178,43 @@ def _exptime(path):
     return float(h.get('EFFEXPTM', h.get('EXPTIME', 0.0)))
 
 
-def run_detector1(uncal_files, out_dir, flicker_by_channel):
-    """Detector1 on each uncal that has no rate yet. Returns the rate paths."""
+def _link_from_neighbour(path):
+    """Hard-link `path` (a rate or cal in data/<stage>/<sample>/<lens>/<FILT>/) from another
+    lens of the same sample, stage tree and filter that already made it. Survey neighbours
+    (COSMOS-Web lenses a few arcmin apart) share exposures, and neither Detector1 nor Image2
+    depends on the lens. True if linked. Never in a destriped tree: those rates carry an
+    object mask taken from the lens's own mosaic."""
+    filt_dir = os.path.dirname(path)
+    sample_dir = os.path.dirname(os.path.dirname(filt_dir))
+    if os.path.basename(os.path.dirname(sample_dir)).endswith('_destriped'):
+        return False
+    pattern = os.path.join(sample_dir, '*', os.path.basename(filt_dir), os.path.basename(path))
+    for twin in glob.glob(pattern):
+        if not os.path.samefile(os.path.dirname(twin), filt_dir):
+            os.link(twin, path)
+            print(f'      {os.path.basename(path)} linked from {os.path.relpath(twin, sample_dir)}', flush=True)
+            return True
+    return False
+
+
+def run_detector1(uncal_files, out_dir, flicker_by_channel, cal_dir=None):
+    """Detector1 on each uncal that has no rate yet. Returns the rate paths.
+
+    With `cal_dir` (a pruned sample, whose rates are deleted once calibrated), an uncal
+    whose cal is already there, or at a neighbour's, is not re-run: its rate path is
+    returned although the file is gone, and run_image2 skips it on the cal."""
     from jwst.pipeline import Detector1Pipeline
     os.makedirs(out_dir, exist_ok=True)
     rates = []
     for i, f in enumerate(uncal_files, 1):
         rate = os.path.join(out_dir, _rootname(f) + '_rate.fits')
-        if os.path.exists(rate):
+        if cal_dir is not None:
+            cal = os.path.join(cal_dir, _rootname(f) + '_cal.fits')
+            os.makedirs(cal_dir, exist_ok=True)
+            if os.path.exists(cal) or _link_from_neighbour(cal):
+                rates.append(rate)
+                continue
+        if os.path.exists(rate) or _link_from_neighbour(rate):
             rates.append(rate)
             continue
         t0 = time.time()
@@ -199,13 +233,50 @@ def run_detector1(uncal_files, out_dir, flicker_by_channel):
     return rates
 
 
+def prune_rates(rate_files, cal_dir):
+    """Delete each rate (and rateints) whose cal exists: a pruned sample keeps uncal + cal."""
+    for r in rate_files:
+        if os.path.exists(os.path.join(cal_dir, _rootname(r) + '_cal.fits')):
+            for f in (r, r.replace('_rate.fits', '_rateints.fits')):
+                if os.path.exists(f):
+                    os.remove(f)
+
+
+def covers(cal_file, coord):
+    """True if the cal file's footprint (SCI S_REGION) covers `coord`; a frame with no
+    S_REGION is assumed to."""
+    from astropy.io import fits
+    import download_nircam
+    s_region = fits.getheader(cal_file, 'SCI').get('S_REGION')
+    return not s_region or download_nircam._overlaps_box(s_region, coord, 0.01)
+
+
+def lens_first_order(cal_files, coord):
+    """The cal files with those covering `coord` first (each part in name order): the order
+    tweakreg aligns them in when the sample sets tweakreg_lens_first."""
+    return sorted(cal_files, key=lambda f: (not covers(f, coord), os.path.basename(f)))
+
+
+def exptime_at(cal_files, coord):
+    """Exposure time AT THE LENS: EFFEXPTM summed once per exposure (rootname minus the
+    detector suffix, so a lens on a detector edge is not counted twice) over the cal files
+    whose footprint (SCI S_REGION) covers `coord`. A survey mosaic also holds neighbouring
+    tiles' exposures that never see the lens; a frame with no S_REGION is counted."""
+    per_exposure = {}
+    for f in cal_files:
+        if not covers(f, coord):
+            continue
+        per_exposure[_rootname(f).rsplit('_', 1)[0]] = _exptime(f)
+    return float(sum(per_exposure.values()))
+
+
 def run_image2(rate_files, out_dir):
     from jwst.pipeline import Image2Pipeline
     os.makedirs(out_dir, exist_ok=True)
     cals = []
     for i, f in enumerate(rate_files, 1):
         cal = os.path.join(out_dir, _rootname(f) + '_cal.fits')
-        if os.path.exists(cal):
+        if os.path.exists(cal) or _link_from_neighbour(cal):
             cals.append(cal)
             continue
         t0 = time.time()
@@ -231,16 +302,23 @@ def write_asn(cal_files, product_name, out_dir):
     return path
 
 
-def run_image3(cal_files, out_dir, product_name, coord, scale, field, tweakreg_mode):
-    from jwst.pipeline import Image3Pipeline
-    os.makedirs(out_dir, exist_ok=True)
-    asn_path = write_asn(cal_files, product_name, out_dir)
+def mosaic_side(field, scale):
+    """Output mosaic side in pixels: even, so crpix (the catalogue position) is a pixel corner."""
     n = int(round(field / scale))
-    n += n % 2                         # even side: crpix at a pixel corner... keep it simple
+    return n + n % 2
+
+
+def image3_steps(coord, scale, field, tweakreg_mode, lens_first=False):
+    """The Image3 step overrides of the science mosaic, in one place so that a later re-run of
+    tweakreg or resample on the same frames reproduces them exactly."""
+    n = mosaic_side(field, scale)
     tweak = {'skip': True} if tweakreg_mode == 'skip' else {}
     if tweakreg_mode == 'gaia':
-        tweak = {'abs_refcat': 'GAIADR3'}
-    steps = {
+        tweak = {'abs_refcat': 'GAIADR3'}       # jwst sets expand_refcat itself for this
+    elif tweakreg_mode == 'relative' and lens_first:
+        # the caller puts the lens-covering frames first (lens_first_order)
+        tweak = {'expand_refcat': True, 'enforce_user_order': True}
+    return {
         'tweakreg': tweak,
         'skymatch': {'skymethod': 'global+match', 'subtract': False},
         'outlier_detection': {},
@@ -254,11 +332,124 @@ def run_image3(cal_files, out_dir, product_name, coord, scale, field, tweakreg_m
         },
         'source_catalog': {'skip': True},
     }
+
+
+FRAME_CENTRE = 1023.5     # detector pixel at which a frame's WCS offset is measured and applied
+
+
+def tweak_offsets(cal_files, out_dir):
+    """{rootname: [dRA cos(dec), dDec] in mas}: each frame's tweakreg correction at its centre,
+    from the crf files Image3 wrote beside the mosaic (crf WCS minus cal WCS). Frames without a
+    crf are left out. tweakreg's NIRCam fit is a shift, i.e. one sky offset per exposure."""
+    from stdatamodels.jwst import datamodels
+    out = {}
+    for f in cal_files:
+        r = _rootname(f)
+        crf = sorted(glob.glob(os.path.join(out_dir, f'{r}_*crf.fits')))
+        if not crf:
+            continue
+        with datamodels.open(f) as a, datamodels.open(crf[0]) as b:
+            ra0, dec0 = a.meta.wcs(FRAME_CENTRE, FRAME_CENTRE)
+            ra1, dec1 = b.meta.wcs(FRAME_CENTRE, FRAME_CENTRE)
+        out[r] = [round(float((ra1 - ra0) * np.cos(np.radians(dec0)) * 3.6e6), 2),
+                  round(float((dec1 - dec0) * 3.6e6), 2)]
+    return out
+
+
+def shift_wcs(wcs, offset_mas, x=FRAME_CENTRE, y=FRAME_CENTRE):
+    """`wcs` (a cal frame's gwcs) moved so pixel (x, y) lands `offset_mas` = [dRA cos(dec), dDec]
+    from where it was. jwst's adjust_wcs takes telescope-frame rotations, not a sky offset, so
+    the rotations are solved for numerically (two Newton steps; the result is good to < 0.01 mas)."""
+    from jwst.tweakreg.utils import adjust_wcs
+    ra0, dec0 = wcs(x, y)
+    target = np.asarray(offset_mas, float)
+    cosd = np.cos(np.radians(dec0))
+
+    def off(p):
+        ra, dec = adjust_wcs(wcs, delta_ra=p[0], delta_dec=p[1])(x, y)
+        return np.array([(ra - ra0) * cosd * 3.6e6, (dec - dec0) * 3.6e6])
+
+    h = 1e-5                                   # deg
+    jac = np.column_stack([off([h, 0.0]) / h, off([0.0, h]) / h])
+    p = np.linalg.solve(jac, target)
+    p = p + np.linalg.solve(jac, target - off(p))
+    return adjust_wcs(wcs, delta_ra=p[0], delta_dec=p[1])
+
+
+def lw_exposure_offsets(sample, lens):
+    """{exposure: [dRA cos(dec), dDec] mas}: the tweakreg offsets of the lens's LW bands
+    (`tweak_offsets_mas` in lens_products.json), keyed by exposure (rootname minus detector)."""
+    recs = info_json.load(os.path.join(ws_path, 'info', 'provenance', 'lens_products.json')).get(sample, {}).get(lens, {})
+    out = {}
+    for key, rec in recs.items():
+        if rec and lens_samples.channel(key.split('_')[0]) == 'LW':
+            for r, o in (rec.get('tweak_offsets_mas') or {}).items():
+                out.setdefault(r.rsplit('_', 1)[0], o)
+    return out
+
+
+def apply_offsets(cal_files, offsets, work_dir):
+    """Copies of `cal_files` in `work_dir`, each frame's WCS moved by its exposure's offset in
+    `offsets` (lw_exposure_offsets); a frame whose exposure has none is copied unchanged (as LW
+    leaves an exposure tweakreg could not align). Returns (paths, {rootname: offset or None})."""
+    from stdatamodels.jwst import datamodels
+    os.makedirs(work_dir, exist_ok=True)
+    paths, applied = [], {}
+    for f in cal_files:
+        r = _rootname(f)
+        o = offsets.get(r.rsplit('_', 1)[0])
+        dst = os.path.join(work_dir, os.path.basename(f))
+        if o is None:
+            shutil.copy(f, dst)
+        else:
+            with datamodels.open(f) as m:
+                m.meta.wcs = shift_wcs(m.meta.wcs, o)
+                m.save(dst)
+        paths.append(dst)
+        applied[r] = o
+    return paths, applied
+
+
+class _TweakLog(logging.Handler):
+    """Collects tweakreg's per-group outcome lines, which stpipe does not print here: a
+    tweakreg that aligns nothing still marks every frame COMPLETE."""
+    KEYS = ('as reference image', 'Found initial', 'Not enough matches', 'Computed ', 'XSH:', 'FIT RMSE')
+
+    def __init__(self):
+        super().__init__(logging.INFO)
+        self.lines = []
+
+    def emit(self, record):
+        msg = record.getMessage()
+        if any(k in msg for k in self.KEYS):
+            self.lines.append(msg.strip())
+
+
+def run_image3(cal_files, out_dir, product_name, coord, scale, field, tweakreg_mode, lens_first=False):
+    from jwst.pipeline import Image3Pipeline
+    os.makedirs(out_dir, exist_ok=True)
+    asn_path = write_asn(cal_files, product_name, out_dir)
+    n = mosaic_side(field, scale)
+    steps = image3_steps(coord, scale, field, tweakreg_mode, lens_first)
     t0 = time.time()
     print(f'  [stage3] {len(cal_files)} cal -> {product_name}_i2d.fits  '
-          f'({n}x{n} px at {scale}"/px, tweakreg={tweakreg_mode})', flush=True)
-    Image3Pipeline.call(asn_path, output_dir=out_dir, save_results=True, in_memory=False,
-                        steps=steps)
+          f'({n}x{n} px at {scale}"/px, tweakreg={tweakreg_mode}'
+          f'{", lens frames first" if lens_first else ""})', flush=True)
+    tlog = _TweakLog()
+    loggers = [logging.getLogger(name) for name in ('jwst.tweakreg', 'tweakwcs')]
+    saved = [lg.level for lg in loggers]
+    for lg in loggers:
+        lg.addHandler(tlog)
+        lg.setLevel(logging.INFO)
+    try:
+        Image3Pipeline.call(asn_path, output_dir=out_dir, save_results=True, in_memory=False,
+                            steps=steps)
+    finally:
+        for lg, lvl in zip(loggers, saved):
+            lg.removeHandler(tlog)
+            lg.setLevel(lvl)
+    for line in tlog.lines:
+        print(f'      tweakreg: {line}', flush=True)
     i2d = os.path.join(out_dir, f'{product_name}_i2d.fits')
     if not os.path.exists(i2d):
         raise RuntimeError(f'Image3 produced no {i2d}')
@@ -293,7 +484,7 @@ def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--lens', required=True)
     p.add_argument('--filt', required=True, help='NIRCam filter, e.g. F444W')
-    p.add_argument('--sample', default=None)
+    p.add_argument('--sample', type=lens_samples.sample_arg, default=None)
     p.add_argument('--start', choices=['uncal', 'rate', 'cal'], default='uncal',
                    help='uncal: full reduction (default). rate/cal: start from MAST products '
                         'in data/calibrated (download_nircam.py --level rate|cal); the '
@@ -301,8 +492,8 @@ def main():
     p.add_argument('--scale', type=float, default=None,
                    help=f'output pixel scale, arcsec (default SW {DEFAULT_SCALE["SW"]}, '
                         f'LW {DEFAULT_SCALE["LW"]})')
-    p.add_argument('--field', type=float, default=DEFAULT_FIELD,
-                   help=f'output mosaic side, arcsec (default {DEFAULT_FIELD})')
+    p.add_argument('--field', type=float, default=None,
+                   help=f"output mosaic side, arcsec (default: the sample's mosaic_field, else {DEFAULT_FIELD})")
     p.add_argument('--tweakreg', choices=['relative', 'gaia', 'skip'], default='relative')
     p.add_argument('--flicker-by-channel', action='store_true', default=False,
                    help='clean_flicker_noise.fit_by_channel=True (per-amplifier 1/f fit)')
@@ -313,12 +504,17 @@ def main():
     a = p.parse_args()
 
     setup_crds()
-    sample = a.sample or lens_samples.sample_of(a.lens)
+    sample = lens_samples.resolve_sample(p, a)
     lens_samples.entry(a.lens, sample)
     filt = lens_samples.canonical_filter(a.filt)
     ch = lens_samples.channel(filt)
     scale = a.scale if a.scale is not None else DEFAULT_SCALE[ch]
     coord = lens_samples.coord(a.lens, sample)
+    if a.field is None:
+        a.field = lens_samples.mosaic_field(sample) or DEFAULT_FIELD
+    prune = lens_samples.prune_intermediates(sample)
+    lens_first = lens_samples.tweakreg_lens_first(sample)
+    sw_from_lw = ch == 'SW' and a.tweakreg == 'relative' and lens_samples.tweakreg_sw_from_lw(sample)
     variant = {'uncal': '', 'rate': 'mastrate', 'cal': 'mastcal'}[a.start]
     if a.flicker_by_channel:
         if a.start != 'uncal':
@@ -353,13 +549,21 @@ def main():
     sync_references(kept)
     base_variant = '' if a.destripe else variant      # the destripe starts from the standard stages
     if a.start == 'uncal':
-        rates = run_detector1(kept, _stage_dir('stage1', sample, a.lens, filt, base_variant), a.flicker_by_channel)
-        cals = run_image2(rates, _stage_dir('stage2', sample, a.lens, filt, base_variant))
+        stage2_dir = _stage_dir('stage2', sample, a.lens, filt, base_variant)
+        # a destripe needs the standard rates, so a pruned sample re-makes them for it
+        rates = run_detector1(kept, _stage_dir('stage1', sample, a.lens, filt, base_variant), a.flicker_by_channel,
+                              cal_dir=stage2_dir if prune and not a.destripe else None)
+        cals = run_image2(rates, stage2_dir)
+        if prune and not a.destripe:
+            prune_rates(rates, stage2_dir)
     elif a.start == 'rate':
         rates = kept
         cals = run_image2(kept, _stage_dir('stage2', sample, a.lens, filt, variant))
     else:
         cals = kept
+    lens_at = lens_samples.deflector_coord(a.lens, sample) or coord
+    if lens_first:
+        cals = lens_first_order(cals, lens_at)
 
     destripe_stats = None
     if a.destripe:
@@ -368,13 +572,35 @@ def main():
         std_dir = _stage_dir('mosaics', sample, a.lens, filt, '')
         i2d0 = os.path.join(std_dir, f'{product_name}_i2d.fits')
         if not os.path.exists(i2d0):
-            i2d0 = run_image3(cals, std_dir, product_name, coord, scale, a.field, a.tweakreg)
+            i2d0 = run_image3(cals, std_dir, product_name, coord, scale, a.field, a.tweakreg, lens_first)
             plot_i2d(i2d0, i2d0.replace('_i2d.fits', '_i2d.png'))
         rates, destripe_stats = destripe_nircam.destripe_frames(
             rates, cals, i2d0, _stage_dir('stage1', sample, a.lens, filt, variant))
         cals = run_image2(rates, _stage_dir('stage2', sample, a.lens, filt, variant))
+        if lens_first:
+            cals = lens_first_order(cals, lens_at)
 
-    i2d = run_image3(cals, mosaic_dir, product_name, coord, scale, a.field, a.tweakreg)
+    tweak_mode, offsets = a.tweakreg, None
+    if sw_from_lw:
+        lw = lw_exposure_offsets(sample, a.lens)
+        if not lw:
+            raise SystemExit(f'ERROR: {sample} takes SW tweakreg offsets from LW (tweakreg_sw_from_lw), but '
+                             f'{a.lens} has no LW band with tweak_offsets_mas: reduce its LW bands first')
+        work_dir = os.path.join(mosaic_dir, '_lw_offsets')
+        image3_in, offsets = apply_offsets(cals, lw, work_dir)
+        tweak_mode = 'skip'
+        n_none = sum(o is None for o in offsets.values())
+        print(f'  SW WCS from LW tweakreg: {len(offsets) - n_none}/{len(offsets)} frames moved '
+              f'({n_none} exposures with no LW offset kept a-priori)', flush=True)
+        i2d = run_image3(image3_in, mosaic_dir, product_name, coord, scale, a.field, tweak_mode)
+        shutil.rmtree(work_dir)
+    else:
+        i2d = run_image3(cals, mosaic_dir, product_name, coord, scale, a.field, a.tweakreg, lens_first)
+        if a.tweakreg != 'skip':
+            offsets = tweak_offsets(cals, mosaic_dir) or None
+    if prune:
+        for f in glob.glob(os.path.join(mosaic_dir, '*_crf.fits')):
+            os.remove(f)
     if a.destripe:
         from astropy.io import fits as _fits
         with _fits.open(i2d, mode='update') as h:
@@ -387,7 +613,8 @@ def main():
     rec = {
         'rootnames': [_rootname(f) for f in cals], 'n_frames': len(cals),
         'start': a.start, 'variant': variant, 'scale': scale, 'field_arcsec': a.field,
-        'tweakreg': a.tweakreg, 'flicker_by_channel': a.flicker_by_channel,
+        'tweakreg': 'from_lw' if sw_from_lw else a.tweakreg, 'tweakreg_lens_first': lens_first and not sw_from_lw,
+        'tweak_offsets_mas': offsets, 'flicker_by_channel': a.flicker_by_channel,
         'destripe': bool(a.destripe),
         'destripe_mask': None if destripe_stats is None else destripe_stats['mask'],
         'jwst_version': hdr.get('CAL_VER'), 'crds_context': hdr.get('CRDS_CTX', crds_context()),
@@ -397,11 +624,8 @@ def main():
     }
     info_json.update(products_json, sample, a.lens, key, rec)
     if not variant:                             # exptime / instrument are band properties
-        # exposure time AT THE LENS: one detector per dither, so sum EFFEXPTM once per
-        # exposure (rootname minus the detector suffix), not over every detector's frame
-        per_exposure = {_rootname(f).rsplit('_', 1)[0]: _exptime(f) for f in cals}
         info_json.update(os.path.join(ws_path, 'info', 'provenance', 'lens_exptime.json'), sample, a.lens, key,
-                         round(float(sum(per_exposure.values())), 1))
+                         round(exptime_at(cals, lens_at), 1))
         info_json.update(os.path.join(ws_path, 'info', 'provenance', 'lens_instrument.json'), sample, a.lens, key,
                          f'NIRCAM/{ch}')
     print(f'=== done: {i2d}')
