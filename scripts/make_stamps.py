@@ -221,7 +221,7 @@ def main():
     p.add_argument('--output', default=None, help='write here instead of the stamp tree (scratch use)')
     a = p.parse_args()
 
-    sample = a.sample or lens_samples.sample_of(a.lens)
+    sample = lens_samples.resolve_sample(p, a)
     filt = lens_samples.canonical_filter(a.filt)
     ch = lens_samples.channel(filt)
     coord = lens_samples.coord(a.lens, sample)

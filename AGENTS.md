@@ -229,9 +229,11 @@ measure_lens_centres.py the lens core per band (LW-anchored) -> deflector_ra/dec
 choose_best_band.py     GUI over the band overview: choose each lens's best band by eye -> best_band_visual
 choose_primary_band.py  arc S/N per band, discounted below 5 PSF widths across theta_E -> each lens's primary band
 make_masks.py / make_arc_masks.py / make_positions.py   GUIs, one draw per band (primary first), broadcast by WCS
+make_extra_galaxies.py  GUI: the extra galaxies' centres of a multi_galaxy lens -> stamp<S>_extra_galaxies_centres.json
 make_dataset_subplots.py / make_qc_grids.py              QC
-make_band_overview.py   every band of a lens side by side (isophote-subtracted; + masks, positions, primary band) -> <lens>/stamp<S>_bands.png
+make_band_overview.py   every band of a lens side by side (isophote-subtracted; + masks, extra-galaxy centres, primary band) -> <lens>/stamp<S>_bands.png
 export_dataset.py   -> <dest>/<lens>/<FILT>/{data,noise_map,psf}.fits + info.json [+ mask, positions]
+set_lens_category.py    put a lens in its sample's category (COWLS: prime / multi_galaxy) and move its stamp dir
 ```
 
 **NIRCam only.** TEMPLATES also took MIRI imaging
@@ -242,6 +244,15 @@ needs its own `instrument_name='MIRI/IMAGE'` query and a `mirimage` branch in th
 PyAutoReduce has no MIRI support either.
 
 ## Lens samples (`info/samples/lens_samples.json`, read only by `scripts/lens_samples.py`)
+
+**`--lens` never needs `--sample` (2026-11-02).** A lens is in exactly one sample (`sample_of`
+raises otherwise), so every script finds it through `lens_samples.resolve_sample(parser, args)`
+right after parsing.
+- An unknown lens is an error naming the closest match.
+- A `--sample` that contradicts the lens is an error.
+- Without `--lens`, each script keeps its old behaviour: the GUIs default to `spt`, the
+  sample-wide tools require `--sample`, and the overview and primary-band tools run every sample.
+- New scripts call `resolve_sample` too, rather than `a.sample or sample_of(a.lens)`.
 
 A JWST lens is located in MAST by **proposal ID + target name** (not an `SDSS%` wildcard
 as for SLACS), so each sample block carries `proposal_id` and each lens its `mast_target`,
@@ -524,6 +535,52 @@ mosaics' absolute astrometry (relative alignment only).
   COSJ095917+015424 to F444W, COSJ100047+015023 to F277W, and COSJ100028+021928 became
   measurable (F444W). The old stamps and masks are in
   `diagnostics/recut_backup_20261101/` (gitignored).
+- **A catalogue position can sit on the wrong object: COSJ095955+021900 (2026-11-02).** Its
+  COWLS II Table 1 position lies on a lens-coloured knot. The lens is a galaxy 0.99" NE of it
+  (+0.27" E, +1.03" N of ra/dec), 9x brighter in F277W, and COWLS II Fig. 2 (panel G) centres on
+  that galaxy. The 0.5" search took the knot, and the band overview's isophote fit then failed in
+  every band. Two changes:
+  - `measure_lens_centres.py` now refuses to write a lens with a peak ≥ 3x brighter than the
+    chosen core within 2.5" in an LW band. Only COSJ095955+021900 trips it. `--near DE,DN`
+    (arcsec from ra/dec) centres the search on the real lens.
+  - The stamps were re-cut on the new centre. The F277W mask moved by the exact whole-pixel shift
+    of (−5, +15) LW px. The lens then went to `multi_galaxy` and that mask was deleted, to be
+    redrawn (a copy is in `diagnostics/recentre_backup_20261102/`, gitignored).
+
+**Lens categories (`cowls_spectacular`, 2026-11-02).** A sample may list `lens_categories` in
+`lens_samples.json`, and each of its lenses then carries `category` (+ `category_note`). Its
+stamps live one level deeper, in `data/stamps/<sample>/<category>/<lens>/`.
+- COWLS: `prime` has one deflector, with its neighbours masked as contaminants. `multi_galaxy`
+  means more than one galaxy's mass has to be modelled: a second lens, or a perturber near the arcs.
+- `multi_galaxy` lenses (2026-11-02):
+  - COSJ100119+014849: the round galaxy 1.7" SE is a second lens, 0.56" from the ring.
+  - COSJ095955+021900: a group-scale lens (θ_E 2.11"). An elongated galaxy 3.9" SE, about 1.3"
+    from the arc, has 0.30x the lens's F444W light, with colours within 0.25 mag of the lens's.
+    There are also a compact galaxy 1.15" E (inside the ring, 0.10x) and another 2.6" N (0.11x).
+    Light ratios are in r < 0.25" apertures.
+  - COSJ100013+023424: two compact sources inside the ring (θ_E 1.45") carry the lens's colours to
+    ~0.2 mag. One is bright, 0.65" S, a second nucleus or merging companion; the other is a knot
+    0.85" NE. The lensed arc (E) and its candidate counter-image (0.58" WSW) are bright only in
+    F277W and F444W.
+- **Extra-galaxy centres** (`make_extra_galaxies.py`): for each `multi_galaxy` lens, click the
+  centre of every galaxy besides the main deflector on its primary band, in the positions GUI.
+  - Clicks snap to the brightest pixel.
+  - The result goes to every band as `stamp<S>_extra_galaxies_centres.json`, reprojected through
+    sky coordinates. It is one `al.Grid2DIrregular` of autoarray (y, x) arcsec (+y South, +x West),
+    the file autolens_workspace's multi-galaxy examples load.
+  - The record is `lens_extra_galaxies.json`, which also gives the centres as (East, North).
+  - `export_dataset.py` ships the file as `extra_galaxies_centres.json`. The band overview marks
+    the centres with a cyan x.
+  - Masked pixels are outlined, not blanked, so a masked galaxy can still be clicked.
+  - The mask and a centre do different things: the mask removes a galaxy's LIGHT from the fit,
+    the centre adds its MASS to the model. A faint satellite near the arcs is often best both
+    masked and given a centre (COSJ100013+023424's NE knot, 2026-11-02).
+- **Every tool reaches a lens through `stamp_paths.lens_stamp_dir` / `stamp_dir` / `band_dirs`.**
+  Never join `<sample>/<lens>` by hand, and never glob `<sample>/*/*`, or a categorised lens
+  silently drops out of the sweep. `band_dirs` lists lenses from the roster, so both layouts are found.
+- `set_lens_category.py` changes a lens's category and moves its whole dir with `os.rename`.
+- `export_dataset.py` writes `lens_category` into `info.json`, and keeps the `<dest>/<lens>/` layout flat.
+- Only the stamp tree is categorised. The mosaics, PSF and stage trees stay flat.
 
 ### Noise
 
@@ -729,9 +786,10 @@ always answers `stamp<S>` for the lens's modelling size). The semantics are unch
   stamp, a zoom on the lens, and the zoom with the lens light removed by an ISOPHOTE model
   (`isophote_model.py`, as the positions GUI; smoothed, red-blue, red = light the model lacks,
   masked pixels blank). Its colour range is set outside the central 0.2", whose cusp the inner
-  isophotes cannot follow. The other panels have their own arcsinh stretch, North up, East left.
-  Overlaid: the contaminant mask outline, the image positions (a colour per source) and θ_E; the
-  primary band is starred.
+  isophotes cannot follow. The other panels have their own stretch in the repo's one look
+  (`display_look.py`, the dataset subplots' inferno + 99% asinh), North up, East left.
+  Overlaid: the contaminant mask outline, the extra-galaxy centres and θ_E; the primary band is
+  starred. Image positions are NOT drawn (2026-11-02): each band's `*_positions.png` shows them.
   - The zooms, the θ_E circle and the isophote model are centred on the lens's measured
     centre (`deflector_ra/dec`) at its exact sub-pixel position. The stamps are cut on it,
     snapped to the LW grid, so it is ≤ 39 mas from the stamp centre; the header prints the
@@ -740,7 +798,7 @@ always answers `stamp<S>` for the lens's modelling size). The semantics are unch
     corner here, so even a half-pixel offset leaves a dipole. `radial_subtract` takes the
     sub-pixel centre instead.
   - It is not called a "mosaic", which means the Image3 product here.
-  - `make_masks.py`, `make_positions.py` (marking and `--rebroadcast`) and `choose_primary_band.py`
+  - `make_masks.py`, `make_extra_galaxies.py` and `choose_primary_band.py`
     re-render it after writing, once per changed lens at the END of the run (best-effort, never
     fatal). A stamp re-cut does not, so re-run the script after one.
   - **It renders on a plain `matplotlib.figure.Figure`, never pyplot, and must not call
@@ -767,15 +825,23 @@ always answers `stamp<S>` for the lens's modelling size). The semantics are unch
   `positions=` (list of (y, x) arcsec), `mask_overlay=` (an `al.Mask2D`) and `title=`, and
   reads back `get_scribble_masks()` ('1' = add, '2' = erase) and `mask_from()`
   (`(proposal | added) & ~erased`). Consequences to know: brushes are **'1' white = add,
-  '2' black = erase** (was green/red); the display stretch is the Scribbler's median/MAD
-  arcsinh, so `--stretch/--asinh-a/--vmin-percent/--vmax-percent` are gone from
-  `make_masks.py` and `make_arc_masks.py` (they survive in `make_positions.py`, whose
-  Clicker panels are plain axes, and `make_masks._STRETCHES`/`stretched_display` stay for
-  it); the proposal is a black-on-white contour rather than a 1 px burned-in line; the
-  contaminant edge in `make_arc_masks.py` is black 'x's from autoarray's `derive_grid.edge`,
-  which also runs along the stamp border; `--cross-size` defaults to the Scribbler's own
-  (1.5% of the shorter side, ≥3 px); the arc QC PNG uses the same
-  `display_util.radial_median_subtract` + `arcsinh_stretch` as the GUI's left panel.
+  '2' black = erase** (was green/red); `--stretch/--asinh-a/--vmin-percent/--vmax-percent`
+  are gone from `make_masks.py`, `make_arc_masks.py` and (2026-11-02) `make_positions.py`,
+  whose `--vmax-value` stays. The proposal is a black-on-white contour rather than a 1 px
+  burned-in line; the contaminant edge in `make_arc_masks.py` is 'x's from autoarray's
+  `derive_grid.edge` (recoloured cyan here, as black vanishes on inferno), which also runs
+  along the stamp border; `--cross-size` defaults to the Scribbler's own (1.5% of the shorter
+  side, ≥3 px).
+- **One image look everywhere (2026-11-02, `scripts/display_look.py`)**: the dataset subplots'
+  data / PSF / S/N panels, i.e. `inferno` with each panel's own `PercentileInterval(99)` +
+  `AsinhStretch(0.1)`.
+  - The mask GUIs pass `display_look.SCRIBBLER` as the Scribbler's `cmap`: an object with
+    `norm_from(array=)` + `cmap_name`, which the Scribbler applies per panel.
+  - The positions / extra-galaxy GUIs and their PNGs, the arc-mask QC PNG and the band overview's
+    as-observed rows all use `display_look.normalised`, as does the dataset subplot itself.
+  - Signed residuals (the isophote-subtracted panels) stay red-blue.
+  - Before this, the Scribbler showed its median/MAD `arcsinh_stretch` on autoarray's colormap,
+    the positions GUI a percentile asinh on `jet`, and the overview gray.
   `reproject_mask_bool` is deliberately kept over `al.mask_2d_regridded_from`: ours
   transfers through the two bands' header WCS, upstream's by pixel scale + origin only.
 - One draw per band; the next band starts from a reviewed proposal reprojected by WCS.
@@ -793,7 +859,20 @@ always answers `stamp<S>` for the lens's modelling size). The semantics are unch
     lets the band overview keep the measured lens centre: the HST default refines it with a 0.3"
     centroid, which creeps toward a ring inside that window.
   - **Position sets.** Number keys 1–9 in the GUI switch the source being marked, one set per
-    source (double source planes, distinct sources), and Esc finishes.
+    source (double source planes, distinct sources), and Esc finishes. `z` (or Backspace)
+    undoes the last click (2026-11-02).
+  - **The snap is our own since 2026-11-02 (`make_positions.snap_click`).**
+    - It moves a double-click to the brightest pixel (true flux) within a disc of
+      `--snap-radius` px (default 1; 0 = none; `--search-box-size` is the old name).
+    - `al.Clicker`'s snap first rounded the click to a pixel CORNER on these even-sided stamps,
+      then searched an asymmetric box (−b … b−1). With the old default of 2 it moved the first
+      COWLS clicks 0.5–2.5 px, up to 0.15" in LW.
+    - The record key is now `snap_radius_px`.
+  - **After Esc nothing slow runs in the GUI process.** The per-band `_positions.png` overlays
+    (an isophote fit each: ~7 s an SW band, ~2.5 s LW) and the band overview are drawn at the
+    end of the run, in one detached process (`make_positions.background_renders`, log in
+    `data/run_logs/positions_renders_*`). Drawn inline, they kept the closed window frozen for
+    ~20 s per lens.
     - `positions_io.write_sets` writes ONE set exactly as before, a single `Grid2DIrregular`, so
       every existing file and reader is unchanged. Two or more sets are autoconf's list type,
       which `al.from_json` returns as a list.
@@ -810,19 +889,37 @@ always answers `stamp<S>` for the lens's modelling size). The semantics are unch
   (the stamp centre), labelled `lens core (fallback)` — which is only right when the stamp is
   centred on the lens. Recorded as `band_tie_{mas,px,scatter_mas,n_sources,method}` in
   `info/provenance/lens_positions.json`.
-- GUI orientation: North down, East left on screen (row 0 at the top). Quote offsets as
-  ΔRA/ΔDec or (col, row).
+- **Every GUI and QC plot is North up, East left (2026-11-02)**, like the band overview. Before
+  that the GUIs showed row 0 at the top, which is North down, a vertical mirror of the sky.
+  - Rows run South → North and columns East → West in every stamp.
+  - The Scribbler is built with `block=False`, its pixel y axis is set increasing upward
+    (`make_masks.north_up_pixels`), and then it is started.
+  - The positions panels invert their autoarray-y axis and label the ticks East/North
+    (`make_positions.north_up`). Clicks and saved positions are still autoarray (y, x).
+  - The arc-mask QC PNG draws with `origin='lower'`.
+  - The dataset subplot is drawn from top-to-bottom flipped copies of the four products: flipping
+    autolens's imshow origin would mirror its own overlays.
+  - None of this changes a saved mask or position.
+  - Quote offsets as ΔRA/ΔDec.
+  - **No pyplot after a Scribbler.** `al.Scribbler.start()` calls `plt.ion()`, so any later
+    pyplot figure in that process flashes up as a blank window.
+    - The dataset subplots of the bands a mask run wrote (`make_masks.PENDING_SUBPLOTS`) are drawn
+      by the same detached process as the band overviews (`rerender_overviews(..., subplots)`).
+    - The arc-mask QC PNG is drawn on a plain `Figure`.
+- **Headless GUI tests:** `al.Scribbler` defaults to `backend='TkAgg'` (ignoring `MPLBACKEND`)
+  and, unless `block=False`, opens its window and blocks INSIDE `__init__`. A test needs
+  `backend='Agg', block=False` and no `start()`, or it opens a real window and hangs.
 - `make_qc_grids.py` is the HST `make_mosaics.py`, renamed because "mosaic" here means the
   Image3 product; it writes `data/qc/<sample>/`.
 
 **First JWST use: B1938+666, 2026-10-04**, with the HST-port GUIs (before the native-Scribbler
 rewrite). `make_positions.py` marked A and B on F277W and broadcast them to F115W;
 `make_masks.py` drew the contaminant masks (F115W 27 515 px, F277W 6 854 px, provenance in
-`info/provenance/lens_masks.json`); `make_dataset_subplots.py` rendered both bands. `make_arc_masks.py` and
-`make_qc_grids.py` have still never run on a JWST stamp: expect small breakages (header cards,
+`info/provenance/lens_masks.json`); `make_dataset_subplots.py` rendered both bands. `make_arc_masks.py` has
+still never run on a JWST stamp (`make_qc_grids.py` first ran 2026-11-02, cleanly): expect small breakages (header cards,
 the `--pass` plumbing) on first use and fix them in place. The native-Scribbler rewrite was
-verified headless only (`backend='Agg'`, synthetic stamps, strokes injected through
-`add_circle_to_scribble`); the first real TkAgg run is still to come.
+verified headless first (`backend='Agg'`, synthetic stamps, strokes injected through
+`add_circle_to_scribble`). It has been used for real since, on all the COWLS masks.
 
 ## Export to the modelling project (`scripts/export_dataset.py`)
 
@@ -831,8 +928,8 @@ uv run python scripts/export_dataset.py --lens SPT2147-50 --dest <modelling-proj
 ```
 
 Copies each band's stamp, noise map and PSF to `<dest>/<lens>/<FILT>/{data,noise_map,psf}.fits`,
-the contaminant mask as `mask_extra_galaxies.fits` and the positions as `positions.json` when
-they exist, and writes `info.json` with `pixel_scale`, `mask_radius`, the redshifts, the
+the contaminant mask as `mask_extra_galaxies.fits`, the positions as `positions.json` and the
+extra-galaxy centres as `extra_galaxies_centres.json` when they exist, and writes `info.json` with `pixel_scale`, `mask_radius`, the redshifts, the
 lens's primary band (`primary_band`, `primary_band_source`, `best_band_visual`, `is_primary_band`; *Masks*) and the
 provenance (i2d path, variant, jwst version, `NOISECOR`). This is the layout a PyAutoLens
 SLaM-style dataset loader expects (`data`/`noise_map`/`psf` + `info.json`; mask and positions
@@ -848,9 +945,10 @@ data/
   calibrated/<sample>/<lens>/<FILT>/      hard links into pool/, by header FILTER
   stage1/  stage2/                        our rate / cal products
   mosaics[_<variant>]/<sample>/<lens>/<FILT>/   <lens>_<filt>_{asn.json,i2d.fits,i2d.png} + Image3 by-products
-  stamps/<sample>/<lens>/<FILT>/          THE science tree, every size side by side (stamp<S>_*; only each
+  stamps/<sample>/[<cat>/]<lens>/<FILT>/  THE science tree, every size side by side (stamp<S>_*; only each
                                           lens's modelling size is tracked; stamp<S>.png and *_positions.png
-                                          are gitignored QC renders, rebuilt by the scripts)
+                                          are gitignored QC renders, rebuilt by the scripts). <cat> only for a
+                                          sample with lens_categories (COWLS: prime, multi_galaxy; see *Stamps*)
   psf/<sample>/<lens>/<FILT>/             archival kernels + psf.png
   qc[_<S>arcsec]/<sample>/                stamp grids
   reference_files/                        CRDS cache, stpsf-data/
@@ -885,7 +983,8 @@ Exercised 2026-10-30: the STPSF model tier of `make_psf.py` (too narrow, see *PS
 pooled empirical tier, and the COWLS tweakreg settings `tweakreg_lens_first` /
 `tweakreg_sw_from_lw` (all 68 bands).
 
-Not yet exercised: `make_arc_masks.py`, `make_qc_grids.py`, `--tweakreg gaia`. Stubs: `detect_arcs.py`.
+Not yet exercised: `make_arc_masks.py`, `--tweakreg gaia`. (`make_qc_grids.py` ran on
+`cowls_spectacular` F444W on 2026-11-02 to test the category layout; its output was not kept.) Stubs: `detect_arcs.py`.
 Exercised since: `measure_corr_factor.py` (12 stamps, 2026-10-04), `--start rate` and
 `--flicker-by-channel` (SPT0418-47 F150W, 2026-10-02), `destripe_nircam.py`, and
 `make_masks.py`, `make_positions.py` and `make_dataset_subplots.py` on B1938+666 (2026-10-04,

@@ -928,7 +928,7 @@ def main():
         p.error('give --lens, or --pool with --sample')
     if a.pool and not a.sample:
         p.error('--pool needs --sample')
-    sample = a.sample or mast_target_names.sample_of(a.lens)
+    sample = mast_target_names.resolve_sample(p, a)
     filt = mast_target_names.canonical_filter(a.filt)
     a.filt = filt
     psf_json = os.path.join(ws_path, 'info', 'provenance', 'lens_psf.json')

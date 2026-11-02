@@ -1,38 +1,38 @@
 {
-    "lens": "COSJ095955+021900",
+    "lens": "COSJ100119+014849",
     "sample": "cowls_spectacular",
     "primary_band": "F277W",
     "primary_band_source": "visual",
     "best_band_visual": "F277W",
-    "best_band_arc_snr": "F277W",
-    "theta_e": 2.11,
+    "best_band_arc_snr": "F444W",
+    "theta_e": 1.14,
     "scores": {
         "F115W": {
-            "arc_snr": 17.7,
+            "arc_snr": -1.99,
             "psf_fwhm_arcsec": 0.0527,
             "resolution_factor": 1.0,
-            "score": 17.7,
+            "score": -1.99,
             "contaminant_mask": false
         },
         "F150W": {
-            "arc_snr": 41.55,
+            "arc_snr": 4.59,
             "psf_fwhm_arcsec": 0.0637,
             "resolution_factor": 1.0,
-            "score": 41.55,
+            "score": 4.59,
             "contaminant_mask": false
         },
         "F277W": {
-            "arc_snr": 187.15,
+            "arc_snr": 149.92,
             "psf_fwhm_arcsec": 0.1246,
             "resolution_factor": 1.0,
-            "score": 187.15,
+            "score": 149.92,
             "contaminant_mask": true
         },
         "F444W": {
-            "arc_snr": 134.29,
+            "arc_snr": 160.44,
             "psf_fwhm_arcsec": 0.1666,
             "resolution_factor": 1.0,
-            "score": 134.29,
+            "score": 160.44,
             "contaminant_mask": false
         }
     },

@@ -155,10 +155,54 @@ def tweakreg_sw_from_lw(sample):
 
 
 def sample_of(lens):
-    for name, block in _load().items():
-        if lens in block['lenses']:
-            return name
-    return None
+    """The one sample `lens` is in, or None. A lens in two samples is a roster error (every
+    tool finds a lens's sample this way), so it raises rather than picking one."""
+    hits = [name for name, block in _load().items() if lens in block['lenses']]
+    if len(hits) > 1:
+        raise ValueError(f'{lens!r} is in more than one sample ({", ".join(hits)}) in {SAMPLES_JSON}')
+    return hits[0] if hits else None
+
+
+def resolve_sample(parser, args, required=False, default=None):
+    """The sample a script works on, from its parsed `args` (`args.sample`, `args.lens`: one
+    name or a list), so --sample is never needed alongside --lens (2026-11-02).
+
+      * --lens given: the sample is the one the lens is in (lens_samples.json; a lens is in one
+        sample only). An unknown lens is an error naming the closest one; --sample, if also
+        given, must agree; lenses from different samples are an error.
+      * no --lens: --sample, else `default` (the script's old default sample; None for "every
+        sample"), or an error when `required`.
+
+    Errors go through `parser.error`, so they print the usage line and exit 2. The result is
+    also written back to `args.sample`."""
+    names = args.lens if isinstance(args.lens, (list, tuple)) else ([args.lens] if args.lens else [])
+    sample = args.sample
+    if names:
+        found = {}
+        for lens in names:
+            s = sample_of(lens)
+            if s is None:
+                every = [l for b in _load().values() for l in b['lenses']]
+                close = difflib.get_close_matches(lens, every, n=1, cutoff=0.6)
+                parser.error(f'unknown lens {lens!r}' + (f" (did you mean '{close[0]}'?)" if close else '')
+                             + f'; it is in no sample of {SAMPLES_JSON}')
+            found[lens] = s
+        if sample is not None:
+            wrong = [f'{l} is in {s!r}' for l, s in found.items() if s != sample]
+            if wrong:
+                parser.error(f'{"; ".join(wrong)}, not --sample {sample!r} (leave --sample out: it '
+                             f'is found from --lens)')
+        elif len(set(found.values())) > 1:
+            parser.error('the lenses are in different samples ('
+                         + ', '.join(f'{l}: {s}' for l, s in found.items()) + '); run one sample at a time')
+        else:
+            sample = next(iter(found.values()))
+    elif sample is None:
+        if required:
+            parser.error('give --lens, or --sample for every lens of a sample')
+        sample = default
+    args.sample = sample
+    return sample
 
 
 def entry(lens, sample=None):
@@ -223,6 +267,42 @@ def set_best_band_visual(lens, band, note, sample=None):
     e = data[sample]['lenses'][lens]
     e['best_band_visual'] = canonical_filter(band)
     e['best_band_visual_note'] = note
+    with open(SAMPLES_JSON, 'w') as f:
+        f.write(json.dumps(data, indent=4, ensure_ascii=False) + '\n')
+    _cache = None
+
+
+def categories(sample):
+    """The sample's lens categories (`lens_categories`), in order, or [] for a flat sample. A
+    categorised sample's stamps live in data/stamps/<sample>/<category>/<lens>/ (stamp_paths)."""
+    return list(_sample(sample).get('lens_categories') or [])
+
+
+def category(lens, sample=None):
+    """The lens's category (`category`; default the sample's first), or None for a flat sample."""
+    sample = sample or sample_of(lens)
+    cats = categories(sample)
+    if not cats:
+        return None
+    c = entry(lens, sample).get('category') or cats[0]
+    if c not in cats:
+        raise ValueError(f'{lens}: category {c!r} is not one of {sample}\'s lens_categories {cats}')
+    return c
+
+
+def set_category(lens, cat, note=None, sample=None):
+    """Record `lens`'s category (+ `category_note`) in lens_samples.json. The stamp dir is moved
+    by set_lens_category.py, not here."""
+    global _cache
+    sample = sample or sample_of(lens)
+    if cat not in categories(sample):
+        raise ValueError(f'{cat!r} is not one of {sample}\'s lens_categories {categories(sample)}')
+    with open(SAMPLES_JSON) as f:
+        data = json.load(f)
+    e = data[sample]['lenses'][lens]
+    e['category'] = cat
+    if note:
+        e['category_note'] = note
     with open(SAMPLES_JSON, 'w') as f:
         f.write(json.dumps(data, indent=4, ensure_ascii=False) + '\n')
     _cache = None

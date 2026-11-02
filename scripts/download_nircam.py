@@ -296,7 +296,7 @@ def main():
     p.add_argument('--dry-run', action='store_true', help='query and list, download nothing')
     a = p.parse_args()
 
-    sample = a.sample or lens_samples.sample_of(a.lens)
+    sample = lens_samples.resolve_sample(p, a)
     lens_samples.entry(a.lens, sample)
     if a.field is None:
         a.field = lens_samples.mosaic_field(sample) or DEFAULT_FIELD

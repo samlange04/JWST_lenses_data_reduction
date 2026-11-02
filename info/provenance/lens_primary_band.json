@@ -278,31 +278,31 @@
             "r0": 5.0,
             "scores": {
                 "F115W": {
-                    "arc_snr": 17.7,
+                    "arc_snr": 3.24,
                     "psf_fwhm_arcsec": 0.0527,
                     "resolution_factor": 1.0,
-                    "score": 17.7,
+                    "score": 3.24,
                     "contaminant_mask": false
                 },
                 "F150W": {
-                    "arc_snr": 41.55,
+                    "arc_snr": 1.86,
                     "psf_fwhm_arcsec": 0.0637,
                     "resolution_factor": 1.0,
-                    "score": 41.55,
+                    "score": 1.86,
                     "contaminant_mask": false
                 },
                 "F277W": {
-                    "arc_snr": 187.15,
+                    "arc_snr": 42.25,
                     "psf_fwhm_arcsec": 0.1246,
                     "resolution_factor": 1.0,
-                    "score": 187.15,
-                    "contaminant_mask": true
+                    "score": 42.25,
+                    "contaminant_mask": false
                 },
                 "F444W": {
-                    "arc_snr": 134.29,
+                    "arc_snr": 20.72,
                     "psf_fwhm_arcsec": 0.1666,
                     "resolution_factor": 1.0,
-                    "score": 134.29,
+                    "score": 20.72,
                     "contaminant_mask": false
                 }
             },
@@ -652,11 +652,11 @@
                     "contaminant_mask": false
                 },
                 "F277W": {
-                    "arc_snr": 148.91,
+                    "arc_snr": 149.92,
                     "psf_fwhm_arcsec": 0.1246,
                     "resolution_factor": 1.0,
-                    "score": 148.91,
-                    "contaminant_mask": false
+                    "score": 149.92,
+                    "contaminant_mask": true
                 },
                 "F444W": {
                     "arc_snr": 160.44,

@@ -12,6 +12,8 @@ Writes <dest>/<lens>/<FILT>/:
     psf.fits                  psf.fits            (odd, unit-sum)
     mask_extra_galaxies.fits  stamp12_mask.fits           (True = remove by noise-scaling; optional)
     positions.json            stamp12_positions.json      (al.Grid2DIrregular JSON; optional)
+    extra_galaxies_centres.json  stamp12_extra_galaxies_centres.json  (al.Grid2DIrregular JSON of
+                              the extra galaxies' (y, x) centres, make_extra_galaxies.py; optional)
     info.json                 pixel_scale, mask_radius, redshift_lens, redshift_source,
                               plus provenance (i2d, variant, jwst version, noise factor)
 
@@ -65,6 +67,10 @@ def export_band(sample, lens, filt, dest, mask_radius, size):
     if os.path.exists(pos):
         shutil.copyfile(pos, os.path.join(out, 'positions.json'))
         optional['positions'] = True
+    eg = os.path.join(cdir, f'{prefix}_extra_galaxies_centres.json')
+    if os.path.exists(eg):
+        shutil.copyfile(eg, os.path.join(out, 'extra_galaxies_centres.json'))
+        optional['extra_galaxies_centres'] = True
     hdr = fits.getheader(sci)
     nhdr = fits.getheader(noise)
     zl, zs = lens_samples.redshifts(lens, sample)
@@ -78,6 +84,9 @@ def export_band(sample, lens, filt, dest, mask_radius, size):
         # 'arc_snr' = the measured best arc S/N (choose_primary_band.py)
         'primary_band': primary, 'primary_band_source': primary_source, 'is_primary_band': filt == primary,
         'best_band_visual': lens_samples.entry(lens, sample).get('best_band_visual'),
+        # prime: one deflector; multi_galaxy: more than one galaxy's mass must be modelled
+        # (lens_samples.json lens_categories); None for a sample without categories
+        'lens_category': lens_samples.category(lens, sample),
         'bunit': hdr.get('BUNIT'), 'photmjsr': hdr.get('PHOTMJSR'), 'pixar_sr': hdr.get('PIXAR_SR'),
         'variant': hdr.get('REDUCVAR', 'standard'), 'jwst_version': hdr.get('CAL_VER'),
         'noise_corr_factor': nhdr.get('NOISECOR'), 'noise_corr_scale_arcsec': nhdr.get('NOISESCL'),
@@ -88,7 +97,8 @@ def export_band(sample, lens, filt, dest, mask_radius, size):
     with open(os.path.join(out, 'info.json'), 'w') as fh:
         json.dump(info, fh, indent=4)
     print(f'  {filt}: -> {out}  ({hdr["NAXIS1"]}x{hdr["NAXIS2"]} @ {info["pixel_scale"]}"/px'
-          + (', mask' if 'mask_extra_galaxies' in optional else '') + (', positions' if 'positions' in optional else '') + ')')
+          + (', mask' if 'mask_extra_galaxies' in optional else '') + (', positions' if 'positions' in optional else '')
+          + (', extra-galaxy centres' if 'extra_galaxies_centres' in optional else '') + ')')
     return out
 
 
@@ -102,9 +112,9 @@ def main():
     p.add_argument('--size', type=float, default=None,
                    help='stamp size to export (default: the lens\'s modelling size)')
     a = p.parse_args()
-    sample = a.sample or lens_samples.sample_of(a.lens)
+    sample = lens_samples.resolve_sample(p, a)
     dest = os.path.expanduser(a.dest)
-    root = os.path.join(stamp_paths.stamps_root(ws_path), sample, a.lens)
+    root = stamp_paths.lens_stamp_dir(ws_path, sample, a.lens)
     filts = [lens_samples.canonical_filter(f) for f in a.filters] if a.filters else \
         sorted(d for d in os.listdir(root) if os.path.isdir(os.path.join(root, d))) if os.path.isdir(root) else []
     print(f'=== export {sample}/{a.lens} -> {dest}')

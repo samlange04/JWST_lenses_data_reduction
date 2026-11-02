@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-One figure per lens with every band's stamp side by side: data/stamps/<sample>/<lens>/stamp<S>_bands.png.
+One figure per lens with every band's stamp side by side: data/stamps/<sample>/[<category>/]<lens>/stamp<S>_bands.png.
 
     uv run python scripts/make_band_overview.py                          # every lens of every sample
     uv run python scripts/make_band_overview.py --sample cowls_spectacular [--lens LENS]
@@ -13,18 +13,20 @@ the bands in wavelength order. Rows:
   3. the same zoom with the lens light removed by an ISOPHOTE model (isophote_model.py: elliptical
      isophotes free in ellipticity and PA, centre fixed on the lens, masked pixels left out;
      the positions GUI's panel), smoothed and on a red-blue map (red = light the model lacks,
-     masked pixels blank), with the image positions where marked and the Einstein radius (dashed).
+     masked pixels blank), with the Einstein radius (dashed). Image positions are NOT drawn
+     (2026-11-02): they have their own per-band QC overlays (make_positions.py, *_positions.png).
      A radial median, used until 2026-11-01, leaves a quadrupole on every elliptical lens.
 The zooms, the theta_E circle and the isophote model are centred on the lens's measured
 centre (deflector_ra/dec, measure_lens_centres.py; else the catalogue position), at its exact
 sub-pixel position: the stamps are cut on it but snapped to the 0.06" LW grid, and a profile even
 half a pixel off the lens leaves a dipole. The residual offset is printed in the header.
-Every panel has its own arcsinh stretch (autogalaxy's arcsinh_stretch, as the GUIs). North is up
+Every as-observed panel has its own stretch, the dataset subplots' look (display_look.py: inferno,
+PercentileInterval(99) + AsinhStretch(0.1)), as the GUIs. North is up
 and East left (the stamps' rows run South to North, columns East to West). The primary band
 (lens_samples.primary_band: reviewed, or choose_primary_band.py's suggestion) is starred, and
 the header gives the lens and source redshifts, theta_E and the primary band's source.
 
-make_masks.py, make_positions.py and choose_primary_band.py re-render it after they write; a
+make_masks.py, make_extra_galaxies.py and choose_primary_band.py re-render it after they write; a
 re-cut of the stamps (make_stamps.py) does not, so run this after one. Tracked in git with the
 stamps (it is a stamp<S>_* file), so it costs ~0.3-0.6 MB of history per render.
 """
@@ -45,12 +47,12 @@ import isophote_model
 import lens_samples
 import positions_io
 import stamp_paths
+import display_look
 from scipy.ndimage import gaussian_filter
 
 CORE_ARCSEC = 0.2      # the core left out of the isophote panel's colour range (it saturates)
+EXTRA_COLOUR = 'cyan'  # extra-galaxy centres (make_extra_galaxies.py)
 SMOOTH_PX = 1.5        # the isophote residual's smoothing (Gaussian sigma, px), as the positions GUI
-# position sets (one per source; positions_io), dark on the red-blue panel, with a white halo
-SET_COLOURS = ['black', 'darkgreen', 'purple', 'saddlebrown', 'navy']
 HALO = [matplotlib.patheffects.withStroke(linewidth=3, foreground='white')]
 
 ws_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -60,7 +62,7 @@ FILTER_UM = {'F070W': 0.70, 'F090W': 0.90, 'F115W': 1.15, 'F150W': 1.50, 'F200W'
 
 
 def load_band(stamp_dir, prefix):
-    """The band's sci (no-data pixels NaN), pixel scale, mask (or None), position sets (or [])."""
+    """The band's sci (no-data pixels NaN), pixel scale, mask (or None), extra-galaxy centres (or [])."""
     sci_f = stamp_paths.find_stamp(stamp_dir, prefix, 'sci')
     noise_f = stamp_paths.find_stamp(stamp_dir, prefix, 'noise')
     if sci_f is None:
@@ -72,9 +74,9 @@ def load_band(stamp_dir, prefix):
     scale = float(hdr['PIXSCALE'])
     mask_f = os.path.join(stamp_dir, f'{prefix}_mask.fits')
     mask = fits.getdata(mask_f).astype(bool) if os.path.exists(mask_f) else None
-    pos_f = os.path.join(stamp_dir, f'{prefix}_positions.json')
-    sets = positions_io.read_sets(pos_f) if os.path.exists(pos_f) else []
-    return dict(sci=sci, scale=scale, mask=mask, sets=[s_ for s_ in sets if s_], hdr=hdr)
+    eg_f = os.path.join(stamp_dir, f'{prefix}_extra_galaxies_centres.json')       # make_extra_galaxies.py
+    extra = positions_io.flatten(positions_io.read_sets(eg_f)) if os.path.exists(eg_f) else []
+    return dict(sci=sci, scale=scale, mask=mask, extra=extra, hdr=hdr)
 
 
 def build_figure(sample, lens, fig=None):
@@ -85,9 +87,9 @@ def build_figure(sample, lens, fig=None):
     import this module mid-GUI. Until 2026-11-01 it called matplotlib.use('Agg') at import,
     which switched those processes' backend, so every later GUI window flashed and returned
     unanswered."""
-    from autogalaxy.gui.display_util import arcsinh_stretch, mask_boundary
+    from autogalaxy.gui.display_util import mask_boundary
     prefix = stamp_paths.stamp_prefix(stamp_paths.modelling_size(lens, sample))
-    lens_dir = os.path.join(stamp_paths.stamps_root(ws_path), sample, lens)
+    lens_dir = stamp_paths.lens_stamp_dir(ws_path, sample, lens)
     bands = {}
     for d in glob.glob(os.path.join(lens_dir, 'F*')):
         b = load_band(d, prefix)
@@ -153,7 +155,8 @@ def build_figure(sample, lens, fig=None):
                 ax.imshow(d, origin='lower', cmap='RdBu_r', vmin=-vmax, vmax=vmax, extent=ext,
                           interpolation='nearest')
             else:
-                ax.imshow(arcsinh_stretch(a), origin='lower', cmap='gray', extent=ext, interpolation='nearest')
+                ax.imshow(display_look.normalised(a), origin='lower', cmap=display_look.CMAP, vmin=0.0, vmax=1.0,
+                          extent=ext, interpolation='nearest')
             if mask is not None and mask[rs, cs].any():
                 edge = mask_boundary(mask[rs, cs])
                 rgba = np.zeros(edge.shape + (4,))
@@ -168,12 +171,10 @@ def build_figure(sample, lens, fig=None):
                 if te:
                     t = np.linspace(0, 2 * np.pi, 200)
                     ax.plot(e0 + te * np.cos(t), n0 + te * np.sin(t), ls='--', lw=0.8, color='0.3', alpha=0.9)
-                for k, pts in enumerate(b['sets']):
-                    # autoarray (y, x) about the stamp centre: y points toward row 0 (South
-                    # here), x toward higher columns (West), so (East, North) = (-x, -y)
-                    colour = SET_COLOURS[k % len(SET_COLOURS)]
-                    for y, x in pts:
-                        ax.plot(-x, -y, '+', color=colour, ms=10, mew=1.6, path_effects=HALO, zorder=5)
+            # extra-galaxy centres, every row. autoarray (y, x) about the stamp centre: y points toward
+            # row 0 (South here), x toward higher columns (West), so (East, North) = (-x, -y)
+            for y, x in b['extra']:
+                ax.plot(-x, -y, 'x', color=EXTRA_COLOUR, ms=8, mew=1.8, path_effects=HALO, zorder=6)
             ax.set_xlim(*xl)
             ax.set_ylim(*yl)
             ax.set_xticks([]); ax.set_yticks([])
@@ -203,10 +204,12 @@ def build_figure(sample, lens, fig=None):
     zs_s = f'{zs:.3f}' if zs is not None else '?'
     te_s = f'{te:.2f}"' if te else '?'
     prim = f'{primary} ({psource})' if primary else 'not set (no band measurable)'
-    fig.suptitle(f'{lens}  ({sample})   z_l {zl_s}   z_s {zs_s}   θ_E {te_s}\n'
+    cat = lens_samples.category(lens, sample)
+    fig.suptitle(f'{lens}  ({sample}{", " + cat if cat else ""})   z_l {zl_s}   z_s {zs_s}   θ_E {te_s}\n'
                  f'primary band: {prim}  (★)\n'
                  f'zooms on the measured lens centre ({1e3 * e0:+.0f} mas E, {1e3 * n0:+.0f} mas N of the stamp centre)\n'
-                 f'red outline: contaminant mask   +: image positions (a colour per source)   dashed: θ_E',
+                 f'red outline: contaminant mask   dashed: θ_E'
+                 + ('   cyan x: extra-galaxy centres' if any(bands[f]['extra'] for f in filts) else ''),
                  fontsize=9)
     fig.tight_layout(rect=(0, 0, 1, 0.90))
     return fig, dict(filts=filts, axes=axes, lens_dir=lens_dir, prefix=prefix, primary=primary)
@@ -239,6 +242,8 @@ def main():
     p.add_argument('--sample', type=lens_samples.sample_arg, default=None, help='default: every sample')
     p.add_argument('--lens', nargs='*', default=None, help='one or more lenses (default: all)')
     a = p.parse_args()
+    for lens in a.lens or []:                 # each lens's sample is found; they may differ here
+        lens_samples.resolve_sample(p, argparse.Namespace(lens=lens, sample=a.sample))
     warnings.simplefilter('ignore')
     for sample in ([a.sample] if a.sample else lens_samples.samples()):
         for lens in lens_samples.lenses(sample):

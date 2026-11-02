@@ -146,7 +146,7 @@ def main():
     p.add_argument('--sample', type=lens_samples.sample_arg, default=None)
     p.add_argument('--analyse-only', action='store_true')
     a = p.parse_args()
-    sample = a.sample or lens_samples.sample_of(a.lens)
+    sample = lens_samples.resolve_sample(p, a)
     filt = lens_samples.canonical_filter(a.filt)
     ch = lens_samples.channel(filt)
     scale = reduce_nircam.DEFAULT_SCALE[ch]

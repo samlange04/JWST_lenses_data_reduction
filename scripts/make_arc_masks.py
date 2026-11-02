@@ -94,8 +94,8 @@ from astropy.wcs import WCS
 import autolens as al
 import autolens.plot as aplt
 # The Scribbler's own display transforms, reused so the QC PNG shows what the GUI showed.
-from autogalaxy.gui.display_util import arcsinh_stretch, radial_median_subtract
-from matplotlib import pyplot as plt
+from autogalaxy.gui.display_util import radial_median_subtract
+import display_look
 
 ws_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -241,26 +241,30 @@ def save_arc_qc_png(stamp_dir, prefix, arc_bool, pixel_scales, out_path, lens, f
     """QC overlay: the arc region outlined over the band's own (radial-subtracted) image.
 
     Written per band, so a broadcast can be checked where it actually matters -- the f160W
-    regrid (0.06"/px), where an array-index copy would land the region ~20px off. Stretched
-    exactly as the GUI's left panel is (the Scribbler's radial_median_subtract +
-    arcsinh_stretch), so the PNG shows what was drawn on.
+    regrid (0.06"/px), where an array-index copy would land the region ~20px off. Shown
+    exactly as the GUI's left panel is (radial_median_subtract on the display_look stretch and
+    colormap), so the PNG shows what was drawn on.
     """
     base, _ = make_masks.load_display_base(stamp_dir, prefix, 'snr', pixel_scales)
-    a = arcsinh_stretch(radial_median_subtract(np.asarray(base, dtype=float)))
+    a = display_look.normalised(radial_median_subtract(np.asarray(base, dtype=float)))
     hw = int(a.shape[1] / 2) * pixel_scales
-    ext = [-hw, hw, -hw, hw]
-    fig = plt.figure(figsize=(7, 7))
-    plt.imshow(a, cmap='jet', extent=ext)
-    # origin='upper' is REQUIRED: with an extent, imshow draws row 0 at the top but
-    # contour defaults to row 0 at the BOTTOM, so without it the outline is drawn
-    # vertically mirrored -- a QC image that looks fine and checks nothing (verified).
-    plt.contour(np.asarray(arc_bool, dtype=float), levels=[0.5], colors='white',
-                linewidths=1.2, extent=ext, origin='upper')
-    plt.title(f'{lens}  {filt}  --  arc mask region (white outline)')
-    plt.xlabel('arcsec'); plt.ylabel('arcsec')
-    plt.tight_layout()
+    # North up, East left (2026-11-02), as every figure in the repo: rows run South -> North and
+    # columns East -> West, so origin='lower' with East positive to the LEFT. The SAME origin is
+    # REQUIRED on the contour, or the outline is drawn vertically mirrored -- a QC image that
+    # looks fine and checks nothing (verified).
+    ext = [hw, -hw, -hw, hw]
+    # A plain Figure, never pyplot: after al.Scribbler has run, pyplot is in interactive mode
+    # (plt.ion), so a pyplot figure would flash up as a blank window (2026-11-02).
+    from matplotlib.figure import Figure
+    fig = Figure(figsize=(7, 7))
+    ax = fig.subplots()
+    ax.imshow(a, cmap=display_look.CMAP, vmin=0.0, vmax=1.0, extent=ext, origin='lower')
+    ax.contour(np.asarray(arc_bool, dtype=float), levels=[0.5], colors='white',
+               linewidths=1.2, extent=ext, origin='lower')
+    ax.set_title(f'{lens}  {filt}  --  arc mask region (white outline)')
+    ax.set_xlabel('arcsec East'); ax.set_ylabel('arcsec North')
+    fig.tight_layout()
     fig.savefig(out_path, dpi=110)
-    plt.close(fig)
 
 
 def write_arc_mask(arc_bool, pixel_scales, path):
@@ -462,9 +466,9 @@ def process_lens_arc_mask(lens, filt_dirs, sample, requested_filt, drizzle_pass,
 def main():
     p = argparse.ArgumentParser(description=__doc__,
                                 formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--sample', type=mast_target_names.sample_arg, default=mast_target_names.DEFAULT_SAMPLE,
-                   help=f'sample subdirectory of data/stamps/ (default '
-                        f'{mast_target_names.DEFAULT_SAMPLE})')
+    p.add_argument('--sample', type=mast_target_names.sample_arg, default=None,
+                   help='sample subdirectory of data/stamps/ (default: the sample --lens is in, '
+                        f'else {mast_target_names.DEFAULT_SAMPLE})')
     p.add_argument('--lens', default=None,
                    help='restrict to one lens; default every lens with stamps in --sample')
     p.add_argument('--filt', default=None,
@@ -546,6 +550,7 @@ def main():
                         'work written there is non-regenerable and invisible to every clone. '
                         'Use only to work on a diagnostic deliberately.')
     a = p.parse_args()
+    mast_target_names.resolve_sample(p, a, default=mast_target_names.DEFAULT_SAMPLE)
 
     # Same rule as make_masks.py: --broadcast writes one draw to every band unseen, which is
     # the opposite of reviewing a proposal per band. Combining them would push a region

@@ -57,7 +57,13 @@ in `info/samples/lens_samples.json`), to within 0.04″, and a lens's SW and LW 
 ## Using the finished products
 
 Each lens and filter has one folder, `data/stamps/<sample>/<lens>/<filter>/`, for example
-`data/stamps/b1938/B1938+666/F115W/`. The files in it are:
+`data/stamps/b1938/B1938+666/F115W/`. The COWLS lenses add a level for their category,
+`data/stamps/cowls_spectacular/<category>/<lens>/<filter>/`:
+- `prime`: one lens galaxy; neighbours are masked as contaminants;
+- `multi_galaxy`: more than one galaxy's mass has to be modelled, such as a second lens or a
+  galaxy close enough to the arcs to perturb them.
+
+The exported `info.json` names the category (`lens_category`). The files in each folder are:
 
 | File | What it is |
 |---|---|
@@ -67,13 +73,14 @@ Each lens and filter has one folder, `data/stamps/<sample>/<lens>/<filter>/`, fo
 | `psf_err.fits` | The per-pixel uncertainty of that PSF. |
 | `stamp<S>_mask.fits` | **The mask**: 1 marks a pixel to *exclude* from a fit (nearby galaxies, stars, detector artefacts), 0 a pixel to use. The lens itself is never masked. Hand-drawn. |
 | `stamp<S>_positions.json` | **Image positions**: where the multiple images of the lensed source are, hand-marked (see below). |
-| `stamp<S>_dataset.png` | A quick-look figure of the image, noise, PSF and mask together — the fastest way to check a lens. |
+| `stamp<S>_extra_galaxies_centres.json` | **Extra-galaxy centres** (multi-galaxy lenses only): where the galaxies besides the main lens are, hand-marked, so a lens model can include their mass. (y, x) in arcsec from the stamp centre, autoarray's convention: +y is South, +x is West. |
+| `stamp<S>_dataset.png` | A quick-look figure of the image, noise, PSF and mask together, North up and East left — the fastest way to check a lens. |
 
 **All bands at once.** `data/stamps/<sample>/<lens>/stamp<S>_bands.png` shows every band of the
 lens side by side, North up and East left:
 - the full stamp, then a zoom on the lens, then that zoom with the lens light removed by a model of
   its elliptical isophotes (red: light the model lacks, i.e. arcs and lensed images);
-- the contaminant masks, image positions and Einstein radius drawn on, where they exist;
+- the contaminant masks, extra-galaxy centres and Einstein radius drawn on, where they exist;
 - the primary band starred.
 
 **Which band is best.** Each lens also has `data/stamps/<sample>/<lens>/primary_band.json`,
@@ -100,7 +107,9 @@ image, noise map and PSF**; no masks or positions yet.
 **Orientation.** North is towards increasing row number and West towards increasing column
 number, so with Python's usual display (row 0 at the top) **North appears at the bottom and
 East on the left**. That is a vertical flip of the way astronomical images are usually shown,
-not a rotation. The FITS headers carry full sky coordinates (WCS) if you need them.
+not a rotation. Every figure this repo makes (the band overview, the dataset and positions
+plots, the masking and marking tools) is drawn North up, East left, with `origin='lower'` or
+the equivalent. The FITS headers carry full sky coordinates (WCS) if you need them.
 
 **Image positions** are stored in the format of the [PyAutoLens](https://github.com/PyAutoLabs/PyAutoLens)
 lens-modelling software, which reads them directly. Each entry is a `(y, x)` offset in
@@ -233,7 +242,7 @@ in the dataset layout a PyAutoLens modelling project loads (`data.fits`, `noise_
 ## Repository layout
 
 ```
-data/stamps/<sample>/<lens>/<filter>/   the finished products (in git)
+data/stamps/<sample>/[<category>/]<lens>/<filter>/   the finished products (in git; COWLS has prime/, multi_galaxy/)
 data/...                                 downloads and intermediate files (not in git, rebuildable)
 info/samples/lens_samples.json           the lenses: programs, coordinates, redshifts, stamp sizes
 info/overrides/                          hand-set values (the noise corrections)

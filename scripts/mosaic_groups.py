@@ -28,5 +28,7 @@ def groups_for_sample(sample, stamps_dir):
     """{group_name: [filters]} -- one group per filter present under stamps_dir/<lens>/."""
     if sample in SAMPLE_GROUPS:
         return SAMPLE_GROUPS[sample]
-    filts = {os.path.basename(d) for d in glob.glob(os.path.join(stamps_dir, '*', '*')) if os.path.isdir(d)}
+    import stamp_paths
+    root, s = os.path.split(os.path.normpath(stamps_dir))
+    filts = {os.path.basename(d) for d in stamp_paths.band_dirs(root, s)}
     return {f: [f] for f in sorted(filts, key=_order)}

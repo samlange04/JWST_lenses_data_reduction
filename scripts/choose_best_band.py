@@ -105,10 +105,12 @@ def choose(sample, lens):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--sample', type=lens_samples.sample_arg, required=True)
+    p.add_argument('--sample', type=lens_samples.sample_arg, default=None,
+                   help='every lens of this sample (not needed with --lens: its sample is found)')
     p.add_argument('--lens', default=None)
     p.add_argument('--unreviewed', action='store_true', help='only lenses without a best_band_visual')
     a = p.parse_args()
+    lens_samples.resolve_sample(p, a, required=True)
     warnings.simplefilter('ignore')
     lenses = [a.lens] if a.lens else lens_samples.lenses(a.sample)
     for lens in lenses:

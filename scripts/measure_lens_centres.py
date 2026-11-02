@@ -19,12 +19,20 @@ outshine the lens in some bands. In the SW bands of COSJ100025+015245 the lensed
 light of the lens dominates, anchor the centre: their median peak. Every band within
 AGREE_ARCSEC of the anchor then votes, and the deflector is the median of those bands' peaks.
 
+The search is only 0.5" wide, so a catalogue position that is not ON the lens finds whatever
+lies near it. COSJ095955+021900's COWLS II position sits on a lens-coloured knot 0.97" SW of a
+galaxy 8x brighter in F444W, which COWLS II's own Fig. 2 centres on as the lens; the first run
+(2026-11-01) took the knot. So every lens is checked for a peak at least BRIGHTER_FACTOR x the
+chosen core within BRIGHTER_ARCSEC, which is printed as a warning and the lens is not written;
+--near DE,DN (arcsec East, North of the catalogue position) then centres the search on the lens.
+
 A lens that already has deflector_ra/dec (measured by hand: B1938+666) is skipped unless --force.
 The result goes into info/samples/lens_samples.json as deflector_ra / deflector_dec /
 deflector_note. ra/dec stay the mosaics' CRVAL. Then re-cut the stamps (run_stamps_all.sh,
 --center auto) and move any drawn masks with them (AGENTS.md *Stamps*).
 """
 import argparse
+import datetime
 import glob
 import json
 import os
@@ -43,16 +51,18 @@ import stamp_paths
 ws_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SEARCH_ARCSEC = 0.5       # the core is looked for within this of the stamp centre
 AGREE_ARCSEC = 0.06       # a band votes if its peak is within this of the LW anchor (one LW px)
+BRIGHTER_ARCSEC = 2.5     # look this far for a galaxy brighter than the chosen core
+BRIGHTER_FACTOR = 3.0     # ... by at least this factor (smoothed peak), which flags the lens
 
 
-def light_peak(sci, scale, search=SEARCH_ARCSEC, smooth_px=1.0):
-    """The core: (col, row) of the brightest smoothed pixel within `search` of the stamp centre,
-    refined to sub-pixel by a 3-point parabola on each axis."""
+def light_peak(sci, scale, search=SEARCH_ARCSEC, smooth_px=1.0, near=(0.0, 0.0)):
+    """The core: (col, row) of the brightest smoothed pixel within `search` of the stamp centre
+    (or of `near`, arcsec East, North of it), refined to sub-pixel by a 3-point parabola on each axis."""
     n = sci.shape[0]
     c = (n - 1) / 2.0
     sm = gaussian_filter(np.nan_to_num(sci), smooth_px)
     yy, xx = np.mgrid[:n, :n]
-    win = np.hypot(xx - c, yy - c) * scale <= search
+    win = np.hypot(xx - (c - near[0] / scale), yy - (c + near[1] / scale)) * scale <= search
     i, j = np.unravel_index(np.argmax(np.where(win, sm, -np.inf)), sm.shape)
 
     def vertex(a, b, cc):
@@ -61,16 +71,40 @@ def light_peak(sci, scale, search=SEARCH_ARCSEC, smooth_px=1.0):
     return j + vertex(sm[i, j - 1], sm[i, j], sm[i, j + 1]), i + vertex(sm[i - 1, j], sm[i, j], sm[i + 1, j])
 
 
-def measure(sample, lens):
+def brighter_neighbour(sci, scale, col, row, smooth_px=1.5):
+    """The brightest smoothed local peak within BRIGHTER_ARCSEC of (col, row) that is at least
+    BRIGHTER_FACTOR x the smoothed value there, as (arcsec East, arcsec North of it, ratio), or None."""
+    from scipy.ndimage import maximum_filter
+    sm = gaussian_filter(np.nan_to_num(sci), smooth_px)
+    n = sci.shape[0]
+    yy, xx = np.mgrid[:n, :n]
+    core = sm[int(round(row)), int(round(col))]
+    pk = (sm == maximum_filter(sm, 7)) & (np.hypot(xx - col, yy - row) * scale <= BRIGHTER_ARCSEC) & (sm >= BRIGHTER_FACTOR * core)
+    if core <= 0 or not pk.any():
+        return None
+    i, j = np.unravel_index(np.argmax(np.where(pk, sm, -np.inf)), sm.shape)
+    return -(j - col) * scale, (i - row) * scale, float(sm[i, j] / core)
+
+
+def measure(sample, lens, near=(0.0, 0.0)):
     prefix = stamp_paths.stamp_prefix(stamp_paths.modelling_size(lens, sample))
-    peaks = {}
-    for d in sorted(glob.glob(os.path.join(ws_path, 'data', 'stamps', sample, lens, 'F*'))):
+    peaks, brighter = {}, {}
+    for d in stamp_paths.band_dirs(stamp_paths.stamps_root(ws_path), sample, lens, 'F*'):
         f = stamp_paths.find_stamp(d, prefix, 'sci')
         if f is None:
             continue
         hdr = fits.getheader(f)
-        col, row = light_peak(fits.getdata(f).astype(float), float(hdr['PIXSCALE']))
+        sci = fits.getdata(f).astype(float)
+        scale = float(hdr['PIXSCALE'])
+        # the stamp may be cut on an earlier deflector: `near` is relative to the catalogue position
+        cat_col, cat_row = (float(v) for v in WCS(hdr).world_to_pixel(lens_samples.coord(lens, sample)))
+        c = (sci.shape[0] - 1) / 2.0
+        off = (near[0] - (cat_col - c) * scale, near[1] + (cat_row - c) * scale)
+        col, row = light_peak(sci, scale, near=off)
         peaks[os.path.basename(d)] = WCS(hdr).pixel_to_world(col, row)
+        b = brighter_neighbour(sci, scale, col, row)
+        if b is not None:
+            brighter[os.path.basename(d)] = b
     lw = [f for f in peaks if lens_samples.channel(f) == 'LW']
     if not lw:
         return None
@@ -82,18 +116,27 @@ def measure(sample, lens):
                       np.median([peaks[f].dec.deg for f in votes]) * u.deg)
     cat = lens_samples.coord(lens, sample)
     de, dn = cat.spherical_offsets_to(centre)
-    return dict(centre=centre, votes=votes, rejected=sorted(set(peaks) - set(votes)),
+    return dict(centre=centre, votes=votes, rejected=sorted(set(peaks) - set(votes)), brighter=brighter,
                 east_mas=float(de.to(u.mas).value), north_mas=float(dn.to(u.mas).value),
                 spread_mas=float(max(peaks[f].separation(centre).arcsec for f in votes) * 1e3))
 
 
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument('--sample', type=lens_samples.sample_arg, required=True)
+    p.add_argument('--sample', type=lens_samples.sample_arg, default=None,
+                   help='every lens of this sample (not needed with --lens: its sample is found)')
     p.add_argument('--lens', default=None)
     p.add_argument('--dry-run', action='store_true', help='print, do not write lens_samples.json')
     p.add_argument('--force', action='store_true', help='re-measure a lens that already has a deflector')
+    p.add_argument('--near', default=None, metavar='DE,DN',
+                   help='search around this offset (arcsec East, North of the catalogue position), for a '
+                        'lens whose catalogue position is not on it; needs --lens')
+    p.add_argument('--note', default=None, help='appended to deflector_note (why --near was needed)')
     a = p.parse_args()
+    lens_samples.resolve_sample(p, a, required=True)
+    if a.near and not a.lens:
+        p.error('--near needs --lens')
+    near = tuple(float(v) for v in a.near.split(',')) if a.near else (0.0, 0.0)
     warnings.simplefilter('ignore')
     with open(lens_samples.SAMPLES_JSON) as f:
         data = json.load(f)
@@ -105,9 +148,16 @@ def main():
         if 'deflector_ra' in e and not a.force:
             print(f'{lens}: has a deflector already ({e.get("deflector_note", "")[:60]}...), skipped')
             continue
-        m = measure(a.sample, lens)
+        m = measure(a.sample, lens, near)
         if m is None:
             print(f'{lens}: no LW stamp, skipped')
+            continue
+        lw_brighter = {f: b for f, b in m['brighter'].items() if lens_samples.channel(f) == 'LW'}
+        if lw_brighter:
+            f, (be, bn, ratio) = next(iter(lw_brighter.items()))
+            print(f'{lens}: WARNING, in {f} a peak {ratio:.1f}x brighter than the core found lies {be:+.2f}" E '
+                  f'{bn:+.2f}" N of it: the catalogue position may not be on the lens. Not written; look at the '
+                  f'stamp and re-run with --lens {lens} --near DE,DN (arcsec from the catalogue position).')
             continue
         print(f'{lens:18s} {m["east_mas"]:+6.0f} mas E {m["north_mas"]:+6.0f} mas N of the catalogue; '
               f'{len(m["votes"])} bands within {m["spread_mas"]:.0f} mas'
@@ -117,11 +167,12 @@ def main():
         e['deflector_ra'] = round(float(m['centre'].ra.deg), 8)
         e['deflector_dec'] = round(float(m['centre'].dec.deg), 8)
         e['deflector_note'] = (
-            f'Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of '
+            f'Lens-light peak, measure_lens_centres.py ({datetime.date.today().isoformat()}): the median smoothed peak of '
             f'{", ".join(sorted(m["votes"]))}, which agree to {m["spread_mas"]:.0f} mas'
             + (f' ({", ".join(m["rejected"])} left out, >{AGREE_ARCSEC * 1e3:.0f} mas from the LW peak)' if m['rejected'] else '')
             + f'; {m["east_mas"]:+.0f} mas E, {m["north_mas"]:+.0f} mas N of ra/dec, which stay the mosaics\' CRVAL. '
-            f'make_stamps --center auto cuts the stamp here, snapped to the 0.06" LW grid.')
+            f'make_stamps --center auto cuts the stamp here, snapped to the 0.06" LW grid.'
+            + (f' Searched around {near[0]:+.2f}" E, {near[1]:+.2f}" N of ra/dec (--near). {a.note or ""}'.rstrip() if a.near else ''))
         changed = True
     if changed:
         with open(lens_samples.SAMPLES_JSON, 'w') as f:

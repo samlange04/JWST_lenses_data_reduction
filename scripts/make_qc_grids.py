@@ -102,7 +102,10 @@ def build_group(stamps_dir, precedence):
     F606W is itself far noisier than ACS F555W), so those mosaics split the colourbar
     per instrument rather than share one."""
     entries = []
-    for lens_dir in sorted(glob.glob(os.path.join(stamps_dir, '*'))):
+    root, sample = os.path.split(os.path.normpath(stamps_dir))
+    lens_dirs = sorted({os.path.dirname(d) for d in stamp_paths.band_dirs(root, sample)},
+                       key=os.path.basename)                 # every layout, incl. category dirs
+    for lens_dir in lens_dirs:
         lens = os.path.basename(lens_dir)
         for filt in precedence:
             band_dir = os.path.join(lens_dir, filt)

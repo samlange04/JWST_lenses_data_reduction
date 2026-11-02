@@ -36,7 +36,7 @@ fixed order).
 Writes:
   * info/provenance/lens_primary_band.json: per lens, best_band_arc_snr, best_band_visual, the
     resolved primary_band and its source, theta_E, and every band's arc S/N, FWHM and score;
-  * data/stamps/<sample>/<lens>/primary_band.json: the resolved choice, so it travels with the
+  * data/stamps/<sample>/[<category>/]<lens>/primary_band.json: the resolved choice, so it travels with the
     lens's stamps.
 export_dataset.py writes `primary_band`, `primary_band_source` and `is_primary_band` into each
 band's info.json.
@@ -96,7 +96,7 @@ def measure(sample, lens):
     psf = info_json.load(info_json.path(ws_path, 'lens_psf.json')).get(sample, {}).get(lens, {})
     prefix = stamp_paths.stamp_prefix(stamp_paths.modelling_size(lens, sample))
     scores = {}
-    for d in sorted(glob.glob(os.path.join(ws_path, 'data', 'stamps', sample, lens, 'F*'))):
+    for d in stamp_paths.band_dirs(stamp_paths.stamps_root(ws_path), sample, lens, 'F*'):
         filt = os.path.basename(d)
         sci_f = stamp_paths.find_stamp(d, prefix, 'sci')
         noise_f = stamp_paths.find_stamp(d, prefix, 'noise')
@@ -123,7 +123,7 @@ def measure(sample, lens):
 
 def record(sample, lens, rerender=True):
     """Measure the lens, resolve its primary band (visual > arc_snr), and write both records
-    (lens_primary_band.json, data/stamps/<sample>/<lens>/primary_band.json) and, with `rerender`,
+    (lens_primary_band.json, data/stamps/<sample>/[<category>/]<lens>/primary_band.json) and, with `rerender`,
     the band overview. Returns the record, or None without stamps or theta_E."""
     rec = measure(sample, lens)
     if not rec['scores']:
@@ -140,7 +140,7 @@ def record(sample, lens, rerender=True):
                      best_band_visual=lens_samples.entry(lens, sample).get('best_band_visual'),
                      best_band_arc_snr=rec['best_band_arc_snr'], theta_e=rec['theta_e'], scores=rec['scores'],
                      how='best_band_arc_snr: choose_primary_band.py (measured); best_band_visual: choose_best_band.py (by eye)')
-    with open(os.path.join(ws_path, 'data', 'stamps', sample, lens, 'primary_band.json'), 'w') as f:
+    with open(os.path.join(stamp_paths.lens_stamp_dir(ws_path, sample, lens), 'primary_band.json'), 'w') as f:
         json.dump(stamp_rec, f, indent=4)
     if rerender:
         make_band_overview.rerender(sample, lens)          # its star marks the primary band
@@ -152,6 +152,7 @@ def main():
     p.add_argument('--sample', type=lens_samples.sample_arg, default=None, help='default: every sample')
     p.add_argument('--lens', default=None)
     a = p.parse_args()
+    lens_samples.resolve_sample(p, a)
     warnings.simplefilter('ignore')
     samples = [a.sample] if a.sample else lens_samples.samples()
     for sample in samples:
@@ -168,7 +169,7 @@ def main():
                     else f'  [no band reaches arc S/N {MIN_ARC_SNR:g}: set primary_band by eye]')
             print(f'{lens:18s} theta_E {rec["theta_e"]:.2f}"  arc-S/N best {rec["best_band_arc_snr"]}  -> primary {band} ({source})'
                   f'{flag}\n    arc S/N/score: {row}')
-    print(f"wrote {info_json.path(ws_path, 'lens_primary_band.json')} and data/stamps/<sample>/<lens>/primary_band.json")
+    print(f"wrote {info_json.path(ws_path, 'lens_primary_band.json')} and data/stamps/<sample>/[<category>/]<lens>/primary_band.json")
 
 
 if __name__ == '__main__':

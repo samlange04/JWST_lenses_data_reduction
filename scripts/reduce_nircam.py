@@ -504,7 +504,7 @@ def main():
     a = p.parse_args()
 
     setup_crds()
-    sample = a.sample or lens_samples.sample_of(a.lens)
+    sample = lens_samples.resolve_sample(p, a)
     lens_samples.entry(a.lens, sample)
     filt = lens_samples.canonical_filter(a.filt)
     ch = lens_samples.channel(filt)
