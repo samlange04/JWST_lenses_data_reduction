@@ -501,15 +501,31 @@ def draw_mask_gui(display_dir, display_prefix, lens, filt, brush_radius, brush_w
 
 
 def rerender_overviews(sample, lenses):
-    """Re-render the band overview (make_band_overview.py) of every lens this run changed, once,
-    at the END of the run: done after each lens it put an isophote fit (~10 s) between one GUI
-    and the next."""
+    """Re-render the band overview (make_band_overview.py) of every lens this run changed, at
+    the END of the run, in a DETACHED background process.
+
+    Done after each lens, it put an isophote fit (~10 s) between one GUI and the next. Done in
+    this process at the end, it left the GUI app alive but busy and not answering macOS for
+    ~10 s a lens, which showed as a blank window and a spinning cursor, like a hang
+    (2026-11-02). The background run writes its own log; this process exits at once."""
     if not lenses:
         return
-    import make_band_overview
-    print(f"\nre-rendering the band overview of {len(lenses)} lens(es)")
-    for lens in lenses:
-        make_band_overview.rerender(sample, lens)
+    import subprocess
+    import time
+    try:
+        import matplotlib.pyplot as plt
+        plt.close('all')
+    except Exception:
+        pass
+    log = os.path.join(ws_path, 'data', 'run_logs', f'band_overview_{sample}_{time.strftime("%Y%m%d_%H%M%S")}.log')
+    os.makedirs(os.path.dirname(log), exist_ok=True)
+    script = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'make_band_overview.py')
+    with open(log, 'w') as fh:
+        subprocess.Popen([sys.executable, script, '--sample', sample, '--lens', *lenses],
+                         stdout=fh, stderr=subprocess.STDOUT, start_new_session=True,
+                         env=dict(os.environ, MPLBACKEND='Agg'))
+    print(f"\nband overview of {len(lenses)} lens(es) re-rendering IN THE BACKGROUND "
+          f"(~10 s each); log: {os.path.relpath(log, ws_path)}")
 
 
 def regenerate_dataset_subplot(lens, filt, sample, size, drizzle_pass):

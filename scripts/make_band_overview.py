@@ -237,12 +237,12 @@ def rerender(sample, lens):
 def main():
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument('--sample', type=lens_samples.sample_arg, default=None, help='default: every sample')
-    p.add_argument('--lens', default=None)
+    p.add_argument('--lens', nargs='*', default=None, help='one or more lenses (default: all)')
     a = p.parse_args()
     warnings.simplefilter('ignore')
     for sample in ([a.sample] if a.sample else lens_samples.samples()):
         for lens in lens_samples.lenses(sample):
-            if a.lens and lens != a.lens:
+            if a.lens and lens not in a.lens:
                 continue
             out = render(sample, lens)
             print(f'{lens}: ' + (os.path.relpath(out, ws_path) if out else 'no stamps'))
