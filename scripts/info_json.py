@@ -18,10 +18,12 @@ import os
 # Where each info/ file lives (2026-10-26): split by who writes it.
 INFO_LAYOUT = {
     'samples': ('lens_samples.json',),
-    'overrides': ('noise_corr_factors.json', 'psf_stars.json', 'lens_cr_params.json'),
+    'overrides': ('noise_corr_factors.json', 'psf_stars.json', 'lens_cr_params.json',
+                  'psf_model_calibration.json'),
     'provenance': ('lens_products.json', 'lens_instrument.json', 'lens_exptime.json',
                    'lens_stamp_qc.json', 'lens_masks.json', 'lens_arc_masks.json',
-                   'lens_positions.json', 'lens_psf.json', 'lens_dataset_subplots.json',
+                   'lens_positions.json', 'lens_psf.json', 'lens_psf_injected.json', 'lens_psf_pooled.json',
+                   'lens_psf_starcheck.json', 'lens_dataset_subplots.json',
                    'lens_downloads.json', 'lens_exports.json', 'lens_primary_band.json',
                    'lens_extra_galaxies.json'),
 }
@@ -47,15 +49,20 @@ def load(path):
 
 
 def update(path, sample, lens, key, value):
-    """Merge {sample: {lens: {key: value}}} into `path`, sorted at every level."""
-    data = load(path)
-    sample_data = data.setdefault(sample, {})
-    lens_entry = sample_data.setdefault(lens, {})
-    lens_entry[key] = value
-    sample_data[lens] = dict(sorted(lens_entry.items()))
-    data[sample] = dict(sorted(sample_data.items()))
-    with open(path, 'w') as f:
-        json.dump(dict(sorted(data.items())), f, indent=4)
+    """Merge {sample: {lens: {key: value}}} into `path`, sorted at every level. Holds an
+    exclusive lock on `path`.lock for the read-modify-write, so parallel runs (4 bands at a
+    time, as the COWLS batches do) cannot drop each other's records."""
+    import fcntl
+    with open(path + '.lock', 'w') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        data = load(path)
+        sample_data = data.setdefault(sample, {})
+        lens_entry = sample_data.setdefault(lens, {})
+        lens_entry[key] = value
+        sample_data[lens] = dict(sorted(lens_entry.items()))
+        data[sample] = dict(sorted(sample_data.items()))
+        with open(path, 'w') as f:
+            json.dump(dict(sorted(data.items())), f, indent=4)
 
 
 def entry(path, sample, lens, key, default=None):

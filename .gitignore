@@ -48,3 +48,4 @@ info/provenance/lens_exports.json
 # CLAUDE.md imports the tracked AGENTS.md (@AGENTS.md) and adds the maintainer's private
 # working notes. Only AGENTS.md is needed to use the repo.
 /CLAUDE.md
+info/**/*.lock

@@ -309,8 +309,8 @@ def mosaic_side(field, scale):
 
 
 def image3_steps(coord, scale, field, tweakreg_mode, lens_first=False):
-    """The Image3 step overrides of the science mosaic, in one place so that a later re-run of
-    tweakreg or resample on the same frames reproduces them exactly."""
+    """The Image3 step overrides of the science mosaic. make_psf_inject.py re-runs tweakreg and
+    resample from this same dict, so an injected star is resampled exactly as the data were."""
     n = mosaic_side(field, scale)
     tweak = {'skip': True} if tweakreg_mode == 'skip' else {}
     if tweakreg_mode == 'gaia':
