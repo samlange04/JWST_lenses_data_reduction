@@ -696,13 +696,17 @@ sizes grew (SW 33–43 px, LW 31–41 px; F444W keeps its full 41 px): the noise
 real wings that the old pedestal subtraction cut off.
 
 Rebuilt 2026-10-31, and on 2026-11-01 with the phase-scatter error term and the 20 short-grid
-bands re-done (*Model tier*). FWHM ranges by filter (lenses differ by their dithers and depth):
+bands re-done (*Model tier*). The 78 SPT and COWLS bands were rebuilt again on 2026-11-02, because
+the injection grid is centred on the lens and every lens centre had been re-measured (*Stamps*;
+COSJ095955+021900's by 0.99"). FWHMs moved by a median −0.1%, −3.6% to +1.5%; the largest was
+COSJ100012+022015 F277W, 0.135" → 0.130". B1938+666's hand-measured centre did not move, so its
+two bands were not rebuilt. FWHM ranges by filter (lenses differ by their dithers and depth):
 
 | filter | bands | FWHM | | filter | bands | FWHM |
 |---|---|---|---|---|---|---|
-| F115W | 19 | 0.058–0.062" | | F277W | 20 | 0.129–0.135" |
-| F150W | 18 | 0.065–0.068" | | F356W | 2 | 0.147" |
-| F200W | 2 | 0.076" | | F444W | 19 | 0.164–0.167" |
+| F115W | 19 | 0.058–0.061" | | F277W | 20 | 0.129–0.133" |
+| F150W | 18 | 0.065–0.067" | | F356W | 2 | 0.146–0.147" |
+| F200W | 2 | 0.076" | | F444W | 19 | 0.165–0.166" |
 
 Against the previous shipped PSFs (empirical, or COWLS pooled), new/old FWHM:
 - the undersampled bands broadened: COWLS F115W +9 to +16%, F277W +1 to +8%; B1938+666 +8%;
