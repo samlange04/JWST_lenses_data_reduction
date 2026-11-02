@@ -32,7 +32,6 @@ stamps (it is a stamp<S>_* file), so it costs ~0.3-0.6 MB of history per render.
 """
 import argparse
 import glob
-import json
 import os
 import sys
 import warnings

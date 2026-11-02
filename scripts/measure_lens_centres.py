@@ -33,7 +33,6 @@ deflector_note. ra/dec stay the mosaics' CRVAL. Then re-cut the stamps (run_stam
 """
 import argparse
 import datetime
-import glob
 import json
 import os
 import sys

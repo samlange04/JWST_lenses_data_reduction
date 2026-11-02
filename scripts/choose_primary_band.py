@@ -42,7 +42,6 @@ export_dataset.py writes `primary_band`, `primary_band_source` and `is_primary_b
 band's info.json.
 """
 import argparse
-import glob
 import json
 import os
 import sys

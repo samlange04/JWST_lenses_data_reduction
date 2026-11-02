@@ -49,7 +49,6 @@ import os
 import shutil
 import sys
 import time
-import warnings
 
 import numpy as np
 

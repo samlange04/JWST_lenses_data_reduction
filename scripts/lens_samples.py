@@ -343,7 +343,6 @@ def redshifts(lens, sample=None):
 
 
 if __name__ == '__main__':
-    import argparse
     p = argparse.ArgumentParser(description='Print the lenses in a sample, one per line.')
     p.add_argument('sample', nargs='?', type=sample_arg, default=DEFAULT_SAMPLE)
     p.add_argument('--list', action='store_true', help='list sample names and sizes')

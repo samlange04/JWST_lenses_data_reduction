@@ -34,7 +34,6 @@ JWST port: reads the i2d SCI/ERR/WHT (var = ERR^2, no WHT calibration constant),
 the header and the native scale from the channel; otherwise the HST method unchanged.
 """
 import argparse
-import glob
 import json
 import os
 import sys

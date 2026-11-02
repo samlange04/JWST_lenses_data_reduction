@@ -44,7 +44,6 @@ zero ERR, or zero WHT get sci=0, noise=1e8 (the autolens "masked-by-noise" senti
 a second variant beside an existing stamp is refused unless --force, which removes the other.
 """
 import argparse
-import json
 import os
 import sys
 import warnings
