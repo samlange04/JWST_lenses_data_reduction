@@ -338,8 +338,51 @@ def primary_band(lens, sample=None):
 
 
 def redshifts(lens, sample=None):
+    """(z_lens, z_source), None where unknown. SPECTROSCOPIC AND PHOTOMETRIC ALIKE: anything that
+    shows or exports a redshift must also say which it is (redshift_kinds / redshift_text)."""
     e = entry(lens, sample)
     return e['redshift_lens'], e['redshift_source']
+
+
+def redshift_kind_of(kind_text):
+    """'spectroscopic' or 'photometric' from a `redshift_*_kind` string ('spec (...)',
+    'photo-z (...)'), else None."""
+    k = (kind_text or '').strip().lower()
+    if k.startswith('spec'):
+        return 'spectroscopic'
+    if k.startswith('photo'):
+        return 'photometric'
+    return None
+
+
+def redshift_kinds(lens, sample=None):
+    """(kind_lens, kind_source): 'spectroscopic', 'photometric', or None (no redshift).
+
+    Only a SPECTROSCOPIC redshift is a confirmed redshift in this repo (2026-11-02). A
+    photometric one may be shown or exported, but always labelled as photometric. Every
+    redshift in lens_samples.json carries its `redshift_*_kind` (a source and a method);
+    one without a kind is an error, not silently 'confirmed'."""
+    e = entry(lens, sample)
+    out = []
+    for w in ('lens', 'source'):
+        z, k = e.get(f'redshift_{w}'), e.get(f'redshift_{w}_kind')
+        if z is None:
+            out.append(None)
+            continue
+        kind = redshift_kind_of(k)
+        if kind is None:
+            raise ValueError(f'{lens}: redshift_{w} {z} has no recognisable redshift_{w}_kind ({k!r}); '
+                             f'it must start with "spec" or "photo-z"')
+        out.append(kind)
+    return tuple(out)
+
+
+def redshift_text(z, kind, fmt='{:g}'):
+    """A redshift for display, as precise as recorded: '0.881' (spectroscopic), '0.577 (photo-z)'
+    (photometric), '?' (none)."""
+    if z is None:
+        return '?'
+    return fmt.format(z) + ('' if kind == 'spectroscopic' else ' (photo-z)')
 
 
 if __name__ == '__main__':

@@ -14,7 +14,8 @@ Writes <dest>/<lens>/<FILT>/:
     positions.json            stamp12_positions.json      (al.Grid2DIrregular JSON; optional)
     extra_galaxies_centres.json  stamp12_extra_galaxies_centres.json  (al.Grid2DIrregular JSON of
                               the extra galaxies' (y, x) centres, make_extra_galaxies.py; optional)
-    info.json                 pixel_scale, mask_radius, redshift_lens, redshift_source,
+    info.json                 pixel_scale, mask_radius, redshift_lens, redshift_source (with
+                              redshift_*_kind 'spectroscopic' | 'photometric' and redshift_*_ref),
                               plus provenance (i2d, variant, jwst version, noise factor)
 
 This is the layout a PyAutoLens SLaM-style dataset loader expects (data/noise_map/psf +
@@ -74,11 +75,17 @@ def export_band(sample, lens, filt, dest, mask_radius, size):
     hdr = fits.getheader(sci)
     nhdr = fits.getheader(noise)
     zl, zs = lens_samples.redshifts(lens, sample)
+    kl, ks = lens_samples.redshift_kinds(lens, sample)
     primary, primary_source = lens_samples.primary_band(lens, sample)
     info = {
         'pixel_scale': float(hdr['PIXSCALE']),
         'mask_radius': float(mask_radius),
         'redshift_lens': zl, 'redshift_source': zs,
+        # 'spectroscopic' (a confirmed redshift) or 'photometric' (an estimate; never treat it as
+        # confirmed), None without a redshift; *_ref is the source and method from lens_samples.json
+        'redshift_lens_kind': kl, 'redshift_source_kind': ks,
+        'redshift_lens_ref': lens_samples.entry(lens, sample).get('redshift_lens_kind'),
+        'redshift_source_ref': lens_samples.entry(lens, sample).get('redshift_source_kind'),
         # the band where the lensed images are best defined (choose_primary_band.py): the one to
         # model first; 'visual' = chosen by eye (choose_best_band.py, best_band_visual),
         # 'arc_snr' = the measured best arc S/N (choose_primary_band.py)

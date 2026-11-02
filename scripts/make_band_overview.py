@@ -24,7 +24,8 @@ Every as-observed panel has its own stretch, the dataset subplots' look (display
 PercentileInterval(99) + AsinhStretch(0.1)), as the GUIs. North is up
 and East left (the stamps' rows run South to North, columns East to West). The primary band
 (lens_samples.primary_band: reviewed, or choose_primary_band.py's suggestion) is starred, and
-the header gives the lens and source redshifts, theta_E and the primary band's source.
+the header gives the lens and source redshifts (a photometric one labelled 'photo-z'), theta_E and
+the primary band's source.
 
 make_masks.py, make_extra_galaxies.py and choose_primary_band.py re-render it after they write; a
 re-cut of the stamps (make_stamps.py) does not, so run this after one. Tracked in git with the
@@ -199,8 +200,9 @@ def build_figure(sample, lens, fig=None):
         fig.add_artist(FancyArrowPatch((ox, oy), (ox + dx, oy + dy), transform=fig.transFigure,
                                        arrowstyle='->', mutation_scale=12, color='black', lw=1.3))
         fig.text(ox + 1.15 * dx, oy + 1.15 * dy, lab, ha=ha, va=va, fontsize=9)
-    zl_s = f'{zl:.3f}' if zl is not None else '?'
-    zs_s = f'{zs:.3f}' if zs is not None else '?'
+    # only a spectroscopic redshift is confirmed: a photometric one is labelled (lens_samples.redshift_text)
+    kl, ks = lens_samples.redshift_kinds(lens, sample)
+    zl_s, zs_s = lens_samples.redshift_text(zl, kl), lens_samples.redshift_text(zs, ks)
     te_s = f'{te:.2f}"' if te else '?'
     prim = f'{primary} ({psource})' if primary else 'not set (no band measurable)'
     cat = lens_samples.category(lens, sample)

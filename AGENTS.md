@@ -243,6 +243,18 @@ PyAutoReduce has no MIRI support either.
 
 ## Lens samples (`info/samples/lens_samples.json`, read only by `scripts/lens_samples.py`)
 
+**Only a spectroscopic redshift is a confirmed redshift (2026-11-02).** A photometric one may
+be shown or exported, but always labelled.
+- Every redshift in `lens_samples.json` carries `redshift_lens_kind` / `redshift_source_kind`,
+  starting `spec` or `photo-z` and naming its source. `lens_samples.redshift_kinds` raises on a
+  redshift without one.
+- Figures print redshifts through `lens_samples.redshift_text` ('0.577 (photo-z)').
+- `export_dataset.py` writes `redshift_*_kind` ('spectroscopic' | 'photometric') and
+  `redshift_*_ref` beside each value.
+- SPT and B1938+666 are spectroscopic throughout. SPT lenses: optical/NIR spectroscopy (Rotermund
+  et al. in prep, as tabulated by Spilker+16); SPT sources: CO (Weiß+13). B1938+666: Keck lens
+  spectrum (Tonry & Kochanek 2000), CO from the source (Riechers+11).
+
 **`--lens` never needs `--sample` (2026-11-02).** A lens is in exactly one sample (`sample_of`
 raises otherwise), so every script finds it through `lens_samples.resolve_sample(parser, args)`
 right after parsing.
@@ -270,9 +282,12 @@ own copy must keep them equal).
 are the COWLS IDs, `cowls_letter` the paper's A–Q. `ra`/`dec` are the COSMOS-Web catalogue
 positions OF THE LENS GALAXY (Shuntov+24), so unlike an APT coordinate they need no
 `deflector_ra`. `theta_e` is COWLS I's PyAutoLens value, for orientation. Redshifts carry
-their source in `redshift_*_kind` (DESI spec, COSMOS-Web photo-z, van der Wel+13); P has no
-lens redshift and only COSJ100018+022138, COSJ100024+015334 and COSJ100024+021749 have source
-redshifts, so the rest export `null`. Depth at the
+their source in `redshift_*_kind` (DESI spec, COSMOS-Web photo-z, van der Wel+13);
+COSJ100119+014849 has no lens redshift and only COSJ100018+022138, COSJ100024+015334 and
+COSJ100024+021749 have source redshifts, so the rest export `null`. Spectroscopic: 11 lens
+redshifts and all 3 source redshifts, so both are spectroscopic only for COSJ100018+022138 and
+COSJ100024+021749. The other 5 lens redshifts are photometric (COSJ095917+015424,
+COSJ095955+021900, COSJ100013+023424, COSJ100024+015334, COSJ100025+015245). Depth at the
 lens is set by where it falls in the COSMOS-Web dither pattern, not by the tile: COSJ100028+021928's SW
 stamp rests on ONE exposure, so Image3's outlier detection has nothing to compare and its
 cosmic rays are caught by `jump` alone — look at it before trusting faint SW structure.
@@ -282,7 +297,7 @@ the COSMOS field are not part of this sample.
 Coordinates: APT fixed-target positions (B1938+666 19:38:25.28 +66:48:52.9; SPT0418-47
 04:18:39.68 −47:51:52.7; SPT2147-50 21:47:19.01 −50:35:54.5), which agree with the MAST
 `s_ra/s_dec`. Redshifts: B1938 z_l 0.881 / z_s 2.059 (APT, Tonry & Kochanek 2000, Riechers
-2011); SPT from Lange et al. 2025 §2 (Weiss+13, Reuter+20). Published θ_E: SPT0418 1.207"
+2011); SPT from Lange et al. 2025 §2 (Weiss+13, Reuter+20; the lens redshifts are spectroscopic, Spilker+16 Table 1). Published θ_E: SPT0418 1.207"
 (Cathey+24), SPT2147 1.195" (Spilker+16); B1938 ~0.45" (the radio ring).
 
 **The B1938 target was placed in the "Module Gap"** (APT special requirement): the ring
@@ -945,7 +960,8 @@ always answers `stamp<S>` for the lens's modelling size). The semantics are unch
   spans fewer than 5 PSF widths (SW resolves θ_E down to 0.33", F444W only to 0.83").
 
   **Why not redshift.** The lens light peaks near rest 1.6 µm, but the arc's colour is the
-  source's: 14 of 17 COWLS sources have no redshift, and P has no lens redshift. Measured, the
+  source's: 14 of 17 COWLS sources have no redshift, and COSJ100119+014849 has no lens redshift
+  (and 5 of the 16 lens redshifts are only photometric). Measured, the
   bands do not follow z_l: COSJ100012+022015, COSJ100121+022740 and COSJ100024+021749 all sit at
   z_l ≈ 0.37, yet COSJ100024+021749 is best in F150W and the other two
   in F277W.
