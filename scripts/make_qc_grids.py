@@ -33,7 +33,6 @@ Usage:
 """
 
 import argparse
-import glob
 import math
 import os
 

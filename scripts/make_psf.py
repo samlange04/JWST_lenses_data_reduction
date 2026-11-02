@@ -60,7 +60,6 @@ from astropy.visualization import (AsinhStretch, ImageNormalize, LinearStretch,
                                    LogStretch, PercentileInterval)
 from astropy.wcs import WCS
 from astropy.wcs.utils import proj_plane_pixel_scales
-import astropy.units as u
 from photutils.background import Background2D, MedianBackground
 from photutils.centroids import centroid_com
 from photutils.detection import DAOStarFinder

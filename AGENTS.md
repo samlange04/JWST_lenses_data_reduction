@@ -13,7 +13,7 @@ measurements are not restated here.
 > reporting what is outstanding, verify against source — argparse defaults, what the
 > runner actually passes, tracking JSONs vs what is on disk.
 
-## Current state (2026-10-31)
+## Current state (2026-11-02)
 
 Repo created 2026-10-01 from the HST repo's structure, PyAutoReduce's JWST path and the
 jwst 3.0.0 docs. Program 8281 (B1938+666) became public at 03:16 UTC that day. Public on
@@ -28,7 +28,7 @@ Stamps renamed 2026-10-26 (`data/cutouts/` → `data/stamps/`, `cutout_*` → `s
 | SPT2147-50 | spt | uncal, 4 filters | F200W F277W F356W F444W | all 4 | see info/provenance/lens_psf.json | – |
 | SPT0418-47 | spt | uncal, 6 filters | F115W F150W F200W F277W F356W F444W | all 6 | see info/provenance/lens_psf.json | – |
 | B1938+666 | b1938 | uncal, 210 files / 79 GB | F115W F277W (2026-10-02, 8.5 h) | both | both, see info/provenance/lens_psf.json | both (2026-10-04) |
-| 17 COWLS II lenses | cowls_spectacular | uncal at a 90" field, 802 files / 38 GB | F115W F150W F277W F444W, all 68 bands (2026-10-29, ~11 h incl. 43 GB of new CRDS darks; Image3 re-run 2026-10-30 for tweakreg, ~1 h at 4 in parallel) | all 68, 12" (2026-10-30, re-cut after the Image3 re-run) | STPSF injected per lens (2026-10-31) | – |
+| 17 COWLS II lenses | cowls_spectacular | uncal at a 90" field, 802 files / 38 GB | F115W F150W F277W F444W, all 68 bands (2026-10-29, ~11 h incl. 43 GB of new CRDS darks; Image3 re-run 2026-10-30 for tweakreg, ~1 h at 4 in parallel) | all 68, 12" (re-cut 2026-11-01 on measured lens centres; COSJ095955+021900 2026-11-02) | STPSF injected per lens (rebuilt 2026-11-02 on the measured centres) | all 17 (2026-11-02; COSJ095920+015851 positions deliberately empty); extra-galaxy centres for the 3 `multi_galaxy` lenses |
 
 **COWLS added 2026-10-29** (`cowls_spectacular`, the 17 COWLS II lenses, GO 1727
 COSMOS-Web): the first survey-program sample, located by position and cut by detector
@@ -45,7 +45,7 @@ falls faster than the kept size suggests; macOS purges them under pressure.
 Stamps cut 2026-10-30 at the default 12", with their own measured noise factors (*Noise*).
 **COSJ095917+015424 sits ~2" from COSMOS-Web's southern edge:** its lens is covered,
 but 16% of each SW and 30% of each LW stamp is off the survey (noise 1e8, `n_bad` in
-`lens_stamp_qc.json`); every other COWLS stamp has 0–4 bad pixels. No masks or positions yet.
+`lens_stamp_qc.json`); every other COWLS stamp has 0–4 bad pixels.
 
 **The whole SPT sample reduced in one `run_reduce_all.sh spt` pass (2026-10-02 02:06): 10 ok,
 0 failed.** Per band: SW (4 detectors × 2 dithers) 220–250 s, SW F200W of SPT2147 (24 frames)

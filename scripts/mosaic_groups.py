@@ -4,7 +4,6 @@ The HST repo grouped WFPC2 F606W with ACS F555W into one panel row; nothing like
 needed for NIRCam, so there are no hard-coded groups and `groups_for_sample` always falls
 back to one group per filter directory found on disk, in channel order (SW first).
 """
-import glob
 import os
 import sys
 

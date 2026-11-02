@@ -53,6 +53,7 @@
                         "n_frames": 168,
                         "n_injected": 21,
                         "n_stars": 25,
+                        "n_passes": 1,
                         "star_spacing_px": 121,
                         "frames": [
                             {
@@ -1311,7 +1312,7 @@
                         "stpsf_fov_pixels": 119,
                         "charge_diffusion_sigma": 0.00841,
                         "phase_err_frac": 0.0064,
-                        "seconds": 766.0
+                        "seconds": 771.8
                     }
                 }
             },
@@ -1367,6 +1368,7 @@
                         "n_frames": 42,
                         "n_injected": 21,
                         "n_stars": 25,
+                        "n_passes": 1,
                         "star_spacing_px": 61,
                         "frames": [
                             {
@@ -1743,7 +1745,7 @@
                         "stpsf_fov_pixels": 59,
                         "charge_diffusion_sigma": 0.0205,
                         "phase_err_frac": 0.00668,
-                        "seconds": 206.6
+                        "seconds": 212.6
                     }
                 }
             }

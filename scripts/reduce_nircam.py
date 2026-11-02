@@ -71,7 +71,6 @@ a time; no multiprocessing (ramp_fit maximum_cores stays 'none').
 """
 import argparse
 import glob
-import json
 import logging
 import os
 import shutil
