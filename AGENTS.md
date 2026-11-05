@@ -9,6 +9,9 @@ new evidence. It is the JWST sibling of the AGENTS.md in
 repo" below); where a decision was inherited from there it says so, and that file's
 measurements are not restated here.
 
+> **[`STATUS.md`](STATUS.md) is the to-do picture:** where every sample stands, the open
+> decisions on individual lenses, and the next steps. Update it when a step is done.
+
 > **AGENTS.md documents intent, not always state.** Before running a batch campaign or
 > reporting what is outstanding, verify against source — argparse defaults, what the
 > runner actually passes, tracking JSONs vs what is on disk.
@@ -293,6 +296,22 @@ stamp rests on ONE exposure, so Image3's outlier detection has nothing to compar
 cosmic rays are caught by `jump` alone — look at it before trusting faint SW structure.
 Every lens has all four filters. Only GO 1727 is downloaded: other JWST programs that image
 the COSMOS field are not part of this sample.
+
+**Coverage edges cross most COWLS lenses; a step in the noise map there is real depth, not a bad
+combination (2026-11-02).**
+- In 14 of 17 lenses, the number of exposures per pixel (the i2d `CON` bitmask) changes within
+  ~2θ_E of the lens. SW and LW edges differ, since the detectors' footprints do.
+- On COSJ095953+023319 F444W a 2|4-exposure edge runs within ~0.1" of the lens core. Image 0
+  lies on the 2-exposure side; the lens and the other images lie on the 4-exposure side.
+  - The noise map steps by 1.47x across it, against the expected sqrt(2).
+  - Blank-sky scatter / noise map is 0.65 and 0.66 on the two sides, so the map is right on both.
+  - The sky does not step in LW (F444W 0.0122 vs 0.0127; F277W 0.0181 vs 0.0189).
+  - F115W shows a small sky offset, 0.053 vs 0.059 MJy/sr (about 0.2 of the per-pixel sigma).
+- The fit takes the depth from the noise map. The PSF kernel is built for the lens's own frames
+  (*PSF*), so an image on the other side of an edge sees a slightly different resampled PSF:
+  ~1.5% in F444W, more in SW.
+- Scratch check: `diagnostics/coverage_step.py LENS` (frames per pixel, noise vs scatter, sky per
+  side).
 
 Coordinates: APT fixed-target positions (B1938+666 19:38:25.28 +66:48:52.9; SPT0418-47
 04:18:39.68 −47:51:52.7; SPT2147-50 21:47:19.01 −50:35:54.5), which agree with the MAST
