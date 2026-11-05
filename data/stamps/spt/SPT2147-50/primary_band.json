@@ -2,35 +2,35 @@
     "lens": "SPT2147-50",
     "sample": "spt",
     "primary_band": "F444W",
-    "primary_band_source": "arc_snr",
-    "best_band_visual": null,
+    "primary_band_source": "visual",
+    "best_band_visual": "F444W",
     "best_band_arc_snr": "F444W",
     "theta_e": 1.195,
     "scores": {
         "F200W": {
             "arc_snr": 9.56,
-            "psf_fwhm_arcsec": 0.0753,
+            "psf_fwhm_arcsec": 0.0757,
             "resolution_factor": 1.0,
             "score": 9.56,
             "contaminant_mask": false
         },
         "F277W": {
             "arc_snr": 52.36,
-            "psf_fwhm_arcsec": 0.1315,
+            "psf_fwhm_arcsec": 0.1297,
             "resolution_factor": 1.0,
             "score": 52.36,
             "contaminant_mask": false
         },
         "F356W": {
             "arc_snr": 155.58,
-            "psf_fwhm_arcsec": 0.1501,
+            "psf_fwhm_arcsec": 0.1466,
             "resolution_factor": 1.0,
             "score": 155.58,
             "contaminant_mask": false
         },
         "F444W": {
             "arc_snr": 170.39,
-            "psf_fwhm_arcsec": 0.1697,
+            "psf_fwhm_arcsec": 0.1655,
             "resolution_factor": 1.0,
             "score": 170.39,
             "contaminant_mask": false

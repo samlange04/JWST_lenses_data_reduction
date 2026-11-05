@@ -39,7 +39,9 @@
                 "redshift_source_kind": "spec (CO, Weiss+13)",
                 "deflector_ra": 64.66533624,
                 "deflector_dec": -47.8646396,
-                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F200W, F277W, F356W, F444W, which agree to 20 mas; +17 mas E, -23 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F200W, F277W, F356W, F444W, which agree to 20 mas; +17 mas E, -23 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid.",
+                "best_band_visual": "F444W",
+                "best_band_visual_note": "Chosen by eye with choose_best_band.py (2026-11-02); the best arc-S/N band (choose_primary_band.py) was F444W."
             },
             "SPT2147-50": {
                 "mast_target": "SPT2147-50",
@@ -53,7 +55,9 @@
                 "redshift_source_kind": "spec (CO, Weiss+13)",
                 "deflector_ra": 326.82905952,
                 "deflector_dec": -50.5985216,
-                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F200W, F277W, F356W, F444W, which agree to 8 mas; -359 mas E, -178 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid."
+                "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F200W, F277W, F356W, F444W, which agree to 8 mas; -359 mas E, -178 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid.",
+                "best_band_visual": "F444W",
+                "best_band_visual_note": "Chosen by eye with choose_best_band.py (2026-11-03); the best arc-S/N band (choose_primary_band.py) was F444W."
             }
         }
     },
