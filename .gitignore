@@ -48,4 +48,9 @@ info/provenance/lens_exports.json
 # CLAUDE.md imports the tracked AGENTS.md (@AGENTS.md) and adds the maintainer's private
 # working notes. Only AGENTS.md is needed to use the repo.
 /CLAUDE.md
+# .kimi-code/AGENTS.md is the Kimi Code twin of CLAUDE.md (Kimi Code auto-loads it as a
+# project-level instruction file alongside the root AGENTS.md). .kimi-code/local.toml is
+# Kimi Code's machine-local config.
+/.kimi-code/AGENTS.md
+/.kimi-code/local.toml
 info/**/*.lock
