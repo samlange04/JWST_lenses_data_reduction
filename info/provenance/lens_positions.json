@@ -1279,5 +1279,208 @@
                 ]
             }
         }
+    },
+    "spt": {
+        "SPT0418-47": {
+            "F444W": {
+                "n_positions": 4,
+                "positions_arcsec": [
+                    [
+                        1.11,
+                        0.33
+                    ],
+                    [
+                        -0.93,
+                        -0.75
+                    ],
+                    [
+                        0.81,
+                        -1.71
+                    ],
+                    [
+                        0.15,
+                        2.43
+                    ]
+                ],
+                "n_sets": 2,
+                "positions_arcsec_by_set": [
+                    [
+                        [
+                            1.11,
+                            0.33
+                        ],
+                        [
+                            -0.93,
+                            -0.75
+                        ]
+                    ],
+                    [
+                        [
+                            0.81,
+                            -1.71
+                        ],
+                        [
+                            0.15,
+                            2.43
+                        ]
+                    ]
+                ],
+                "marked_filt": "F444W",
+                "marked_prefix": "stamp12",
+                "drizzle_pass": "single",
+                "pixel_scale_arcsec": 0.06,
+                "snap_radius_px": 1,
+                "snap_moved_px_max": 1.42,
+                "snap_moved_px_mean": 0.84,
+                "broadcast": "sky (WCS pixel->world->pixel per band)",
+                "display": "S/N, as-observed + isophote-subtracted",
+                "display_mask_center_arcsec": null,
+                "display_vmax_value": null,
+                "display_subtract": "isophote",
+                "display_subtract_radial": false,
+                "display_side_by_side": true,
+                "display_hidden_contaminant_px": null,
+                "n_positions_on_contaminant": 0,
+                "broadcast_to": [
+                    {
+                        "filt": "F115W",
+                        "prefix": "stamp12",
+                        "reprojection_shift_mas": 0.0,
+                        "band_tie_mas": 29.9,
+                        "band_tie_px": 0.996,
+                        "band_tie_scatter_mas": null,
+                        "band_tie_n_sources": 0,
+                        "band_tie_method": "lens core (fallback)"
+                    },
+                    {
+                        "filt": "F150W",
+                        "prefix": "stamp12",
+                        "reprojection_shift_mas": 0.0,
+                        "band_tie_mas": 18.9,
+                        "band_tie_px": 0.631,
+                        "band_tie_scatter_mas": null,
+                        "band_tie_n_sources": 0,
+                        "band_tie_method": "lens core (fallback)"
+                    },
+                    {
+                        "filt": "F200W",
+                        "prefix": "stamp12",
+                        "reprojection_shift_mas": 0.0,
+                        "band_tie_mas": 11.5,
+                        "band_tie_px": 0.384,
+                        "band_tie_scatter_mas": null,
+                        "band_tie_n_sources": 0,
+                        "band_tie_method": "lens core (fallback)"
+                    },
+                    {
+                        "filt": "F277W",
+                        "prefix": "stamp12",
+                        "reprojection_shift_mas": 0.0,
+                        "band_tie_mas": 15.3,
+                        "band_tie_px": 0.255,
+                        "band_tie_scatter_mas": null,
+                        "band_tie_n_sources": 0,
+                        "band_tie_method": "lens core (fallback)"
+                    },
+                    {
+                        "filt": "F356W",
+                        "prefix": "stamp12",
+                        "reprojection_shift_mas": 0.0,
+                        "band_tie_mas": 6.9,
+                        "band_tie_px": 0.114,
+                        "band_tie_scatter_mas": null,
+                        "band_tie_n_sources": 0,
+                        "band_tie_method": "lens core (fallback)"
+                    },
+                    {
+                        "filt": "F444W",
+                        "prefix": "stamp12",
+                        "reprojection_shift_mas": 0.0,
+                        "band_tie_mas": null,
+                        "band_tie_px": null,
+                        "band_tie_scatter_mas": null,
+                        "band_tie_n_sources": null,
+                        "band_tie_method": null
+                    }
+                ]
+            }
+        },
+        "SPT2147-50": {
+            "F444W": {
+                "n_positions": 3,
+                "positions_arcsec": [
+                    [
+                        -0.63,
+                        -1.35
+                    ],
+                    [
+                        -1.11,
+                        0.63
+                    ],
+                    [
+                        0.99,
+                        0.09
+                    ]
+                ],
+                "marked_filt": "F444W",
+                "marked_prefix": "stamp12",
+                "drizzle_pass": "single",
+                "pixel_scale_arcsec": 0.06,
+                "snap_radius_px": 1,
+                "snap_moved_px_max": 1.13,
+                "snap_moved_px_mean": 0.84,
+                "broadcast": "sky (WCS pixel->world->pixel per band)",
+                "display": "S/N, as-observed + isophote-subtracted",
+                "display_mask_center_arcsec": null,
+                "display_vmax_value": null,
+                "display_subtract": "isophote",
+                "display_subtract_radial": false,
+                "display_side_by_side": true,
+                "display_hidden_contaminant_px": null,
+                "n_positions_on_contaminant": 0,
+                "broadcast_to": [
+                    {
+                        "filt": "F200W",
+                        "prefix": "stamp12",
+                        "reprojection_shift_mas": 0.0,
+                        "band_tie_mas": 7.5,
+                        "band_tie_px": 0.251,
+                        "band_tie_scatter_mas": null,
+                        "band_tie_n_sources": 0,
+                        "band_tie_method": "lens core (fallback)"
+                    },
+                    {
+                        "filt": "F277W",
+                        "prefix": "stamp12",
+                        "reprojection_shift_mas": 0.0,
+                        "band_tie_mas": 12.2,
+                        "band_tie_px": 0.203,
+                        "band_tie_scatter_mas": null,
+                        "band_tie_n_sources": 0,
+                        "band_tie_method": "lens core (fallback)"
+                    },
+                    {
+                        "filt": "F356W",
+                        "prefix": "stamp12",
+                        "reprojection_shift_mas": 0.0,
+                        "band_tie_mas": 7.5,
+                        "band_tie_px": 0.125,
+                        "band_tie_scatter_mas": null,
+                        "band_tie_n_sources": 0,
+                        "band_tie_method": "lens core (fallback)"
+                    },
+                    {
+                        "filt": "F444W",
+                        "prefix": "stamp12",
+                        "reprojection_shift_mas": 0.0,
+                        "band_tie_mas": null,
+                        "band_tie_px": null,
+                        "band_tie_scatter_mas": null,
+                        "band_tie_n_sources": null,
+                        "band_tie_method": null
+                    }
+                ]
+            }
+        }
     }
 }

@@ -1,0 +1,45 @@
+{
+    "type": "list",
+    "values": [
+        {
+            "type": "instance",
+            "class_path": "autoarray.structures.grids.irregular_2d.Grid2DIrregular",
+            "arguments": {
+                "values": {
+                    "type": "ndarray",
+                    "array": [
+                        [
+                            1.1100000000684362,
+                            0.3300000000185967
+                        ],
+                        [
+                            -0.9300000000521794,
+                            -0.749999999998984
+                        ]
+                    ],
+                    "dtype": "float64"
+                }
+            }
+        },
+        {
+            "type": "instance",
+            "class_path": "autoarray.structures.grids.irregular_2d.Grid2DIrregular",
+            "arguments": {
+                "values": {
+                    "type": "ndarray",
+                    "array": [
+                        [
+                            0.8100000000212849,
+                            -1.7100000000003615
+                        ],
+                        [
+                            0.1499999999704627,
+                            2.430000000045024
+                        ]
+                    ],
+                    "dtype": "float64"
+                }
+            }
+        }
+    ]
+}
