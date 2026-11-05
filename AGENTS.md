@@ -16,7 +16,7 @@ measurements are not restated here.
 > reporting what is outstanding, verify against source — argparse defaults, what the
 > runner actually passes, tracking JSONs vs what is on disk.
 
-## Current state (2026-11-02)
+## Current state (2026-11-05)
 
 Repo created 2026-10-01 from the HST repo's structure, PyAutoReduce's JWST path and the
 jwst 3.0.0 docs. Program 8281 (B1938+666) became public at 03:16 UTC that day. Public on
@@ -28,10 +28,10 @@ Stamps renamed 2026-10-26 (`data/cutouts/` → `data/stamps/`, `cutout_*` → `s
 
 | lens | sample | downloaded | reduced | stamps | PSF | masks + positions |
 |---|---|---|---|---|---|---|
-| SPT2147-50 | spt | uncal, 4 filters | F200W F277W F356W F444W | all 4 | see info/provenance/lens_psf.json | – |
-| SPT0418-47 | spt | uncal, 6 filters | F115W F150W F200W F277W F356W F444W | all 6 | see info/provenance/lens_psf.json | – |
+| SPT2147-50 | spt | uncal, 4 filters | F200W F277W F356W F444W | all 4 | see info/provenance/lens_psf.json | both, all 4 bands (2026-11-05) |
+| SPT0418-47 | spt | uncal, 6 filters | F115W F150W F200W F277W F356W F444W | all 6 | see info/provenance/lens_psf.json | both, all 6 bands (2026-11-05) |
 | B1938+666 | b1938 | uncal, 210 files / 79 GB | F115W F277W (2026-10-02, 8.5 h) | both | both, see info/provenance/lens_psf.json | both (2026-10-04) |
-| 17 COWLS II lenses | cowls_spectacular | uncal at a 90" field, 802 files / 38 GB | F115W F150W F277W F444W, all 68 bands (2026-10-29, ~11 h incl. 43 GB of new CRDS darks; Image3 re-run 2026-10-30 for tweakreg, ~1 h at 4 in parallel) | all 68, 12" (re-cut 2026-11-01 on measured lens centres; COSJ095955+021900 2026-11-02) | STPSF injected per lens (rebuilt 2026-11-02 on the measured centres) | all 17 (2026-11-02; COSJ095920+015851 positions deliberately empty); extra-galaxy centres for the 3 `multi_galaxy` lenses |
+| 17 COWLS II lenses | cowls_spectacular | uncal at a 90" field, 802 files / 38 GB | F115W F150W F277W F444W, all 68 bands (2026-10-29, ~11 h incl. 43 GB of new CRDS darks; Image3 re-run 2026-10-30 for tweakreg, ~1 h at 4 in parallel) | all 68, 12" (re-cut 2026-11-01 on measured lens centres; COSJ095955+021900 2026-11-02) | STPSF injected per lens (rebuilt 2026-11-02 on the measured centres) | all 68 bands masked, positions for 16 lenses (2026-11-05; COSJ095920+015851 positions deliberately empty); extra-galaxy centres for the 3 `multi_galaxy` lenses |
 
 **COWLS added 2026-10-29** (`cowls_spectacular`, the 17 COWLS II lenses, GO 1727
 COSMOS-Web): the first survey-program sample, located by position and cut by detector
