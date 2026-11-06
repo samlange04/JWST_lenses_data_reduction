@@ -3,7 +3,7 @@
 One figure per lens with every band's stamp side by side: data/stamps/<sample>/[<category>/]<lens>/stamp<S>_bands.png.
 
     uv run python scripts/make_band_overview.py                          # every lens of every sample
-    uv run python scripts/make_band_overview.py --sample cowls_spectacular [--lens LENS]
+    uv run python scripts/make_band_overview.py --sample cowls-mahler [--lens LENS]
 
 The per-band QC (stamp<S>_dataset.png) shows one band's data, noise, PSF and mask; this shows all
 of a lens's bands at once, so the lens and its arcs can be compared across wavelength. Columns are

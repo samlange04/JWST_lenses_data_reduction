@@ -1,22 +1,75 @@
 {
-    "_what": "NOISECOR applied by make_stamps.py: stamp12_noise = i2d ERR x factor. Measured by measure_corr_factor.py (diagnostics/corr_factor/), 2026-10-04; see AGENTS.md *Correlated noise*.",
+    "_factors_samples_why": "`factors` is the median over the SPT stamps (TEMPLATES BRIGHT2/SHALLOW2 ramps), so make_stamps applies it to these samples only. Any other sample needs its own `sample_factors[sample]` (same keys as `factors`) or per-lens `lens_overrides`; make_stamps refuses a sample with neither: the factor depends on the readout pattern (see `_overrides_why`).",
     "_how": "Blank-sky block-sum ratio at scale_arcsec (the noise of an s x s patch over what ERR predicts), median over the SPT stamps per channel, thr3 source mask. Not the HST repo's drop-window ACF factor: the residual 1/f after clean_flicker_noise is correlated over ~3 arcsec along detector rows and a 1-px window never sees it. The ratio keeps growing with scale (block_ratio_curve), so a model must rescale if its source pixels footprint the image plane at a coarser scale than scale_arcsec.",
-    "scale_arcsec": 0.2,
+    "_overrides_why": "B1938+666 (88 ks) is too deep for the blank-sky method, so its factors come from split_noise_test.py (2026-10-04): the 21 dithers split into two half-mosaics, A-B cancels every astrophysical feature, block-sum ratio of A-B against sqrt(ERR_A^2+ERR_B^2) inside the 12\" stamp region at 0.2\". F115W 0.94, F277W 1.12. Per pixel the F277W ERR is low by ~1.5 (ratio 1.04 where drizzle alone gives 0.7; also seen on single cal frames) but that cancels against the drizzle correlation by 0.2\". The SW value is well below the SPT channel 1.30 because the 1/f is relatively weaker in MEDIUM8 8-group x 5-integration ramps than in TEMPLATES' 2-3 group BRIGHT2/SHALLOW2 exposures (Rigby+25 s7.2), and the per-frame ERR has no deficit (1.07).",
+    "_what": "NOISECOR applied by make_stamps.py: stamp12_noise = i2d ERR x factor. Measured by measure_corr_factor.py (diagnostics/corr_factor/), 2026-10-04; see AGENTS.md *Correlated noise*.",
+    "block_ratio_curve": {
+        "scale_arcsec": [
+            0.1,
+            0.15,
+            0.2,
+            0.3,
+            0.5,
+            1.0,
+            2.0,
+            3.0
+        ],
+        "NIRCAM/SW": [
+            1.04,
+            1.17,
+            1.3,
+            1.52,
+            2.01,
+            3.53,
+            6.87,
+            9.25
+        ],
+        "NIRCAM/LW": [
+            0.83,
+            0.95,
+            1.03,
+            1.16,
+            1.36,
+            1.85,
+            2.98,
+            3.8
+        ],
+        "drop_window_acf_factor": {
+            "NIRCAM/SW": 1.17,
+            "NIRCAM/LW": 1.22
+        },
+        "per_pixel_c0": "0.45-0.55 in every SPT band: drizzle (pixfrac 1, 0.031->0.03 and 0.063->0.06) halves the per-pixel variance, as it should"
+    },
+    "correlation": {
+        "kind": "residual 1/f after clean_flicker_noise, coherent along detector rows (fast-read axis)",
+        "length_arcsec": 3.0,
+        "amplitude_fraction_of_sigma": 0.06,
+        "row_direction_deg_from_x": -65,
+        "row_direction_note": "SPT module-B frames; B1938 frames have their own roll. Use the stamp's detector PA if it matters.",
+        "not_in_factor": "The factor is a scalar at scale_arcsec; it does not encode the anisotropy or the scale dependence. PyAutoLens's inversion ignores noise_covariance_matrix (autoarray 2026.9.27), so there is no consumer for the full structure yet."
+    },
     "factors": {
         "NIRCAM/SW": 1.3,
         "NIRCAM/LW": 1.03
     },
     "factors_samples": [
-        "spt"
+        "templates"
     ],
-    "_factors_samples_why": "`factors` is the median over the SPT stamps (TEMPLATES BRIGHT2/SHALLOW2 ramps), so make_stamps applies it to these samples only. Any other sample needs its own `sample_factors[sample]` (same keys as `factors`) or per-lens `lens_overrides`; make_stamps refuses a sample with neither: the factor depends on the readout pattern (see `_overrides_why`).",
+    "lens_overrides": {
+        "b1938": {
+            "B1938+666": {
+                "F115W": 0.94,
+                "F277W": 1.12
+            }
+        }
+    },
     "sample_factors": {
-        "cowls_spectacular": {
+        "cowls-mahler": {
             "F115W": 1.25,
             "F150W": 1.22,
             "F277W": 1.03,
             "F444W": 0.95,
-            "_how": "measure_corr_factor.py on all 68 COWLS stamps, 2026-10-30 (diagnostics/corr_factor/corr_factor_measurements_cowls_spectacular.json): the same quantity as `factors` (blank-sky block-sum ratio at 0.2\", thr3 mask, +-30\" region, each stamp's curve interpolated to the scales below), but the median over the 17 lenses PER FILTER, not per channel: F277W exceeds F444W in all 17 lenses and F115W exceeds F150W in 16 of 17, a split larger than the lens-to-lens scatter (16-84%: F115W 1.22-1.26, F150W 1.20-1.24, F277W 1.01-1.06, F444W 0.94-0.97). No dependence on depth: lens N's single SW exposure gives the same factor as the 4-exposure lenses. Per-pixel C(0) 0.42-0.58. SW sits below the SPT channel's 1.30 (5-group SHALLOW4 vs TEMPLATES' 2-3 group ramps), LW brackets its 1.03.",
+            "_how": "measure_corr_factor.py on all 68 COWLS stamps, 2026-10-30 (diagnostics/corr_factor/corr_factor_measurements_cowls-mahler.json): the same quantity as `factors` (blank-sky block-sum ratio at 0.2\", thr3 mask, +-30\" region, each stamp's curve interpolated to the scales below), but the median over the 17 lenses PER FILTER, not per channel: F277W exceeds F444W in all 17 lenses and F115W exceeds F150W in 16 of 17, a split larger than the lens-to-lens scatter (16-84%: F115W 1.22-1.26, F150W 1.20-1.24, F277W 1.01-1.06, F444W 0.94-0.97). No dependence on depth: lens N's single SW exposure gives the same factor as the 4-exposure lenses. Per-pixel C(0) 0.42-0.58. SW sits below the SPT channel's 1.30 (5-group SHALLOW4 vs TEMPLATES' 2-3 group ramps), LW brackets its 1.03.",
             "block_ratio_curve": {
                 "scale_arcsec": [
                     0.1,
@@ -71,60 +124,7 @@
             }
         }
     },
-    "block_ratio_curve": {
-        "scale_arcsec": [
-            0.1,
-            0.15,
-            0.2,
-            0.3,
-            0.5,
-            1.0,
-            2.0,
-            3.0
-        ],
-        "NIRCAM/SW": [
-            1.04,
-            1.17,
-            1.3,
-            1.52,
-            2.01,
-            3.53,
-            6.87,
-            9.25
-        ],
-        "NIRCAM/LW": [
-            0.83,
-            0.95,
-            1.03,
-            1.16,
-            1.36,
-            1.85,
-            2.98,
-            3.8
-        ],
-        "drop_window_acf_factor": {
-            "NIRCAM/SW": 1.17,
-            "NIRCAM/LW": 1.22
-        },
-        "per_pixel_c0": "0.45-0.55 in every SPT band: drizzle (pixfrac 1, 0.031->0.03 and 0.063->0.06) halves the per-pixel variance, as it should"
-    },
-    "lens_overrides": {
-        "b1938": {
-            "B1938+666": {
-                "F115W": 0.94,
-                "F277W": 1.12
-            }
-        }
-    },
-    "_overrides_why": "B1938+666 (88 ks) is too deep for the blank-sky method, so its factors come from split_noise_test.py (2026-10-04): the 21 dithers split into two half-mosaics, A-B cancels every astrophysical feature, block-sum ratio of A-B against sqrt(ERR_A^2+ERR_B^2) inside the 12\" stamp region at 0.2\". F115W 0.94, F277W 1.12. Per pixel the F277W ERR is low by ~1.5 (ratio 1.04 where drizzle alone gives 0.7; also seen on single cal frames) but that cancels against the drizzle correlation by 0.2\". The SW value is well below the SPT channel 1.30 because the 1/f is relatively weaker in MEDIUM8 8-group x 5-integration ramps than in TEMPLATES' 2-3 group BRIGHT2/SHALLOW2 exposures (Rigby+25 s7.2), and the per-frame ERR has no deficit (1.07).",
-    "correlation": {
-        "kind": "residual 1/f after clean_flicker_noise, coherent along detector rows (fast-read axis)",
-        "length_arcsec": 3.0,
-        "amplitude_fraction_of_sigma": 0.06,
-        "row_direction_deg_from_x": -65,
-        "row_direction_note": "SPT module-B frames; B1938 frames have their own roll. Use the stamp's detector PA if it matters.",
-        "not_in_factor": "The factor is a scalar at scale_arcsec; it does not encode the anisotropy or the scale dependence. PyAutoLens's inversion ignores noise_covariance_matrix (autoarray 2026.9.27), so there is no consumer for the full structure yet."
-    },
+    "scale_arcsec": 0.2,
     "split_test": {
         "B1938+666": {
             "F115W": {

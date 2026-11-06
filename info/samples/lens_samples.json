@@ -23,7 +23,7 @@
             }
         }
     },
-    "spt": {
+    "templates": {
         "description": "The two SPT lenses of Lange et al. 2025: JWST GO 1355 TEMPLATES (PI Rigby), NIRCam module B only. SPT0418-47 has F115W F150W F200W + F277W F356W F444W; SPT2147-50 has F200W + F277W F356W F444W. Both also have MIRI imaging (F560W..F2100W) and NIRSpec/MIRI IFU in the same program, deliberately not reduced here (NIRCam only).",
         "proposal_id": "1355",
         "lenses": {
@@ -61,7 +61,7 @@
             }
         }
     },
-    "cowls_spectacular": {
+    "cowls-mahler": {
         "description": "The 17 'spectacular' lenses of COWLS II (Mahler et al. 2025, MNRAS 544, L8, Table 1): the top tier of the COSMOS-Web Lens Survey, JWST GO 1727 COSMOS-Web (PI Kartaltepe & Casey), NIRCam F115W + F277W and F150W + F444W, 4 dithers x 258 s per filter (SHALLOW4, 5 groups) per tile, more where tiles overlap. The F770W MIRI parallels are deliberately not reduced (NIRCam only). Lens keys are the COWLS IDs; cowls_letter is the paper's A-Q. ra/dec are the COSMOS-Web catalogue positions of the lens galaxies (Shuntov+24), so they are the mosaics' CRVAL and the stamp centre. theta_e (arcsec) is from the COWLS I PyAutoLens models (Nightingale+25), for orientation only. Redshifts are COWLS II's, with their source and method in redshift_*_kind (spec or photo-z; only spectroscopic ones count as confirmed); null where the paper has none (COSJ100119+014849 has no lens redshift; only COSJ100018+022138, COSJ100024+015334 and COSJ100024+021749 have source redshifts).",
         "proposal_id": "1727",
         "mast_query": "position",
@@ -70,9 +70,11 @@
         "prune_intermediates": true,
         "lens_categories": [
             "prime",
-            "multi_galaxy"
+            "multi_galaxy",
+            "limited",
+            "complex"
         ],
-        "lens_categories_note": "2026-11-02. prime: one deflector, neighbours masked as contaminants. multi_galaxy: more than one galaxy's mass has to be modelled (a second lens, or a perturber near the arcs). The stamps live in data/stamps/cowls_spectacular/<category>/<lens>/; move a lens with set_lens_category.py.",
+        "lens_categories_note": "2026-11-02: prime, multi_galaxy. 2026-11-06: split into four. prime: the sample's best lenses, none chosen yet. multi_galaxy: more than one galaxy's mass has to be modelled (a second lens, or a perturber near the arcs; unchanged from 2026-11-02). limited: the rest with no spectroscopic redshift for the lens, the source, or both. complex: the rest, whose lens AND source redshifts are both spectroscopic (COSJ100018+022138, COSJ100024+021749). The stamps live in data/stamps/cowls-mahler/<category>/<lens>/; move a lens with set_lens_category.py.",
         "tweakreg_lens_first": true,
         "tweakreg_sw_from_lw": true,
         "tweakreg_note": "2026-10-30. LW: Image3's relative tweakreg aligns the lens-covering frames first (they lead the association; expand_refcat=True, enforce_user_order=True) and grows the reference from them. With the default (expand_refcat=False) tweakwcs takes the first group in file order as the sole reference: on COSJ100013+023424 F444W a neighbouring tile's frame (obs 007), against which every lens-covering group found 0-1 matches (minobj 15), so the first reduction (2026-10-29) aligned nothing. expand_refcat alone starts from the best-overlapping pair anywhere in the field, which on COSJ095914+021219 F444W was a neighbouring visit the lens frames matched with 4 sources, so they stayed unaligned; lens-first aligned them to each other with 67 matches. SW: no fit; each frame takes the offset tweakreg gave its own exposure's LW frames (SW and LW are exposed together through one pointing). Fitted on their own, the SHALLOW4 SW frames gave fit RMSE 0.2-0.4\" on 10-50 matches, and their shifts disagreed with the same exposures' LW shifts by a median 22 mas (max 113) over 204 exposures, while one visit's four LW dithers agreed to 5-30 mas.",
@@ -91,7 +93,7 @@
                 "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 8 mas; -42 mas E, -19 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid.",
                 "best_band_visual": "F277W",
                 "best_band_visual_note": "Chosen by eye with choose_best_band.py (2026-11-02); the measured best band was none (arcs too faint to measure).",
-                "category": "prime"
+                "category": "limited"
             },
             "COSJ095917+015424": {
                 "cowls_letter": "B",
@@ -106,7 +108,7 @@
                 "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 10 mas; +175 mas E, +340 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid.",
                 "best_band_visual": "F444W",
                 "best_band_visual_note": "Chosen by eye with choose_best_band.py (2026-11-02); the measured best band was F444W.",
-                "category": "prime"
+                "category": "limited"
             },
             "COSJ095920+015851": {
                 "cowls_letter": "C",
@@ -121,7 +123,7 @@
                 "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 20 mas; +94 mas E, +368 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid.",
                 "best_band_visual": "F150W",
                 "best_band_visual_note": "Chosen by eye with choose_best_band.py (2026-11-02); the measured best band was F277W.",
-                "category": "prime"
+                "category": "limited"
             },
             "COSJ095921+020638": {
                 "cowls_letter": "D",
@@ -136,7 +138,7 @@
                 "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 5 mas; -2 mas E, -46 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid.",
                 "best_band_visual": "F115W",
                 "best_band_visual_note": "Chosen by eye with choose_best_band.py (2026-11-02); the measured best band was F277W.",
-                "category": "prime"
+                "category": "limited"
             },
             "COSJ095950+022057": {
                 "cowls_letter": "E",
@@ -151,7 +153,7 @@
                 "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 10 mas; -22 mas E, +15 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid.",
                 "best_band_visual": "F277W",
                 "best_band_visual_note": "Chosen by eye with choose_best_band.py (2026-11-02); the measured best band was F277W.",
-                "category": "prime"
+                "category": "limited"
             },
             "COSJ095953+023319": {
                 "cowls_letter": "F",
@@ -166,7 +168,7 @@
                 "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 7 mas; -32 mas E, +142 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid.",
                 "best_band_visual": "F444W",
                 "best_band_visual_note": "Chosen by eye with choose_best_band.py (2026-11-02); the measured best band was F444W.",
-                "category": "prime"
+                "category": "limited"
             },
             "COSJ095955+021900": {
                 "cowls_letter": "G",
@@ -197,7 +199,7 @@
                 "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 6 mas; +14 mas E, +36 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid.",
                 "best_band_visual": "F115W",
                 "best_band_visual_note": "Chosen by eye with choose_best_band.py (2026-11-02); the measured best band was F277W.",
-                "category": "prime"
+                "category": "limited"
             },
             "COSJ100013+023424": {
                 "cowls_letter": "I",
@@ -229,7 +231,7 @@
                 "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 16 mas; +22 mas E, +5 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid.",
                 "best_band_visual": "F150W",
                 "best_band_visual_note": "Chosen by eye with choose_best_band.py (2026-11-02); the measured best band was F277W.",
-                "category": "prime"
+                "category": "complex"
             },
             "COSJ100024+015334": {
                 "cowls_letter": "K",
@@ -245,7 +247,7 @@
                 "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 10 mas; +28 mas E, -17 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid.",
                 "best_band_visual": "F444W",
                 "best_band_visual_note": "Chosen by eye with choose_best_band.py (2026-11-02); the measured best band was F444W.",
-                "category": "prime"
+                "category": "limited"
             },
             "COSJ100024+021749": {
                 "cowls_letter": "L",
@@ -261,7 +263,7 @@
                 "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 10 mas; +20 mas E, -17 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid.",
                 "best_band_visual": "F444W",
                 "best_band_visual_note": "Chosen by eye with choose_best_band.py (2026-11-02); the measured best band was F150W.",
-                "category": "prime"
+                "category": "complex"
             },
             "COSJ100025+015245": {
                 "cowls_letter": "M",
@@ -276,7 +278,7 @@
                 "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F277W, F444W, which agree to 6 mas (F115W, F150W left out, >60 mas from the LW peak); +31 mas E, +27 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid.",
                 "best_band_visual": "F444W",
                 "best_band_visual_note": "Chosen by eye with choose_best_band.py (2026-11-02); the measured best band was F444W.",
-                "category": "prime"
+                "category": "limited"
             },
             "COSJ100028+021928": {
                 "cowls_letter": "N",
@@ -291,7 +293,7 @@
                 "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 10 mas; -41 mas E, -10 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid.",
                 "best_band_visual": "F444W",
                 "best_band_visual_note": "Chosen by eye with choose_best_band.py (2026-11-02); the measured best band was F444W.",
-                "category": "prime"
+                "category": "limited"
             },
             "COSJ100047+015023": {
                 "cowls_letter": "O",
@@ -306,7 +308,7 @@
                 "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 8 mas; -31 mas E, +59 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid.",
                 "best_band_visual": "F277W",
                 "best_band_visual_note": "Chosen by eye with choose_best_band.py (2026-11-02); the measured best band was F277W.",
-                "category": "prime"
+                "category": "limited"
             },
             "COSJ100119+014849": {
                 "cowls_letter": "P",
@@ -337,7 +339,7 @@
                 "deflector_note": "Lens-light peak, measure_lens_centres.py (2026-11-01): the median smoothed peak of F115W, F150W, F277W, F444W, which agree to 5 mas; +15 mas E, +25 mas N of ra/dec, which stay the mosaics' CRVAL. make_stamps --center auto cuts the stamp here, snapped to the 0.06\" LW grid.",
                 "best_band_visual": "F444W",
                 "best_band_visual_note": "Chosen by eye with choose_best_band.py (2026-11-02); the measured best band was F277W.",
-                "category": "prime"
+                "category": "limited"
             }
         }
     }

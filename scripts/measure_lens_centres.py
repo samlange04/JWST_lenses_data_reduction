@@ -3,7 +3,7 @@
 Measure each lens's light centre and record it as its deflector position, so make_stamps.py cuts
 the stamps centred on the lens.
 
-    uv run python scripts/measure_lens_centres.py --sample cowls_spectacular [--lens LENS] [--dry-run] [--force]
+    uv run python scripts/measure_lens_centres.py --sample cowls-mahler [--lens LENS] [--dry-run] [--force]
 
 The stamps are cut at the lens's catalogue position (the mosaics' CRVAL). That misses the lens
 light by 20-50 mas typically, and by ~0.4" for SPT2147-50 (its APT coordinate),

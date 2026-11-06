@@ -27,7 +27,7 @@
             "theta_e": 0.45
         }
     },
-    "cowls_spectacular": {
+    "cowls-mahler": {
         "COSJ095914+021219": {
             "best_band_arc_snr": null,
             "best_band_visual": "F277W",
@@ -709,7 +709,7 @@
             "theta_e": 0.86
         }
     },
-    "spt": {
+    "templates": {
         "SPT0418-47": {
             "best_band_arc_snr": "F444W",
             "best_band_visual": "F444W",

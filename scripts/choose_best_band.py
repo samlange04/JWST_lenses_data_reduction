@@ -2,9 +2,9 @@
 """
 Choose each lens's best (primary) band BY EYE: a GUI over the lens's band overview.
 
-    uv run python scripts/choose_best_band.py --sample cowls_spectacular             # every lens
-    uv run python scripts/choose_best_band.py --sample cowls_spectacular --unreviewed
-    uv run python scripts/choose_best_band.py --sample spt --lens SPT2147-50
+    uv run python scripts/choose_best_band.py --sample cowls-mahler                    # every lens
+    uv run python scripts/choose_best_band.py --sample cowls-mahler --unreviewed
+    uv run python scripts/choose_best_band.py --sample templates --lens SPT2147-50
 
 The primary band is the one where the lensed images are best defined: the mask GUIs draw it
 first, positions are clicked on it, and it is the band to model first. choose_primary_band.py

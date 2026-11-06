@@ -16,7 +16,7 @@ two to four separate images around the deflector. Modelling those arcs measures 
 distributed in the deflector. A model needs more than a picture, though: it needs to know how
 uncertain every pixel is, how blurred the telescope makes a point of light, which pixels to
 ignore, and roughly where the multiple images are. This repository produces that for 20
-lenses from three JWST programs (for the 17 COSMOS-Web lenses, so far the image and noise map).
+lenses from three JWST programs.
 
 **Most people only need the finished products in `data/stamps/`** — they are in git, so a
 plain clone has them. Re-running the reduction is only needed to change how it was done.
@@ -31,9 +31,9 @@ tools drew the masks and marked the positions.
 | Sample folder | Lens | JWST program | NIRCam filters | Lens / source redshift |
 |---|---|---|---|---|
 | `b1938` | B1938+666 | GO 8281 (PI Vegetti) | F115W, F277W (21 dithers, ~24 h per filter) | 0.881 / 2.059 |
-| `spt` | SPT0418-47 | ERS 1355 TEMPLATES (PI Rigby) | F115W, F150W, F200W, F277W, F356W, F444W | 0.263 / 4.22 |
-| `spt` | SPT2147-50 | ERS 1355 TEMPLATES (PI Rigby) | F200W, F277W, F356W, F444W | 0.845 / 3.76 |
-| `cowls_spectacular` | the 17 "spectacular" COWLS lenses of Mahler et al. (2025), `COSJ095914+021219` … `COSJ100121+022740` | GO 1727 COSMOS-Web (PIs Kartaltepe & Casey) | F115W, F150W, F277W, F444W (2–4 exposures of 258 s per filter at the lens) | per lens in `lens_samples.json`: 11 spectroscopic and 5 photometric lens redshifts, 3 spectroscopic source redshifts |
+| `templates` | SPT0418-47 | ERS 1355 TEMPLATES (PI Rigby) | F115W, F150W, F200W, F277W, F356W, F444W | 0.263 / 4.22 |
+| `templates` | SPT2147-50 | ERS 1355 TEMPLATES (PI Rigby) | F200W, F277W, F356W, F444W | 0.845 / 3.76 |
+| `cowls-mahler` | the 17 "spectacular" COWLS lenses of Mahler et al. (2025), `COSJ095914+021219` … `COSJ100121+022740` | GO 1727 COSMOS-Web (PIs Kartaltepe & Casey) | F115W, F150W, F277W, F444W (2–4 exposures of 258 s per filter at the lens) | per lens in `lens_samples.json`: 11 spectroscopic and 5 photometric lens redshifts, 3 spectroscopic source redshifts |
 
 That is 80 lens-and-filter images in total (12 + 68 COWLS). A filter name gives its approximate central
 wavelength in hundredths of a micron: F115W is centred near 1.15 μm and F444W near 4.4 μm,
@@ -58,10 +58,12 @@ in `info/samples/lens_samples.json`), to within 0.04″, and a lens's SW and LW 
 
 Each lens and filter has one folder, `data/stamps/<sample>/<lens>/<filter>/`, for example
 `data/stamps/b1938/B1938+666/F115W/`. The COWLS lenses add a level for their category,
-`data/stamps/cowls_spectacular/<category>/<lens>/<filter>/`:
-- `prime`: one lens galaxy; neighbours are masked as contaminants;
+`data/stamps/cowls-mahler/<category>/<lens>/<filter>/`:
+- `prime`: the sample's best lenses (none chosen yet);
 - `multi_galaxy`: more than one galaxy's mass has to be modelled, such as a second lens or a
-  galaxy close enough to the arcs to perturb them.
+  galaxy close enough to the arcs to perturb them;
+- `limited`: no spectroscopic redshift for the lens, the source, or both;
+- `complex`: the lens and source redshifts are both spectroscopic.
 
 The exported `info.json` names the category (`lens_category`). The files in each folder are:
 
@@ -100,9 +102,10 @@ and COWLS lenses. A stamp cut at another size (`make_stamps.py --size 20`) is wr
 `stamp20_*` and is not kept in git. The PSF has no size in its name because it does not depend
 on the stamp size.
 
-**Masks and positions so far exist for B1938+666 only.** The SPT bands carry the image, noise
-map and PSF; their masks and positions have not been drawn yet. **The COWLS bands carry the
-image, noise map and PSF**; no masks or positions yet.
+**Every band of every lens has a hand-drawn contaminant mask, and every lens has image
+positions** — except COSJ095920+015851, where the positions file is deliberately empty.
+COSJ100018+022138 has two position sets (two lensed sources), and the three `multi_galaxy`
+COWLS lenses also carry extra-galaxy centres.
 
 **Orientation.** North is towards increasing row number and West towards increasing column
 number, so with Python's usual display (row 0 at the top) **North appears at the bottom and
@@ -238,7 +241,7 @@ model-PSF fallback) go in `data/reference_files/stpsf-data/`.
 uv run python scripts/download_nircam.py --lens SPT2147-50                 # raw ramps from MAST, sorted by filter
 uv run python scripts/reduce_nircam.py   --lens SPT2147-50 --filt F444W    # ramps -> calibrated exposures -> mosaic
 uv run python scripts/make_stamps.py     --lens SPT2147-50 --filt F444W    # stamp + noise map
-uv run python scripts/make_psf.py        --lens SPT2147-50 --filt F444W    # empirical PSF (STPSF fallback)
+uv run python scripts/make_psf.py        --lens SPT2147-50 --filt F444W    # injected STPSF PSF (field-star ePSF as its check)
 uv run python scripts/make_masks.py      --lens SPT2147-50                 # GUI: paint contaminants to remove
 uv run python scripts/make_positions.py  --lens SPT2147-50                 # GUI: mark the multiple images
 ```
@@ -255,7 +258,7 @@ in the dataset layout a PyAutoLens modelling project loads (`data.fits`, `noise_
 ## Repository layout
 
 ```
-data/stamps/<sample>/[<category>/]<lens>/<filter>/   the finished products (in git; COWLS has prime/, multi_galaxy/)
+data/stamps/<sample>/[<category>/]<lens>/<filter>/   the finished products (in git; COWLS has prime/, multi_galaxy/, limited/, complex/)
 data/...                                 downloads and intermediate files (not in git, rebuildable)
 info/samples/lens_samples.json           the lenses: programs, coordinates, redshifts, stamp sizes
 info/overrides/                          hand-set values (the noise corrections)

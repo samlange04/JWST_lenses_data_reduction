@@ -2,7 +2,7 @@
 """
 Download one lens's NIRCam exposures from MAST into a per-lens pool, and sort them by filter.
 
-    uv run python scripts/download_nircam.py --lens SPT0418-47 [--sample spt] [--level uncal]
+    uv run python scripts/download_nircam.py --lens SPT0418-47 [--sample templates] [--level uncal]
 
 Why a POOL and not a per-filter download (the trap this script exists to avoid): a NIRCam
 MAST *observation* is one filter (``jw01355-o016_t001_nircam_clear-f115w``) but its

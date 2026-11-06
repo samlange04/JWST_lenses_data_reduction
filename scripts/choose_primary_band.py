@@ -5,7 +5,7 @@ mask and arc-mask GUIs draw it first (every other band starts from its mask), po
 clicked on it, and it is the band to model first.
 
     uv run python scripts/choose_primary_band.py                    # every sample
-    uv run python scripts/choose_primary_band.py --sample cowls_spectacular [--lens LENS]
+    uv run python scripts/choose_primary_band.py --sample cowls-mahler [--lens LENS]
 
 A fixed order cannot do this. It used to be F444W > F356W > F277W > ... > F115W, but the best
 band depends on the lens and source spectra: the lens light is old stars peaking near rest

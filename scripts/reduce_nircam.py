@@ -2,7 +2,7 @@
 """
 NIRCam reduction for one lens + filter: uncal -> rate -> cal -> North-up mosaic at the lens.
 
-    uv run python scripts/reduce_nircam.py --lens SPT2147-50 --filt F444W [--sample spt]
+    uv run python scripts/reduce_nircam.py --lens SPT2147-50 --filt F444W [--sample templates]
 
 The JWST analogue of the HST repo's drizzle_*.py: one product per lens+filter, idempotent,
 tracking JSONs updated at the end. Three jwst pipeline stages, each cached on disk so a

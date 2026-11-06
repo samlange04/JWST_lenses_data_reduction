@@ -15,7 +15,7 @@
             }
         }
     },
-    "cowls_spectacular": {
+    "cowls-mahler": {
         "COSJ095914+021219": {
             "uncal": {
                 "obs_ids": [
@@ -509,7 +509,7 @@
             }
         }
     },
-    "spt": {
+    "templates": {
         "SPT0418-47": {
             "rate": {
                 "obs_ids": [

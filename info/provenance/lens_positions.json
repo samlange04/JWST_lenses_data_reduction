@@ -53,7 +53,7 @@
             }
         }
     },
-    "cowls_spectacular": {
+    "cowls-mahler": {
         "COSJ095914+021219": {
             "F277W": {
                 "n_positions": 2,
@@ -1303,7 +1303,7 @@
             }
         }
     },
-    "spt": {
+    "templates": {
         "SPT0418-47": {
             "F444W": {
                 "n_positions": 4,
