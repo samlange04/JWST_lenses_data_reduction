@@ -10,8 +10,8 @@ measured ``deflector_ra``/``deflector_dec`` overrides it, the stamp centre) and 
 redshifts that ``export_dataset.py`` writes into the modelling ``info.json``.
 
     b1938               JVAS B1938+666           GO 8281 (Vegetti)    F115W F277W
-    spt                 SPT0418-47, SPT2147-50   GO 1355 (TEMPLATES)  F115W..F444W (SPT2147: F200W + LW)
-    cowls_spectacular   17 COWLS II lenses       GO 1727 (COSMOS-Web) F115W F150W F277W F444W
+    templates           SPT0418-47, SPT2147-50   GO 1355 (TEMPLATES)  F115W..F444W (SPT2147: F200W + LW)
+    cowls-mahler        17 COWLS II lenses       GO 1727 (COSMOS-Web) F115W F150W F277W F444W
 
 Nothing else parses that file or keeps a second copy of a lens list. Output and directory
 names always use the lens key (``B1938+666``, ``SPT0418-47``), never the MAST target name.
@@ -30,7 +30,7 @@ _INFO_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file_
 SAMPLES_JSON = os.path.join(_INFO_DIR, 'samples', 'lens_samples.json')
 PRIMARY_BAND_JSON = os.path.join(_INFO_DIR, 'provenance', 'lens_primary_band.json')
 
-DEFAULT_SAMPLE = 'spt'
+DEFAULT_SAMPLE = 'templates'
 
 # NIRCam imaging filters this repo knows how to place on a detector. The short-wave
 # channel (nrc[ab]1-4, 0.031"/pix) and long-wave channel (nrc[ab]long, 0.063"/pix) are

@@ -287,7 +287,7 @@
             }
         }
     },
-    "cowls_spectacular": {
+    "cowls-mahler": {
         "COSJ095914+021219": {
             "F115W": {
                 "n_stars": 3,
@@ -3869,7 +3869,7 @@
             }
         }
     },
-    "spt": {
+    "templates": {
         "SPT0418-47": {
             "F115W": {
                 "n_stars": 4,

@@ -28,12 +28,12 @@ Stamps renamed 2026-10-26 (`data/cutouts/` → `data/stamps/`, `cutout_*` → `s
 
 | lens | sample | downloaded | reduced | stamps | PSF | masks + positions |
 |---|---|---|---|---|---|---|
-| SPT2147-50 | spt | uncal, 4 filters | F200W F277W F356W F444W | all 4 | see info/provenance/lens_psf.json | both, all 4 bands (2026-11-05) |
-| SPT0418-47 | spt | uncal, 6 filters | F115W F150W F200W F277W F356W F444W | all 6 | see info/provenance/lens_psf.json | both, all 6 bands (2026-11-05) |
+| SPT2147-50 | templates | uncal, 4 filters | F200W F277W F356W F444W | all 4 | see info/provenance/lens_psf.json | both, all 4 bands (2026-11-05) |
+| SPT0418-47 | templates | uncal, 6 filters | F115W F150W F200W F277W F356W F444W | all 6 | see info/provenance/lens_psf.json | both, all 6 bands (2026-11-05) |
 | B1938+666 | b1938 | uncal, 210 files / 79 GB | F115W F277W (2026-10-02, 8.5 h) | both | both, see info/provenance/lens_psf.json | both (2026-10-04) |
-| 17 COWLS II lenses | cowls_spectacular | uncal at a 90" field, 802 files / 38 GB | F115W F150W F277W F444W, all 68 bands (2026-10-29, ~11 h incl. 43 GB of new CRDS darks; Image3 re-run 2026-10-30 for tweakreg, ~1 h at 4 in parallel) | all 68, 12" (re-cut 2026-11-01 on measured lens centres; COSJ095955+021900 2026-11-02) | STPSF injected per lens (rebuilt 2026-11-02 on the measured centres) | all 68 bands masked, positions for 16 lenses (2026-11-05; COSJ095920+015851 positions deliberately empty); extra-galaxy centres for the 3 `multi_galaxy` lenses |
+| 17 COWLS II lenses | cowls-mahler | uncal at a 90" field, 802 files / 38 GB | F115W F150W F277W F444W, all 68 bands (2026-10-29, ~11 h incl. 43 GB of new CRDS darks; Image3 re-run 2026-10-30 for tweakreg, ~1 h at 4 in parallel) | all 68, 12" (re-cut 2026-11-01 on measured lens centres; COSJ095955+021900 2026-11-02) | STPSF injected per lens (rebuilt 2026-11-02 on the measured centres) | all 68 bands masked, positions for 16 lenses (2026-11-05; COSJ095920+015851 positions deliberately empty); extra-galaxy centres for the 3 `multi_galaxy` lenses |
 
-**COWLS added 2026-10-29** (`cowls_spectacular`, the 17 COWLS II lenses, GO 1727
+**COWLS added 2026-10-29** (`cowls-mahler`, the 17 COWLS II lenses, GO 1727
 COSMOS-Web): the first survey-program sample, located by position and cut by detector
 footprint (*Download*), reduced on 90" mosaics with pruned intermediates for disk
 (*Reduction*). Verified on COSJ100013+023424 F444W: 7 detector files from two tiles,
@@ -50,7 +50,7 @@ Stamps cut 2026-10-30 at the default 12", with their own measured noise factors 
 but 16% of each SW and 30% of each LW stamp is off the survey (noise 1e8, `n_bad` in
 `lens_stamp_qc.json`); every other COWLS stamp has 0–4 bad pixels.
 
-**The whole SPT sample reduced in one `run_reduce_all.sh spt` pass (2026-10-02 02:06): 10 ok,
+**The whole SPT sample reduced in one `run_reduce_all.sh templates` pass (2026-10-02 02:06): 10 ok,
 0 failed.** Per band: SW (4 detectors × 2 dithers) 220–250 s, SW F200W of SPT2147 (24 frames)
 690 s, LW 60 s — after the references were cached; the CRDS pull dominated the wall clock
 (30 GB in all, a 6.3 GB dark per SW detector at ~30 min each). tweakreg relative shifts
@@ -141,7 +141,7 @@ resampling predicts — judge the map by block sums (`measure_corr_factor.py`), 
 Empirical PSF: 281 detections → 10 PSF-grade stars, FWHM 2.83 px = 0.170" (JDox 0.145"
 nominal; a resampled, 2-dither ePSF is expected broader), 41 px kernel trimmed to 25 px,
 bootstrap PSF error fraction 2.4e-2. The six-spike NIRCam pattern is visible in the log
-panel of `data/psf/spt/SPT2147-50/F444W/psf.png`. `export_dataset.py` on this band
+panel of `data/psf/templates/SPT2147-50/F444W/psf.png`. `export_dataset.py` on this band
 produced the PyAutoLens dataset layout with `pixel_scale 0.06` and the redshifts.
 
 **Day-one outages and the fixes they forced:** jwst-crds.stsci.edu returned 502/504 then
@@ -246,6 +246,12 @@ PyAutoReduce has no MIRI support either.
 
 ## Lens samples (`info/samples/lens_samples.json`, read only by `scripts/lens_samples.py`)
 
+**Sample names (2026-11-06):** `spt` was renamed `templates` and `cowls_spectacular` renamed
+`cowls-mahler` — every `data/` tree, the stamp tree's category split, the tracking
+JSONs' sample keys and the recorded product paths moved with them. The COWLS categories were
+split the same day from prime/multi_galaxy into prime/multi_galaxy/limited/complex (*Stamps*,
+lens categories).
+
 **Only a spectroscopic redshift is a confirmed redshift (2026-11-02).** A photometric one may
 be shown or exported, but always labelled.
 - Every redshift in `lens_samples.json` carries `redshift_lens_kind` / `redshift_source_kind`,
@@ -263,7 +269,7 @@ raises otherwise), so every script finds it through `lens_samples.resolve_sample
 right after parsing.
 - An unknown lens is an error naming the closest match.
 - A `--sample` that contradicts the lens is an error.
-- Without `--lens`, each script keeps its old behaviour: the GUIs default to `spt`, the
+- Without `--lens`, each script keeps its old behaviour: the GUIs default to `templates`, the
   sample-wide tools require `--sample`, and the overview and primary-band tools run every sample.
 - New scripts call `resolve_sample` too, rather than `a.sample or sample_of(a.lens)`.
 
@@ -276,11 +282,11 @@ own copy must keep them equal).
 | sample | program | lens | MAST obs | NIRCam setup |
 |---|---|---|---|---|
 | `b1938` | 8281, PI Vegetti, Cycle 4 | B1938+666 | `jw08281-o001` | **Module ALL**, F115W+F277W, MEDIUM8 8 grp × 5 int, INTRAMODULE×3 + STANDARD×7 = 21 dithers, 87 934 s per filter, 2 visits (2025-09-20, 2025-09-29). 210 uncal / 79 GB |
-| `spt` | 1355 TEMPLATES, PI Rigby, ERS | SPT0418-47 | `jw01355-o016` | Module B, F115W+F277W (SHALLOW2, 687 s), F150W+F356W (BRIGHT2, 344 s), F200W+F444W (BRIGHT2, 429 s), 2 dithers. Lens on **B4** (Cathey+24) |
-| `spt` | 1355 | SPT2147-50 | `jw01355-o024` | Module B, F200W paired with each of F356W/F444W/F277W (F200W 1460 s total), 2 dithers per pair |
-| `cowls_spectacular` | 1727 COSMOS-Web, PI Kartaltepe & Casey, Cycle 1 | the 17 COWLS II lenses | by position, tiles `CWEBTILE-*` | F115W+F277W, F150W+F444W, SHALLOW4 5 grp × 1 int, 258 s per exposure. **Exposures over the lens: 4 per filter for C E F I L M O Q; J 3 SW / 4 LW; K 4 SW / 2 LW; 2 for A B D G H P; N 1 SW / 2 LW** (MAST footprints, 2026-10-29) |
+| `templates` | 1355 TEMPLATES, PI Rigby, ERS | SPT0418-47 | `jw01355-o016` | Module B, F115W+F277W (SHALLOW2, 687 s), F150W+F356W (BRIGHT2, 344 s), F200W+F444W (BRIGHT2, 429 s), 2 dithers. Lens on **B4** (Cathey+24) |
+| `templates` | 1355 | SPT2147-50 | `jw01355-o024` | Module B, F200W paired with each of F356W/F444W/F277W (F200W 1460 s total), 2 dithers per pair |
+| `cowls-mahler` | 1727 COSMOS-Web, PI Kartaltepe & Casey, Cycle 1 | the 17 COWLS II lenses | by position, tiles `CWEBTILE-*` | F115W+F277W, F150W+F444W, SHALLOW4 5 grp × 1 int, 258 s per exposure. **Exposures over the lens: 4 per filter for C E F I L M O Q; J 3 SW / 4 LW; K 4 SW / 2 LW; 2 for A B D G H P; N 1 SW / 2 LW** (MAST footprints, 2026-10-29) |
 
-**`cowls_spectacular` (added 2026-10-29)** is COWLS II's Table 1 (Mahler et al. 2025, MNRAS
+**`cowls-mahler` (added 2026-10-29)** is COWLS II's Table 1 (Mahler et al. 2025, MNRAS
 544, L8): the 17 "spectacular" lenses, the top tier of the COSMOS-Web Lens Survey; lens keys
 are the COWLS IDs, `cowls_letter` the paper's A–Q. `ra`/`dec` are the COSMOS-Web catalogue
 positions OF THE LENS GALAXY (Shuntov+24), so unlike an APT coordinate they need no
@@ -354,7 +360,7 @@ which never happens for the wide bands here). Hard links, not copies (no second 
 not symlinks. `info/provenance/lens_downloads.json` records obs IDs and per-filter file counts.
 
 **Survey programs: by position, cut by detector footprint** (`"mast_query": "position"` in the
-sample block; `cowls_spectacular`, 2026-10-29). COSMOS-Web's targets are tiles
+sample block; `cowls-mahler`, 2026-10-29). COSMOS-Web's targets are tiles
 (`CWEBTILE-0-4`), and one visit is ~10 arcmin² of which a lens needs one detector or two, so
 target name is useless and "the whole visit" is 4× too much. `query_position` takes every
 NIRCam/IMAGE observation of the program within the mosaic field's half-diagonal; then
@@ -369,7 +375,7 @@ NOT a substitute: it returns one row per exposure with one representative detect
 exposures. Neighbouring lenses share exposures, so a file already in another lens's pool of the
 same sample is hard-linked from there, and `reduce_nircam.py` likewise links a rate or cal a
 neighbour already made (`_link_from_neighbour`; never in the `_destriped` trees, whose rates
-carry the lens's own object mask). Sizes for `cowls_spectacular` (2026-10-29): 1487 unique
+carry the lens's own object mask). Sizes for `cowls-mahler` (2026-10-29): 1487 unique
 detector files / 75 GB uncal at a 150" field, 802 / 40 GB at 90". The overlap test closes
 both polygons explicitly (`_overlaps_box`): matplotlib's `intersects_path` on an open Path
 skips the last→first edge, which dropped a lens-covering F444W exposure on the first try. MAST position queries occasionally hang with no CPU for
@@ -392,7 +398,7 @@ it can never be mistaken for the full reduction.
 uv run python scripts/reduce_nircam.py --lens SPT2147-50 --filt F444W \
     [--start uncal|rate|cal] [--scale 0.06] [--field 150] [--tweakreg relative|gaia|skip] \
     [--flicker-by-channel] [--force]
-bash scripts/run_reduce_all.sh spt          # every lens, every filter in its pool
+bash scripts/run_reduce_all.sh templates    # every lens, every filter in its pool
 ```
 
 Three cached stages; a re-run only redoes what is missing (`--force` rebuilds the mosaic
@@ -404,7 +410,7 @@ data/calibrated/<s>/<l>/<F>/*_uncal.fits -> Detector1 -> data/stage1/<s>/<l>/<F>
                                           -> Image3    -> data/mosaics/<s>/<l>/<F>/<lens>_<filt>_i2d.fits (+png)
 ```
 
-**Per-sample field and pruning (`cowls_spectacular`, 2026-10-29).** A sample may set
+**Per-sample field and pruning (`cowls-mahler`, 2026-10-29).** A sample may set
 `mosaic_field` (arcsec; `--field` defaults to it, and so does `download_nircam.py`) and
 `prune_intermediates`. Why: a pipelined exposure costs ~290 MB of stage products (rate 84,
 rateints 84, cal 118 MB) against ~50 MB of 5-group uncal, plus a ~120 MB Image3 `crf` per input
@@ -502,7 +508,7 @@ EFFEXPTM), `lens_instrument.json` (`NIRCAM/SW` or `NIRCAM/LW`). No data → `nul
 
 ```bash
 uv run python scripts/make_stamps.py --lens SPT2147-50 --filt F444W [--size 12] [--center auto|catalogue|deflector|peak] [--variant mastrate]
-bash scripts/run_stamps_all.sh spt [SIZE] [--variant V]
+bash scripts/run_stamps_all.sh templates [SIZE] [--variant V]
 ```
 
 Writes `data/stamps/<sample>/<lens>/<FILT>/stamp<S>[_<variant>]_{sci,noise}.fits`
@@ -583,11 +589,15 @@ mosaics' absolute astrometry (relative alignment only).
     of (−5, +15) LW px. The lens then went to `multi_galaxy` and that mask was deleted, to be
     redrawn (a copy is in `diagnostics/recentre_backup_20261102/`, gitignored).
 
-**Lens categories (`cowls_spectacular`, 2026-11-02).** A sample may list `lens_categories` in
+**Lens categories (`cowls-mahler`; four since 2026-11-06, replacing the prime/multi_galaxy split of 2026-11-02).** A sample may list `lens_categories` in
 `lens_samples.json`, and each of its lenses then carries `category` (+ `category_note`). Its
 stamps live one level deeper, in `data/stamps/<sample>/<category>/<lens>/`.
-- COWLS: `prime` has one deflector, with its neighbours masked as contaminants. `multi_galaxy`
+- COWLS: `prime` holds the sample's best lenses, none chosen yet. `multi_galaxy`
   means more than one galaxy's mass has to be modelled: a second lens, or a perturber near the arcs.
+  `limited` is the rest with no spectroscopic redshift for the lens, the source or both (12
+  lenses); `complex` is the rest, whose lens AND source redshifts are both spectroscopic
+  (COSJ100018+022138, COSJ100024+021749). Every lens's neighbours are still masked as
+  contaminants, whatever its category.
 - `multi_galaxy` lenses (2026-11-02):
   - COSJ100119+014849: the round galaxy 1.7" SE is a second lens, 0.56" from the ring.
   - COSJ095955+021900: a group-scale lens (θ_E 2.11"). An elongated galaxy 3.9" SE, about 1.3"
@@ -627,16 +637,16 @@ including source Poisson noise, "read, not constructed". `NOISECOR` comes from
 `info/overrides/noise_corr_factors.json` (`factors` keyed `NIRCAM/SW`, `NIRCAM/LW` or a filter;
 `lens_overrides[sample][lens][FILT]`), source recorded as `NOISECRS`, the block scale it was
 read at as `NOISESCL`, and the 1/f correlation length it does NOT cover as `NOISECRL`.
-**`factors` applies only to the samples in `factors_samples` (`spt`, where it was measured);**
+**`factors` applies only to the samples in `factors_samples` (`templates`, where it was measured);**
 any other sample takes `sample_factors[sample]` (same keys) or per-lens `lens_overrides`, and
-`make_stamps.py` refuses a sample with neither (2026-10-29, when `cowls_spectacular` arrived
+`make_stamps.py` refuses a sample with neither (2026-10-29, when `cowls-mahler` arrived
 with SHALLOW4 5-group ramps — see the readout-pattern warning below). For a new sample: cut
 with `--corr-factor 1.0`, measure, add `sample_factors`, re-cut. **COWLS, measured 2026-10-30
-on all 68 stamps (`measure_corr_factor.py --out ..._cowls_spectacular.json`), per FILTER:
+on all 68 stamps (`measure_corr_factor.py --out ..._cowls-mahler.json`), per FILTER:
 F115W 1.25, F150W 1.22, F277W 1.03, F444W 0.95 at 0.2"** (16–84% ranges ±0.02). Per filter
 because F277W > F444W in all 17 lenses and F115W > F150W in 16 of 17, a split larger than the
 scatter; no dependence on depth (COSJ100028+021928's one SW exposure measures like the 4-exposure lenses).
-Curves in `sample_factors.cowls_spectacular.block_ratio_curve`. Re-measured after the 2026-10-30
+Curves in `sample_factors.cowls-mahler.block_ratio_curve`. Re-measured after the 2026-10-30
 Image3 re-run (*Reduction*): F115W 1.25, F150W 1.21, F277W 1.03, F444W 0.95. That is unchanged
 within the scatter, so the factors were kept. The channel medians come from
 interpolating each stamp's block-ratio curve to the scales and taking the median, which
@@ -694,7 +704,7 @@ an image-estimated rms, not an ERR map, and must not be compared to `NOISECOR`.
 
 ```bash
 uv run python scripts/make_psf.py --lens SPT2147-50 --filt F444W [--method auto|model|empirical]
-bash scripts/run_psf_all.sh spt
+bash scripts/run_psf_all.sh templates
 uv run python scripts/psf_star_check.py --lens SPT2147-50 --filt F444W   # model vs real stars
 bash scripts/run_psf_star_check_all.sh 4                                  # every band, 4 at a time
 uv run python scripts/psf_star_check.py --calibrate | --error-maps
@@ -1230,7 +1240,7 @@ Exercised 2026-10-31: the injected tier as the shipped PSF on all 80 bands, `--m
 `--error-maps`).
 
 Not yet exercised: `make_arc_masks.py`, `--tweakreg gaia`. (`make_qc_grids.py` ran on
-`cowls_spectacular` F444W on 2026-11-02 to test the category layout; its output was not kept.) Stubs: `detect_arcs.py`.
+`cowls-mahler` F444W on 2026-11-02 to test the category layout; its output was not kept.) Stubs: `detect_arcs.py`.
 Exercised since: `measure_corr_factor.py` (12 stamps, 2026-10-04), `--start rate` and
 `--flicker-by-channel` (SPT0418-47 F150W, 2026-10-02), `destripe_nircam.py`, and
 `make_masks.py`, `make_positions.py` and `make_dataset_subplots.py` on B1938+666 (2026-10-04,

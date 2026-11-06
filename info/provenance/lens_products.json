@@ -251,7 +251,7 @@
             }
         }
     },
-    "cowls_spectacular": {
+    "cowls-mahler": {
         "COSJ095914+021219": {
             "F115W": {
                 "rootnames": [
@@ -404,7 +404,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 3.260999917984009,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095914+021219/F115W/cosj095914p021219_f115w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095914+021219/F115W/cosj095914p021219_f115w_i2d.fits"
             },
             "F150W": {
                 "rootnames": [
@@ -537,7 +537,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.385999917984009,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095914+021219/F150W/cosj095914p021219_f150w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095914+021219/F150W/cosj095914p021219_f150w_i2d.fits"
             },
             "F277W": {
                 "rootnames": [
@@ -620,7 +620,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.4180000126361847,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095914+021219/F277W/cosj095914p021219_f277w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095914+021219/F277W/cosj095914p021219_f277w_i2d.fits"
             },
             "F444W": {
                 "rootnames": [
@@ -693,7 +693,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.36500000953674316,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095914+021219/F444W/cosj095914p021219_f444w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095914+021219/F444W/cosj095914p021219_f444w_i2d.fits"
             }
         },
         "COSJ095917+015424": {
@@ -748,7 +748,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 3.1040000915527344,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095917+015424/F115W/cosj095917p015424_f115w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095917+015424/F115W/cosj095917p015424_f115w_i2d.fits"
             },
             "F150W": {
                 "rootnames": [
@@ -801,7 +801,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.3550000190734863,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095917+015424/F150W/cosj095917p015424_f150w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095917+015424/F150W/cosj095917p015424_f150w_i2d.fits"
             },
             "F277W": {
                 "rootnames": [
@@ -844,7 +844,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.48500001430511475,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095917+015424/F277W/cosj095917p015424_f277w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095917+015424/F277W/cosj095917p015424_f277w_i2d.fits"
             },
             "F444W": {
                 "rootnames": [
@@ -887,7 +887,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.39100000262260437,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095917+015424/F444W/cosj095917p015424_f444w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095917+015424/F444W/cosj095917p015424_f444w_i2d.fits"
             }
         },
         "COSJ095920+015851": {
@@ -1027,7 +1027,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.7829999923706055,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095920+015851/F115W/cosj095920p015851_f115w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095920+015851/F115W/cosj095920p015851_f115w_i2d.fits"
             },
             "F150W": {
                 "rootnames": [
@@ -1165,7 +1165,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.046999931335449,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095920+015851/F150W/cosj095920p015851_f150w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095920+015851/F150W/cosj095920p015851_f150w_i2d.fits"
             },
             "F277W": {
                 "rootnames": [
@@ -1228,7 +1228,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.4180000126361847,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095920+015851/F277W/cosj095920p015851_f277w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095920+015851/F277W/cosj095920p015851_f277w_i2d.fits"
             },
             "F444W": {
                 "rootnames": [
@@ -1291,7 +1291,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.36500000953674316,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095920+015851/F444W/cosj095920p015851_f444w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095920+015851/F444W/cosj095920p015851_f444w_i2d.fits"
             }
         },
         "COSJ095921+020638": {
@@ -1416,7 +1416,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 3.069000005722046,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095921+020638/F115W/cosj095921p020638_f115w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095921+020638/F115W/cosj095921p020638_f115w_i2d.fits"
             },
             "F150W": {
                 "rootnames": [
@@ -1529,7 +1529,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.305000066757202,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095921+020638/F150W/cosj095921p020638_f150w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095921+020638/F150W/cosj095921p020638_f150w_i2d.fits"
             },
             "F277W": {
                 "rootnames": [
@@ -1622,7 +1622,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.48500001430511475,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095921+020638/F277W/cosj095921p020638_f277w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095921+020638/F277W/cosj095921p020638_f277w_i2d.fits"
             },
             "F444W": {
                 "rootnames": [
@@ -1705,7 +1705,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.39100000262260437,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095921+020638/F444W/cosj095921p020638_f444w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095921+020638/F444W/cosj095921p020638_f444w_i2d.fits"
             }
         },
         "COSJ095950+022057": {
@@ -1820,7 +1820,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 3.1040000915527344,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095950+022057/F115W/cosj095950p022057_f115w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095950+022057/F115W/cosj095950p022057_f115w_i2d.fits"
             },
             "F150W": {
                 "rootnames": [
@@ -1933,7 +1933,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.3550000190734863,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095950+022057/F150W/cosj095950p022057_f150w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095950+022057/F150W/cosj095950p022057_f150w_i2d.fits"
             },
             "F277W": {
                 "rootnames": [
@@ -1996,7 +1996,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.48500001430511475,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095950+022057/F277W/cosj095950p022057_f277w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095950+022057/F277W/cosj095950p022057_f277w_i2d.fits"
             },
             "F444W": {
                 "rootnames": [
@@ -2059,7 +2059,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.39100000262260437,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095950+022057/F444W/cosj095950p022057_f444w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095950+022057/F444W/cosj095950p022057_f444w_i2d.fits"
             }
         },
         "COSJ095953+023319": {
@@ -2164,7 +2164,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 3.1040000915527344,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095953+023319/F115W/cosj095953p023319_f115w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095953+023319/F115W/cosj095953p023319_f115w_i2d.fits"
             },
             "F150W": {
                 "rootnames": [
@@ -2267,7 +2267,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.3550000190734863,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095953+023319/F150W/cosj095953p023319_f150w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095953+023319/F150W/cosj095953p023319_f150w_i2d.fits"
             },
             "F277W": {
                 "rootnames": [
@@ -2325,7 +2325,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.48500001430511475,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095953+023319/F277W/cosj095953p023319_f277w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095953+023319/F277W/cosj095953p023319_f277w_i2d.fits"
             },
             "F444W": {
                 "rootnames": [
@@ -2383,7 +2383,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.39100000262260437,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095953+023319/F444W/cosj095953p023319_f444w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095953+023319/F444W/cosj095953p023319_f444w_i2d.fits"
             }
         },
         "COSJ095955+021900": {
@@ -2498,7 +2498,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 3.0169999599456787,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095955+021900/F115W/cosj095955p021900_f115w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095955+021900/F115W/cosj095955p021900_f115w_i2d.fits"
             },
             "F150W": {
                 "rootnames": [
@@ -2611,7 +2611,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.312999963760376,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095955+021900/F150W/cosj095955p021900_f150w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095955+021900/F150W/cosj095955p021900_f150w_i2d.fits"
             },
             "F277W": {
                 "rootnames": [
@@ -2694,7 +2694,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.48500001430511475,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095955+021900/F277W/cosj095955p021900_f277w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095955+021900/F277W/cosj095955p021900_f277w_i2d.fits"
             },
             "F444W": {
                 "rootnames": [
@@ -2777,7 +2777,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.39100000262260437,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ095955+021900/F444W/cosj095955p021900_f444w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ095955+021900/F444W/cosj095955p021900_f444w_i2d.fits"
             }
         },
         "COSJ100012+022015": {
@@ -2907,7 +2907,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 3.174999952316284,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100012+022015/F115W/cosj100012p022015_f115w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100012+022015/F115W/cosj100012p022015_f115w_i2d.fits"
             },
             "F150W": {
                 "rootnames": [
@@ -3025,7 +3025,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.3570001125335693,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100012+022015/F150W/cosj100012p022015_f150w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100012+022015/F150W/cosj100012p022015_f150w_i2d.fits"
             },
             "F277W": {
                 "rootnames": [
@@ -3108,7 +3108,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.4180000126361847,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100012+022015/F277W/cosj100012p022015_f277w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100012+022015/F277W/cosj100012p022015_f277w_i2d.fits"
             },
             "F444W": {
                 "rootnames": [
@@ -3181,7 +3181,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.36500000953674316,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100012+022015/F444W/cosj100012p022015_f444w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100012+022015/F444W/cosj100012p022015_f444w_i2d.fits"
             }
         },
         "COSJ100013+023424": {
@@ -3291,7 +3291,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 3.0169999599456787,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100013+023424/F115W/cosj100013p023424_f115w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100013+023424/F115W/cosj100013p023424_f115w_i2d.fits"
             },
             "F150W": {
                 "rootnames": [
@@ -3399,7 +3399,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.312999963760376,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100013+023424/F150W/cosj100013p023424_f150w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100013+023424/F150W/cosj100013p023424_f150w_i2d.fits"
             },
             "F277W": {
                 "rootnames": [
@@ -3457,7 +3457,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.48500001430511475,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100013+023424/F277W/cosj100013p023424_f277w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100013+023424/F277W/cosj100013p023424_f277w_i2d.fits"
             },
             "F444W": {
                 "rootnames": [
@@ -3515,7 +3515,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.39100000262260437,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100013+023424/F444W/cosj100013p023424_f444w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100013+023424/F444W/cosj100013p023424_f444w_i2d.fits"
             }
         },
         "COSJ100018+022138": {
@@ -3610,7 +3610,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.7829999923706055,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100018+022138/F115W/cosj100018p022138_f115w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100018+022138/F115W/cosj100018p022138_f115w_i2d.fits"
             },
             "F150W": {
                 "rootnames": [
@@ -3703,7 +3703,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.046999931335449,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100018+022138/F150W/cosj100018p022138_f150w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100018+022138/F150W/cosj100018p022138_f150w_i2d.fits"
             },
             "F277W": {
                 "rootnames": [
@@ -3766,7 +3766,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.4180000126361847,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100018+022138/F277W/cosj100018p022138_f277w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100018+022138/F277W/cosj100018p022138_f277w_i2d.fits"
             },
             "F444W": {
                 "rootnames": [
@@ -3829,7 +3829,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.36500000953674316,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100018+022138/F444W/cosj100018p022138_f444w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100018+022138/F444W/cosj100018p022138_f444w_i2d.fits"
             }
         },
         "COSJ100024+015334": {
@@ -3931,7 +3931,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 3.174999952316284,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100024+015334/F115W/cosj100024p015334_f115w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100024+015334/F115W/cosj100024p015334_f115w_i2d.fits"
             },
             "F150W": {
                 "rootnames": [
@@ -4031,7 +4031,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.3570001125335693,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100024+015334/F150W/cosj100024p015334_f150w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100024+015334/F150W/cosj100024p015334_f150w_i2d.fits"
             },
             "F277W": {
                 "rootnames": [
@@ -4109,7 +4109,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.4180000126361847,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100024+015334/F277W/cosj100024p015334_f277w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100024+015334/F277W/cosj100024p015334_f277w_i2d.fits"
             },
             "F444W": {
                 "rootnames": [
@@ -4187,7 +4187,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.36500000953674316,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100024+015334/F444W/cosj100024p015334_f444w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100024+015334/F444W/cosj100024p015334_f444w_i2d.fits"
             }
         },
         "COSJ100024+021749": {
@@ -4312,7 +4312,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 3.1040000915527344,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100024+021749/F115W/cosj100024p021749_f115w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100024+021749/F115W/cosj100024p021749_f115w_i2d.fits"
             },
             "F150W": {
                 "rootnames": [
@@ -4435,7 +4435,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.3550000190734863,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100024+021749/F150W/cosj100024p021749_f150w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100024+021749/F150W/cosj100024p021749_f150w_i2d.fits"
             },
             "F277W": {
                 "rootnames": [
@@ -4498,7 +4498,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.48500001430511475,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100024+021749/F277W/cosj100024p021749_f277w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100024+021749/F277W/cosj100024p021749_f277w_i2d.fits"
             },
             "F444W": {
                 "rootnames": [
@@ -4561,7 +4561,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.39100000262260437,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100024+021749/F444W/cosj100024p021749_f444w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100024+021749/F444W/cosj100024p021749_f444w_i2d.fits"
             }
         },
         "COSJ100025+015245": {
@@ -4696,7 +4696,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.7829999923706055,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100025+015245/F115W/cosj100025p015245_f115w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100025+015245/F115W/cosj100025p015245_f115w_i2d.fits"
             },
             "F150W": {
                 "rootnames": [
@@ -4829,7 +4829,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.046999931335449,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100025+015245/F150W/cosj100025p015245_f150w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100025+015245/F150W/cosj100025p015245_f150w_i2d.fits"
             },
             "F277W": {
                 "rootnames": [
@@ -4892,7 +4892,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.4180000126361847,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100025+015245/F277W/cosj100025p015245_f277w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100025+015245/F277W/cosj100025p015245_f277w_i2d.fits"
             },
             "F444W": {
                 "rootnames": [
@@ -4955,7 +4955,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.36500000953674316,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100025+015245/F444W/cosj100025p015245_f444w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100025+015245/F444W/cosj100025p015245_f444w_i2d.fits"
             }
         },
         "COSJ100028+021928": {
@@ -5065,7 +5065,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 3.260999917984009,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100028+021928/F115W/cosj100028p021928_f115w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100028+021928/F115W/cosj100028p021928_f115w_i2d.fits"
             },
             "F150W": {
                 "rootnames": [
@@ -5173,7 +5173,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.385999917984009,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100028+021928/F150W/cosj100028p021928_f150w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100028+021928/F150W/cosj100028p021928_f150w_i2d.fits"
             },
             "F277W": {
                 "rootnames": [
@@ -5236,7 +5236,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.4180000126361847,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100028+021928/F277W/cosj100028p021928_f277w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100028+021928/F277W/cosj100028p021928_f277w_i2d.fits"
             },
             "F444W": {
                 "rootnames": [
@@ -5299,7 +5299,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.36500000953674316,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100028+021928/F444W/cosj100028p021928_f444w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100028+021928/F444W/cosj100028p021928_f444w_i2d.fits"
             }
         },
         "COSJ100047+015023": {
@@ -5394,7 +5394,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.7829999923706055,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100047+015023/F115W/cosj100047p015023_f115w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100047+015023/F115W/cosj100047p015023_f115w_i2d.fits"
             },
             "F150W": {
                 "rootnames": [
@@ -5487,7 +5487,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.046999931335449,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100047+015023/F150W/cosj100047p015023_f150w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100047+015023/F150W/cosj100047p015023_f150w_i2d.fits"
             },
             "F277W": {
                 "rootnames": [
@@ -5550,7 +5550,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.4180000126361847,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100047+015023/F277W/cosj100047p015023_f277w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100047+015023/F277W/cosj100047p015023_f277w_i2d.fits"
             },
             "F444W": {
                 "rootnames": [
@@ -5613,7 +5613,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.36500000953674316,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100047+015023/F444W/cosj100047p015023_f444w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100047+015023/F444W/cosj100047p015023_f444w_i2d.fits"
             }
         },
         "COSJ100119+014849": {
@@ -5718,7 +5718,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 3.260999917984009,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100119+014849/F115W/cosj100119p014849_f115w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100119+014849/F115W/cosj100119p014849_f115w_i2d.fits"
             },
             "F150W": {
                 "rootnames": [
@@ -5821,7 +5821,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.385999917984009,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100119+014849/F150W/cosj100119p014849_f150w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100119+014849/F150W/cosj100119p014849_f150w_i2d.fits"
             },
             "F277W": {
                 "rootnames": [
@@ -5874,7 +5874,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.4180000126361847,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100119+014849/F277W/cosj100119p014849_f277w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100119+014849/F277W/cosj100119p014849_f277w_i2d.fits"
             },
             "F444W": {
                 "rootnames": [
@@ -5927,7 +5927,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.36500000953674316,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100119+014849/F444W/cosj100119p014849_f444w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100119+014849/F444W/cosj100119p014849_f444w_i2d.fits"
             }
         },
         "COSJ100121+022740": {
@@ -6052,7 +6052,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.7829999923706055,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100121+022740/F115W/cosj100121p022740_f115w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100121+022740/F115W/cosj100121p022740_f115w_i2d.fits"
             },
             "F150W": {
                 "rootnames": [
@@ -6175,7 +6175,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.046999931335449,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100121+022740/F150W/cosj100121p022740_f150w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100121+022740/F150W/cosj100121p022740_f150w_i2d.fits"
             },
             "F277W": {
                 "rootnames": [
@@ -6238,7 +6238,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.4180000126361847,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100121+022740/F277W/cosj100121p022740_f277w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100121+022740/F277W/cosj100121p022740_f277w_i2d.fits"
             },
             "F444W": {
                 "rootnames": [
@@ -6301,11 +6301,11 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.36500000953674316,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/cowls_spectacular/COSJ100121+022740/F444W/cosj100121p022740_f444w_i2d.fits"
+                "i2d": "data/mosaics/cowls-mahler/COSJ100121+022740/F444W/cosj100121p022740_f444w_i2d.fits"
             }
         }
     },
-    "spt": {
+    "templates": {
         "SPT0418-47": {
             "F115W": {
                 "rootnames": [
@@ -6331,7 +6331,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 3.260999917984009,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/spt/SPT0418-47/F115W/spt0418-47_f115w_i2d.fits"
+                "i2d": "data/mosaics/templates/SPT0418-47/F115W/spt0418-47_f115w_i2d.fits"
             },
             "F150W": {
                 "rootnames": [
@@ -6359,7 +6359,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.385999917984009,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/spt/SPT0418-47/F150W/spt0418-47_f150w_i2d.fits"
+                "i2d": "data/mosaics/templates/SPT0418-47/F150W/spt0418-47_f150w_i2d.fits"
             },
             "F150W_bychan": {
                 "rootnames": [
@@ -6385,7 +6385,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.385999917984009,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics_bychan/spt/SPT0418-47/F150W/spt0418-47_f150w_i2d.fits"
+                "i2d": "data/mosaics_bychan/templates/SPT0418-47/F150W/spt0418-47_f150w_i2d.fits"
             },
             "F150W_destriped": {
                 "rootnames": [
@@ -6418,7 +6418,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.385999917984009,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics_destriped/spt/SPT0418-47/F150W/spt0418-47_f150w_i2d.fits"
+                "i2d": "data/mosaics_destriped/templates/SPT0418-47/F150W/spt0418-47_f150w_i2d.fits"
             },
             "F150W_mastrate": {
                 "rootnames": [
@@ -6444,7 +6444,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 2.385999917984009,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics_mastrate/spt/SPT0418-47/F150W/spt0418-47_f150w_i2d.fits"
+                "i2d": "data/mosaics_mastrate/templates/SPT0418-47/F150W/spt0418-47_f150w_i2d.fits"
             },
             "F200W": {
                 "rootnames": [
@@ -6470,7 +6470,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 1.9980000257492065,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/spt/SPT0418-47/F200W/spt0418-47_f200w_i2d.fits"
+                "i2d": "data/mosaics/templates/SPT0418-47/F200W/spt0418-47_f200w_i2d.fits"
             },
             "F277W": {
                 "rootnames": [
@@ -6490,7 +6490,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.4180000126361847,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/spt/SPT0418-47/F277W/spt0418-47_f277w_i2d.fits"
+                "i2d": "data/mosaics/templates/SPT0418-47/F277W/spt0418-47_f277w_i2d.fits"
             },
             "F356W": {
                 "rootnames": [
@@ -6510,7 +6510,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.37700000405311584,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/spt/SPT0418-47/F356W/spt0418-47_f356w_i2d.fits"
+                "i2d": "data/mosaics/templates/SPT0418-47/F356W/spt0418-47_f356w_i2d.fits"
             },
             "F444W": {
                 "rootnames": [
@@ -6530,7 +6530,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.36500000953674316,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/spt/SPT0418-47/F444W/spt0418-47_f444w_i2d.fits"
+                "i2d": "data/mosaics/templates/SPT0418-47/F444W/spt0418-47_f444w_i2d.fits"
             }
         },
         "SPT2147-50": {
@@ -6574,7 +6574,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 1.9980000257492065,
                 "pixar_sr": 2.1153987485188e-14,
-                "i2d": "data/mosaics/spt/SPT2147-50/F200W/spt2147-50_f200w_i2d.fits"
+                "i2d": "data/mosaics/templates/SPT2147-50/F200W/spt2147-50_f200w_i2d.fits"
             },
             "F277W": {
                 "rootnames": [
@@ -6594,7 +6594,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.4180000126361847,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/spt/SPT2147-50/F277W/spt2147-50_f277w_i2d.fits"
+                "i2d": "data/mosaics/templates/SPT2147-50/F277W/spt2147-50_f277w_i2d.fits"
             },
             "F356W": {
                 "rootnames": [
@@ -6614,7 +6614,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.37700000405311584,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/spt/SPT2147-50/F356W/spt2147-50_f356w_i2d.fits"
+                "i2d": "data/mosaics/templates/SPT2147-50/F356W/spt2147-50_f356w_i2d.fits"
             },
             "F444W": {
                 "rootnames": [
@@ -6634,7 +6634,7 @@
                 "bunit": "MJy/sr",
                 "photmjsr": 0.36500000953674316,
                 "pixar_sr": 8.46159499407523e-14,
-                "i2d": "data/mosaics/spt/SPT2147-50/F444W/spt2147-50_f444w_i2d.fits"
+                "i2d": "data/mosaics/templates/SPT2147-50/F444W/spt2147-50_f444w_i2d.fits"
             }
         }
     }

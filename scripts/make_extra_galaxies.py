@@ -3,9 +3,9 @@
 Mark the centres of the EXTRA galaxies of a multi-galaxy lens: the galaxies besides the main
 deflector whose mass (and light) a lens model has to include.
 
-    uv run python scripts/make_extra_galaxies.py --sample cowls_spectacular            # multi_galaxy lenses
-    uv run python scripts/make_extra_galaxies.py --sample cowls_spectacular --lens COSJ095955+021900 [--force]
-    uv run python scripts/make_extra_galaxies.py --sample spt --lens SPT0418-47 --all    # any lens
+    uv run python scripts/make_extra_galaxies.py --sample cowls-mahler                   # multi_galaxy lenses
+    uv run python scripts/make_extra_galaxies.py --sample cowls-mahler --lens COSJ095955+021900 [--force]
+    uv run python scripts/make_extra_galaxies.py --sample templates --lens SPT0418-47 --all    # any lens
 
 The window is make_positions.py's (North up, East left; as-observed LEFT, isophote-subtracted
 RIGHT; the mask GUIs' arcsinh stretch and colormap), on the lens's primary band. DOUBLE-CLICK
@@ -22,7 +22,7 @@ fraction of a pixel still gets the right pixels. export_dataset.py copies the fi
 `extra_galaxies_centres.json`, and the band overview marks them (cyan x).
 
 Which lenses: with no --lens, the sample's `multi_galaxy` lenses (lens_samples.json
-`category`), or every lens with --all. A lens that already has the file on its primary band is
+`category`; only a sample with a multi_galaxy category has any), or every lens with --all. A lens that already has the file on its primary band is
 skipped unless --force. Clicking nothing writes nothing.
 
 Contaminant-masked pixels are NOT blanked here (the positions GUI blanks them), so a masked

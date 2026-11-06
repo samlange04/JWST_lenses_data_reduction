@@ -1,0 +1,40 @@
+{
+    "lens": "COSJ100012+022015",
+    "sample": "cowls-mahler",
+    "primary_band": "F115W",
+    "primary_band_source": "visual",
+    "best_band_visual": "F115W",
+    "best_band_arc_snr": "F277W",
+    "theta_e": 0.75,
+    "scores": {
+        "F115W": {
+            "arc_snr": 19.29,
+            "psf_fwhm_arcsec": 0.0527,
+            "resolution_factor": 1.0,
+            "score": 19.29,
+            "contaminant_mask": false
+        },
+        "F150W": {
+            "arc_snr": 31.14,
+            "psf_fwhm_arcsec": 0.0637,
+            "resolution_factor": 1.0,
+            "score": 31.14,
+            "contaminant_mask": false
+        },
+        "F277W": {
+            "arc_snr": 93.5,
+            "psf_fwhm_arcsec": 0.1246,
+            "resolution_factor": 1.0,
+            "score": 93.5,
+            "contaminant_mask": false
+        },
+        "F444W": {
+            "arc_snr": 50.31,
+            "psf_fwhm_arcsec": 0.1666,
+            "resolution_factor": 0.9,
+            "score": 45.3,
+            "contaminant_mask": false
+        }
+    },
+    "how": "best_band_arc_snr: choose_primary_band.py (measured); best_band_visual: choose_best_band.py (by eye)"
+}

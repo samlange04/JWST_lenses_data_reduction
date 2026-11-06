@@ -31,9 +31,9 @@ tools drew the masks and marked the positions.
 | Sample folder | Lens | JWST program | NIRCam filters | Lens / source redshift |
 |---|---|---|---|---|
 | `b1938` | B1938+666 | GO 8281 (PI Vegetti) | F115W, F277W (21 dithers, ~24 h per filter) | 0.881 / 2.059 |
-| `spt` | SPT0418-47 | ERS 1355 TEMPLATES (PI Rigby) | F115W, F150W, F200W, F277W, F356W, F444W | 0.263 / 4.22 |
-| `spt` | SPT2147-50 | ERS 1355 TEMPLATES (PI Rigby) | F200W, F277W, F356W, F444W | 0.845 / 3.76 |
-| `cowls_spectacular` | the 17 "spectacular" COWLS lenses of Mahler et al. (2025), `COSJ095914+021219` … `COSJ100121+022740` | GO 1727 COSMOS-Web (PIs Kartaltepe & Casey) | F115W, F150W, F277W, F444W (2–4 exposures of 258 s per filter at the lens) | per lens in `lens_samples.json`: 11 spectroscopic and 5 photometric lens redshifts, 3 spectroscopic source redshifts |
+| `templates` | SPT0418-47 | ERS 1355 TEMPLATES (PI Rigby) | F115W, F150W, F200W, F277W, F356W, F444W | 0.263 / 4.22 |
+| `templates` | SPT2147-50 | ERS 1355 TEMPLATES (PI Rigby) | F200W, F277W, F356W, F444W | 0.845 / 3.76 |
+| `cowls-mahler` | the 17 "spectacular" COWLS lenses of Mahler et al. (2025), `COSJ095914+021219` … `COSJ100121+022740` | GO 1727 COSMOS-Web (PIs Kartaltepe & Casey) | F115W, F150W, F277W, F444W (2–4 exposures of 258 s per filter at the lens) | per lens in `lens_samples.json`: 11 spectroscopic and 5 photometric lens redshifts, 3 spectroscopic source redshifts |
 
 That is 80 lens-and-filter images in total (12 + 68 COWLS). A filter name gives its approximate central
 wavelength in hundredths of a micron: F115W is centred near 1.15 μm and F444W near 4.4 μm,
@@ -58,10 +58,12 @@ in `info/samples/lens_samples.json`), to within 0.04″, and a lens's SW and LW 
 
 Each lens and filter has one folder, `data/stamps/<sample>/<lens>/<filter>/`, for example
 `data/stamps/b1938/B1938+666/F115W/`. The COWLS lenses add a level for their category,
-`data/stamps/cowls_spectacular/<category>/<lens>/<filter>/`:
-- `prime`: one lens galaxy; neighbours are masked as contaminants;
+`data/stamps/cowls-mahler/<category>/<lens>/<filter>/`:
+- `prime`: the sample's best lenses (none chosen yet);
 - `multi_galaxy`: more than one galaxy's mass has to be modelled, such as a second lens or a
-  galaxy close enough to the arcs to perturb them.
+  galaxy close enough to the arcs to perturb them;
+- `limited`: no spectroscopic redshift for the lens, the source, or both;
+- `complex`: the lens and source redshifts are both spectroscopic.
 
 The exported `info.json` names the category (`lens_category`). The files in each folder are:
 
@@ -255,7 +257,7 @@ in the dataset layout a PyAutoLens modelling project loads (`data.fits`, `noise_
 ## Repository layout
 
 ```
-data/stamps/<sample>/[<category>/]<lens>/<filter>/   the finished products (in git; COWLS has prime/, multi_galaxy/)
+data/stamps/<sample>/[<category>/]<lens>/<filter>/   the finished products (in git; COWLS has prime/, multi_galaxy/, limited/, complex/)
 data/...                                 downloads and intermediate files (not in git, rebuildable)
 info/samples/lens_samples.json           the lenses: programs, coordinates, redshifts, stamp sizes
 info/overrides/                          hand-set values (the noise corrections)

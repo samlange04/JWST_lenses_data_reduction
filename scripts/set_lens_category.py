@@ -2,16 +2,18 @@
 """
 Put a lens in one of its sample's categories, and move its stamp dir to match.
 
-    uv run python scripts/set_lens_category.py --sample cowls_spectacular --lens COSJ100119+014849 \
+    uv run python scripts/set_lens_category.py --sample cowls-mahler --lens COSJ100119+014849 \
         --category multi_galaxy --note "the round galaxy 1.7\" SE is a second lens"
 
-A sample may set `lens_categories` in info/samples/lens_samples.json (cowls_spectacular: prime,
-multi_galaxy; 2026-11-02). Its stamps then live in data/stamps/<sample>/<category>/<lens>/, and
-each lens carries `category` (+ `category_note`). `prime`: one deflector; the neighbours are
-masked as contaminants. `multi_galaxy`: more than one galaxy's mass has to be modelled (a second
-lens, or a perturber close enough to the arcs). Every tool finds the lens through
-stamp_paths.lens_stamp_dir / band_dirs, and export_dataset.py writes `lens_category` into each
-band's info.json.
+A sample may set `lens_categories` in info/samples/lens_samples.json (cowls-mahler: prime,
+multi_galaxy, limited, complex; 2026-11-06, replacing prime/multi_galaxy of 2026-11-02). Its
+stamps then live in data/stamps/<sample>/<category>/<lens>/, and each lens carries
+`category` (+ `category_note`). `prime`: the sample's best lenses (none yet).
+`multi_galaxy`: more than one galaxy's mass has to be modelled (a second lens, or a perturber
+close enough to the arcs). `limited`: no spectroscopic redshift for the lens, the source or
+both. `complex`: the lens and source redshifts are both spectroscopic. Every tool finds the
+lens through stamp_paths.lens_stamp_dir / band_dirs, and export_dataset.py writes
+`lens_category` into each band's info.json.
 
 The whole lens dir moves (every band, every size, masks, positions, primary_band.json, the band
 overview), with os.rename, so git sees a rename once the move is staged. Only the stamp tree is

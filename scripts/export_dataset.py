@@ -91,8 +91,8 @@ def export_band(sample, lens, filt, dest, mask_radius, size):
         # 'arc_snr' = the measured best arc S/N (choose_primary_band.py)
         'primary_band': primary, 'primary_band_source': primary_source, 'is_primary_band': filt == primary,
         'best_band_visual': lens_samples.entry(lens, sample).get('best_band_visual'),
-        # prime: one deflector; multi_galaxy: more than one galaxy's mass must be modelled
-        # (lens_samples.json lens_categories); None for a sample without categories
+        # the lens's category of its sample's lens_categories (cowls-mahler: prime /
+        # multi_galaxy / limited / complex; lens_samples.json); None for a flat sample
         'lens_category': lens_samples.category(lens, sample),
         'bunit': hdr.get('BUNIT'), 'photmjsr': hdr.get('PHOTMJSR'), 'pixar_sr': hdr.get('PIXAR_SR'),
         'variant': hdr.get('REDUCVAR', 'standard'), 'jwst_version': hdr.get('CAL_VER'),

@@ -23,7 +23,7 @@
             }
         }
     },
-    "cowls_spectacular": {
+    "cowls-mahler": {
         "COSJ095914+021219": {
             "F115W": {
                 "prefix": "stamp12",
@@ -33,7 +33,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.298994,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095914+021219/F115W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095914+021219/F115W/stamp12_dataset.png"
             },
             "F150W": {
                 "prefix": "stamp12",
@@ -43,7 +43,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.298975,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095914+021219/F150W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095914+021219/F150W/stamp12_dataset.png"
             },
             "F277W": {
                 "prefix": "stamp12",
@@ -53,7 +53,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.30015,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095914+021219/F277W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095914+021219/F277W/stamp12_dataset.png"
             },
             "F444W": {
                 "prefix": "stamp12",
@@ -63,7 +63,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.277725,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095914+021219/F444W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095914+021219/F444W/stamp12_dataset.png"
             }
         },
         "COSJ095917+015424": {
@@ -75,7 +75,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.464738,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095917+015424/F115W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095917+015424/F115W/stamp12_dataset.png"
             },
             "F150W": {
                 "prefix": "stamp12",
@@ -85,7 +85,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.467475,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095917+015424/F150W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095917+015424/F150W/stamp12_dataset.png"
             },
             "F277W": {
                 "prefix": "stamp12",
@@ -95,7 +95,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.476675,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095917+015424/F277W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095917+015424/F277W/stamp12_dataset.png"
             },
             "F444W": {
                 "prefix": "stamp12",
@@ -105,7 +105,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.4689,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095917+015424/F444W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095917+015424/F444W/stamp12_dataset.png"
             }
         },
         "COSJ095920+015851": {
@@ -117,7 +117,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.0137,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095920+015851/F115W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095920+015851/F115W/stamp12_dataset.png"
             },
             "F150W": {
                 "prefix": "stamp12",
@@ -127,7 +127,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.0137,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095920+015851/F150W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095920+015851/F150W/stamp12_dataset.png"
             },
             "F277W": {
                 "prefix": "stamp12",
@@ -137,7 +137,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.058525,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095920+015851/F277W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095920+015851/F277W/stamp12_dataset.png"
             },
             "F444W": {
                 "prefix": "stamp12",
@@ -147,7 +147,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.032775,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095920+015851/F444W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095920+015851/F444W/stamp12_dataset.png"
             }
         },
         "COSJ095921+020638": {
@@ -159,7 +159,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.11005,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095921+020638/F115W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095921+020638/F115W/stamp12_dataset.png"
             },
             "F150W": {
                 "prefix": "stamp12",
@@ -169,7 +169,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.118438,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095921+020638/F150W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095921+020638/F150W/stamp12_dataset.png"
             },
             "F277W": {
                 "prefix": "stamp12",
@@ -179,7 +179,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.131625,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095921+020638/F277W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095921+020638/F277W/stamp12_dataset.png"
             },
             "F444W": {
                 "prefix": "stamp12",
@@ -189,7 +189,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.1707,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095921+020638/F444W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095921+020638/F444W/stamp12_dataset.png"
             }
         },
         "COSJ095950+022057": {
@@ -201,7 +201,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.1197,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095950+022057/F115W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095950+022057/F115W/stamp12_dataset.png"
             },
             "F150W": {
                 "prefix": "stamp12",
@@ -211,7 +211,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.119675,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095950+022057/F150W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095950+022057/F150W/stamp12_dataset.png"
             },
             "F277W": {
                 "prefix": "stamp12",
@@ -221,7 +221,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.135225,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095950+022057/F277W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095950+022057/F277W/stamp12_dataset.png"
             },
             "F444W": {
                 "prefix": "stamp12",
@@ -231,7 +231,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.122775,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095950+022057/F444W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095950+022057/F444W/stamp12_dataset.png"
             }
         },
         "COSJ095953+023319": {
@@ -243,7 +243,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.155663,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095953+023319/F115W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095953+023319/F115W/stamp12_dataset.png"
             },
             "F150W": {
                 "prefix": "stamp12",
@@ -253,7 +253,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.150762,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095953+023319/F150W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095953+023319/F150W/stamp12_dataset.png"
             },
             "F277W": {
                 "prefix": "stamp12",
@@ -263,7 +263,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.154175,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095953+023319/F277W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095953+023319/F277W/stamp12_dataset.png"
             },
             "F444W": {
                 "prefix": "stamp12",
@@ -273,7 +273,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.150875,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ095953+023319/F444W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ095953+023319/F444W/stamp12_dataset.png"
             }
         },
         "COSJ095955+021900": {
@@ -285,7 +285,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.293519,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/multi_galaxy/COSJ095955+021900/F115W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/multi_galaxy/COSJ095955+021900/F115W/stamp12_dataset.png"
             },
             "F150W": {
                 "prefix": "stamp12",
@@ -295,7 +295,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.293519,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/multi_galaxy/COSJ095955+021900/F150W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/multi_galaxy/COSJ095955+021900/F150W/stamp12_dataset.png"
             },
             "F277W": {
                 "prefix": "stamp12",
@@ -305,7 +305,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.29745,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/multi_galaxy/COSJ095955+021900/F277W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/multi_galaxy/COSJ095955+021900/F277W/stamp12_dataset.png"
             },
             "F444W": {
                 "prefix": "stamp12",
@@ -315,7 +315,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.305425,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/multi_galaxy/COSJ095955+021900/F444W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/multi_galaxy/COSJ095955+021900/F444W/stamp12_dataset.png"
             }
         },
         "COSJ100012+022015": {
@@ -327,7 +327,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.273738,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100012+022015/F115W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100012+022015/F115W/stamp12_dataset.png"
             },
             "F150W": {
                 "prefix": "stamp12",
@@ -337,7 +337,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.265119,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100012+022015/F150W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100012+022015/F150W/stamp12_dataset.png"
             },
             "F277W": {
                 "prefix": "stamp12",
@@ -347,7 +347,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.414825,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100012+022015/F277W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100012+022015/F277W/stamp12_dataset.png"
             },
             "F444W": {
                 "prefix": "stamp12",
@@ -357,7 +357,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.2693,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100012+022015/F444W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100012+022015/F444W/stamp12_dataset.png"
             }
         },
         "COSJ100013+023424": {
@@ -369,7 +369,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.209613,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/multi_galaxy/COSJ100013+023424/F115W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/multi_galaxy/COSJ100013+023424/F115W/stamp12_dataset.png"
             },
             "F150W": {
                 "prefix": "stamp12",
@@ -379,7 +379,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.227463,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/multi_galaxy/COSJ100013+023424/F150W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/multi_galaxy/COSJ100013+023424/F150W/stamp12_dataset.png"
             },
             "F277W": {
                 "prefix": "stamp12",
@@ -389,7 +389,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.226625,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/multi_galaxy/COSJ100013+023424/F277W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/multi_galaxy/COSJ100013+023424/F277W/stamp12_dataset.png"
             },
             "F444W": {
                 "prefix": "stamp12",
@@ -399,7 +399,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.226025,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/multi_galaxy/COSJ100013+023424/F444W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/multi_galaxy/COSJ100013+023424/F444W/stamp12_dataset.png"
             }
         },
         "COSJ100018+022138": {
@@ -411,7 +411,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.089456,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100018+022138/F115W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100018+022138/F115W/stamp12_dataset.png"
             },
             "F150W": {
                 "prefix": "stamp12",
@@ -421,7 +421,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.125444,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100018+022138/F150W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100018+022138/F150W/stamp12_dataset.png"
             },
             "F277W": {
                 "prefix": "stamp12",
@@ -431,7 +431,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.1592,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100018+022138/F277W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100018+022138/F277W/stamp12_dataset.png"
             },
             "F444W": {
                 "prefix": "stamp12",
@@ -441,7 +441,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.166425,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100018+022138/F444W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100018+022138/F444W/stamp12_dataset.png"
             }
         },
         "COSJ100024+015334": {
@@ -453,7 +453,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.202825,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100024+015334/F115W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100024+015334/F115W/stamp12_dataset.png"
             },
             "F150W": {
                 "prefix": "stamp12",
@@ -463,7 +463,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.212012,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100024+015334/F150W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100024+015334/F150W/stamp12_dataset.png"
             },
             "F277W": {
                 "prefix": "stamp12",
@@ -473,7 +473,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.22805,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100024+015334/F277W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100024+015334/F277W/stamp12_dataset.png"
             },
             "F444W": {
                 "prefix": "stamp12",
@@ -483,7 +483,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.226325,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100024+015334/F444W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100024+015334/F444W/stamp12_dataset.png"
             }
         },
         "COSJ100024+021749": {
@@ -495,7 +495,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.128537,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100024+021749/F115W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100024+021749/F115W/stamp12_dataset.png"
             },
             "F150W": {
                 "prefix": "stamp12",
@@ -505,7 +505,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.138906,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100024+021749/F150W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100024+021749/F150W/stamp12_dataset.png"
             },
             "F277W": {
                 "prefix": "stamp12",
@@ -515,7 +515,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.141475,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100024+021749/F277W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100024+021749/F277W/stamp12_dataset.png"
             },
             "F444W": {
                 "prefix": "stamp12",
@@ -525,7 +525,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.127975,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100024+021749/F444W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100024+021749/F444W/stamp12_dataset.png"
             }
         },
         "COSJ100025+015245": {
@@ -537,7 +537,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.210925,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100025+015245/F115W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100025+015245/F115W/stamp12_dataset.png"
             },
             "F150W": {
                 "prefix": "stamp12",
@@ -547,7 +547,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.244588,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100025+015245/F150W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100025+015245/F150W/stamp12_dataset.png"
             },
             "F277W": {
                 "prefix": "stamp12",
@@ -557,7 +557,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.288425,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100025+015245/F277W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100025+015245/F277W/stamp12_dataset.png"
             },
             "F444W": {
                 "prefix": "stamp12",
@@ -567,7 +567,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.2589,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100025+015245/F444W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100025+015245/F444W/stamp12_dataset.png"
             }
         },
         "COSJ100028+021928": {
@@ -579,7 +579,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.3341,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100028+021928/F115W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100028+021928/F115W/stamp12_dataset.png"
             },
             "F150W": {
                 "prefix": "stamp12",
@@ -589,7 +589,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.438025,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100028+021928/F150W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100028+021928/F150W/stamp12_dataset.png"
             },
             "F277W": {
                 "prefix": "stamp12",
@@ -599,7 +599,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.44045,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100028+021928/F277W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100028+021928/F277W/stamp12_dataset.png"
             },
             "F444W": {
                 "prefix": "stamp12",
@@ -609,7 +609,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.4417,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100028+021928/F444W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100028+021928/F444W/stamp12_dataset.png"
             }
         },
         "COSJ100047+015023": {
@@ -621,7 +621,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.622212,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100047+015023/F115W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100047+015023/F115W/stamp12_dataset.png"
             },
             "F150W": {
                 "prefix": "stamp12",
@@ -631,7 +631,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.622212,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100047+015023/F150W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100047+015023/F150W/stamp12_dataset.png"
             },
             "F277W": {
                 "prefix": "stamp12",
@@ -641,7 +641,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.62585,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100047+015023/F277W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100047+015023/F277W/stamp12_dataset.png"
             },
             "F444W": {
                 "prefix": "stamp12",
@@ -651,7 +651,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.62585,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100047+015023/F444W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100047+015023/F444W/stamp12_dataset.png"
             }
         },
         "COSJ100119+014849": {
@@ -663,7 +663,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.239506,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/multi_galaxy/COSJ100119+014849/F115W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/multi_galaxy/COSJ100119+014849/F115W/stamp12_dataset.png"
             },
             "F150W": {
                 "prefix": "stamp12",
@@ -673,7 +673,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.214181,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/multi_galaxy/COSJ100119+014849/F150W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/multi_galaxy/COSJ100119+014849/F150W/stamp12_dataset.png"
             },
             "F277W": {
                 "prefix": "stamp12",
@@ -683,7 +683,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.241675,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/multi_galaxy/COSJ100119+014849/F277W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/multi_galaxy/COSJ100119+014849/F277W/stamp12_dataset.png"
             },
             "F444W": {
                 "prefix": "stamp12",
@@ -693,7 +693,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.22015,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/multi_galaxy/COSJ100119+014849/F444W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/multi_galaxy/COSJ100119+014849/F444W/stamp12_dataset.png"
             }
         },
         "COSJ100121+022740": {
@@ -705,7 +705,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.122494,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100121+022740/F115W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100121+022740/F115W/stamp12_dataset.png"
             },
             "F150W": {
                 "prefix": "stamp12",
@@ -715,7 +715,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.146987,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100121+022740/F150W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100121+022740/F150W/stamp12_dataset.png"
             },
             "F277W": {
                 "prefix": "stamp12",
@@ -725,7 +725,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.163575,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100121+022740/F277W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100121+022740/F277W/stamp12_dataset.png"
             },
             "F444W": {
                 "prefix": "stamp12",
@@ -735,11 +735,11 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.152775,
                 "variant": "standard",
-                "output": "data/stamps/cowls_spectacular/prime/COSJ100121+022740/F444W/stamp12_dataset.png"
+                "output": "data/stamps/cowls-mahler/prime/COSJ100121+022740/F444W/stamp12_dataset.png"
             }
         }
     },
-    "spt": {
+    "templates": {
         "SPT0418-47": {
             "F115W": {
                 "prefix": "stamp12",
@@ -749,7 +749,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.052194,
                 "variant": "standard",
-                "output": "data/stamps/spt/SPT0418-47/F115W/stamp12_dataset.png"
+                "output": "data/stamps/templates/SPT0418-47/F115W/stamp12_dataset.png"
             },
             "F150W": {
                 "prefix": "stamp12",
@@ -759,7 +759,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.051144,
                 "variant": "standard",
-                "output": "data/stamps/spt/SPT0418-47/F150W/stamp12_dataset.png"
+                "output": "data/stamps/templates/SPT0418-47/F150W/stamp12_dataset.png"
             },
             "F200W": {
                 "prefix": "stamp12",
@@ -769,7 +769,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.049606,
                 "variant": "standard",
-                "output": "data/stamps/spt/SPT0418-47/F200W/stamp12_dataset.png"
+                "output": "data/stamps/templates/SPT0418-47/F200W/stamp12_dataset.png"
             },
             "F277W": {
                 "prefix": "stamp12",
@@ -779,7 +779,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.10445,
                 "variant": "standard",
-                "output": "data/stamps/spt/SPT0418-47/F277W/stamp12_dataset.png"
+                "output": "data/stamps/templates/SPT0418-47/F277W/stamp12_dataset.png"
             },
             "F356W": {
                 "prefix": "stamp12",
@@ -789,7 +789,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.095375,
                 "variant": "standard",
-                "output": "data/stamps/spt/SPT0418-47/F356W/stamp12_dataset.png"
+                "output": "data/stamps/templates/SPT0418-47/F356W/stamp12_dataset.png"
             },
             "F444W": {
                 "prefix": "stamp12",
@@ -799,7 +799,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.063925,
                 "variant": "standard",
-                "output": "data/stamps/spt/SPT0418-47/F444W/stamp12_dataset.png"
+                "output": "data/stamps/templates/SPT0418-47/F444W/stamp12_dataset.png"
             }
         },
         "SPT2147-50": {
@@ -811,7 +811,7 @@
                 "pixel_scale_arcsec": 0.03,
                 "frac_masked": 0.118837,
                 "variant": "standard",
-                "output": "data/stamps/spt/SPT2147-50/F200W/stamp12_dataset.png"
+                "output": "data/stamps/templates/SPT2147-50/F200W/stamp12_dataset.png"
             },
             "F277W": {
                 "prefix": "stamp12",
@@ -821,7 +821,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.13715,
                 "variant": "standard",
-                "output": "data/stamps/spt/SPT2147-50/F277W/stamp12_dataset.png"
+                "output": "data/stamps/templates/SPT2147-50/F277W/stamp12_dataset.png"
             },
             "F356W": {
                 "prefix": "stamp12",
@@ -831,7 +831,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.10865,
                 "variant": "standard",
-                "output": "data/stamps/spt/SPT2147-50/F356W/stamp12_dataset.png"
+                "output": "data/stamps/templates/SPT2147-50/F356W/stamp12_dataset.png"
             },
             "F444W": {
                 "prefix": "stamp12",
@@ -841,7 +841,7 @@
                 "pixel_scale_arcsec": 0.06,
                 "frac_masked": 0.054325,
                 "variant": "standard",
-                "output": "data/stamps/spt/SPT2147-50/F444W/stamp12_dataset.png"
+                "output": "data/stamps/templates/SPT2147-50/F444W/stamp12_dataset.png"
             }
         }
     }

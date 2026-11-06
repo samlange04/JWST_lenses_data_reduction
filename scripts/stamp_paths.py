@@ -4,8 +4,9 @@ same contract, JWST vocabulary).
 **One tree, the size in the filename (2026-10-26).** Every stamp lives in
 
     data/stamps/<sample>/<lens>/<FILT>/
-    data/stamps/<sample>/<category>/<lens>/<FILT>/     a sample with lens_categories (COWLS:
-                                                       prime, multi_galaxy; 2026-11-02)
+    data/stamps/<sample>/<category>/<lens>/<FILT>/     a sample with lens_categories
+                                                       (cowls-mahler: prime, multi_galaxy,
+                                                       limited, complex; 2026-11-06)
 
 and its filenames start `stamp<S>_`, where S is the stamp's nominal size in arcsec. Each lens
 has one MODELLING size -- its `stamp_size` in info/samples/lens_samples.json, else

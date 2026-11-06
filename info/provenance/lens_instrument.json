@@ -5,7 +5,7 @@
             "F277W": "NIRCAM/LW"
         }
     },
-    "cowls_spectacular": {
+    "cowls-mahler": {
         "COSJ095914+021219": {
             "F115W": "NIRCAM/SW",
             "F150W": "NIRCAM/SW",
@@ -109,7 +109,7 @@
             "F444W": "NIRCAM/LW"
         }
     },
-    "spt": {
+    "templates": {
         "SPT0418-47": {
             "F115W": "NIRCAM/SW",
             "F150W": "NIRCAM/SW",

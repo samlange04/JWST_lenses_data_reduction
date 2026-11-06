@@ -9,8 +9,11 @@ picture. Update it when a step is done.
 | sample | lenses | reduced + stamps | PSF | masks | positions | extra-galaxy centres | exported for modelling |
 |---|---|---|---|---|---|---|---|
 | `b1938` | B1938+666 | F115W, F277W | injected STPSF | both bands | A, B | – | yes (`mask_radius` not settled) |
-| `spt` | SPT0418-47, SPT2147-50 | 6 + 4 bands | injected STPSF | all 10 bands | both lenses (SPT0418-47 two sets, SPT2147-50 one) | – | no |
-| `cowls_spectacular` | 17 (14 `prime`, 3 `multi_galaxy`) | 4 bands each, re-cut on measured lens centres | injected STPSF, rebuilt on those centres | all 68 bands | 16 lenses (COSJ095920+015851 deliberately none); COSJ100018+022138 in two sets | the 3 `multi_galaxy` lenses | no |
+| `templates` | SPT0418-47, SPT2147-50 | 6 + 4 bands | injected STPSF | all 10 bands | both lenses (SPT0418-47 two sets, SPT2147-50 one) | – | no |
+| `cowls-mahler` | 17 (3 `multi_galaxy`, 12 `limited`, 2 `complex`; `prime` empty) | 4 bands each, re-cut on measured lens centres | injected STPSF, rebuilt on those centres | all 68 bands | 16 lenses (COSJ095920+015851 deliberately none); COSJ100018+022138 in two sets | the 3 `multi_galaxy` lenses | no |
+
+(Samples renamed 2026-11-06: `spt` → `templates`, `cowls_spectacular` → `cowls-mahler`; the
+COWLS prime/multi_galaxy categories split into prime/multi_galaxy/limited/complex the same day.)
 
 - **Every PSF is STPSF injected into the lens's own exposures** and resampled as the science was.
   Its charge diffusion is calibrated on 243 stars; the field-star ePSF is kept as a check
