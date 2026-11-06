@@ -16,7 +16,7 @@ two to four separate images around the deflector. Modelling those arcs measures 
 distributed in the deflector. A model needs more than a picture, though: it needs to know how
 uncertain every pixel is, how blurred the telescope makes a point of light, which pixels to
 ignore, and roughly where the multiple images are. This repository produces that for 20
-lenses from three JWST programs (for the 17 COSMOS-Web lenses, so far the image and noise map).
+lenses from three JWST programs.
 
 **Most people only need the finished products in `data/stamps/`** — they are in git, so a
 plain clone has them. Re-running the reduction is only needed to change how it was done.
@@ -102,9 +102,10 @@ and COWLS lenses. A stamp cut at another size (`make_stamps.py --size 20`) is wr
 `stamp20_*` and is not kept in git. The PSF has no size in its name because it does not depend
 on the stamp size.
 
-**Masks and positions so far exist for B1938+666 only.** The SPT bands carry the image, noise
-map and PSF; their masks and positions have not been drawn yet. **The COWLS bands carry the
-image, noise map and PSF**; no masks or positions yet.
+**Every band of every lens has a hand-drawn contaminant mask, and every lens has image
+positions** — except COSJ095920+015851, where the positions file is deliberately empty.
+COSJ100018+022138 has two position sets (two lensed sources), and the three `multi_galaxy`
+COWLS lenses also carry extra-galaxy centres.
 
 **Orientation.** North is towards increasing row number and West towards increasing column
 number, so with Python's usual display (row 0 at the top) **North appears at the bottom and
@@ -240,7 +241,7 @@ model-PSF fallback) go in `data/reference_files/stpsf-data/`.
 uv run python scripts/download_nircam.py --lens SPT2147-50                 # raw ramps from MAST, sorted by filter
 uv run python scripts/reduce_nircam.py   --lens SPT2147-50 --filt F444W    # ramps -> calibrated exposures -> mosaic
 uv run python scripts/make_stamps.py     --lens SPT2147-50 --filt F444W    # stamp + noise map
-uv run python scripts/make_psf.py        --lens SPT2147-50 --filt F444W    # empirical PSF (STPSF fallback)
+uv run python scripts/make_psf.py        --lens SPT2147-50 --filt F444W    # injected STPSF PSF (field-star ePSF as its check)
 uv run python scripts/make_masks.py      --lens SPT2147-50                 # GUI: paint contaminants to remove
 uv run python scripts/make_positions.py  --lens SPT2147-50                 # GUI: mark the multiple images
 ```
