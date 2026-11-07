@@ -33,7 +33,7 @@ tools drew the masks and marked the positions.
 | `b1938` | B1938+666 | GO 8281 (PI Vegetti) | F115W, F277W (21 dithers, ~24 h per filter) | 0.881 / 2.059 |
 | `templates` | SPT0418-47 | ERS 1355 TEMPLATES (PI Rigby) | F115W, F150W, F200W, F277W, F356W, F444W | 0.263 / 4.22 |
 | `templates` | SPT2147-50 | ERS 1355 TEMPLATES (PI Rigby) | F200W, F277W, F356W, F444W | 0.845 / 3.76 |
-| `cowls-mahler` | the 17 "spectacular" COWLS lenses of Mahler et al. (2025), `COSJ095914+021219` … `COSJ100121+022740` | GO 1727 COSMOS-Web (PIs Kartaltepe & Casey) | F115W, F150W, F277W, F444W (2–4 exposures of 258 s per filter at the lens) | per lens in `lens_samples.json`: 11 spectroscopic and 5 photometric lens redshifts, 3 spectroscopic source redshifts |
+| `cowls-mahler` | the 17 "spectacular" COWLS lenses of Mahler et al. (2025), `COSJ095914+021219` … `COSJ100121+022740` | GO 1727 COSMOS-Web (PIs Kartaltepe & Casey) | F115W, F150W, F277W, F444W (2–4 exposures of 258 s per filter at the lens) | per lens in `lens_samples.json`: 14 spectroscopic and 3 photometric lens redshifts, 6 spectroscopic source redshifts |
 
 That is 80 lens-and-filter images in total (12 + 68 COWLS). A filter name gives its approximate central
 wavelength in hundredths of a micron: F115W is centred near 1.15 μm and F444W near 4.4 μm,
@@ -59,7 +59,7 @@ in `info/samples/lens_samples.json`), to within 0.04″, and a lens's SW and LW 
 Each lens and filter has one folder, `data/stamps/<sample>/<lens>/<filter>/`, for example
 `data/stamps/b1938/B1938+666/F115W/`. The COWLS lenses add a level for their category,
 `data/stamps/cowls-mahler/<category>/<lens>/<filter>/`:
-- `prime`: the sample's best lenses (none chosen yet);
+- `prime`: the sample's best lenses (COSJ095921+020638);
 - `multi_galaxy`: more than one galaxy's mass has to be modelled, such as a second lens or a
   galaxy close enough to the arcs to perturb them;
 - `limited`: no spectroscopic redshift for the lens, the source, or both;
@@ -179,8 +179,8 @@ signal_to_noise = image / noise
   method. Only a spectroscopic redshift counts as confirmed here. A photometric one is always
   labelled: "photo-z" on the figures, and `redshift_*_kind: "photometric"` in the exported
   `info.json`. A missing value is `null`. All B1938+666 and SPT redshifts are spectroscopic. For
-  the COWLS lenses, both redshifts are spectroscopic only for COSJ100018+022138 and
-  COSJ100024+021749.
+  the COWLS lenses, both redshifts are spectroscopic for COSJ095921+020638, COSJ095955+021900,
+  COSJ100018+022138, COSJ100024+021749 and COSJ100028+021928.
 
 [`AGENTS.md`](AGENTS.md) has the measurements behind each of these.
 

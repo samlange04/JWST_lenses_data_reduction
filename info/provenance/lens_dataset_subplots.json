@@ -157,7 +157,7 @@
                 "stretch": "asinh",
                 "cmap": "inferno",
                 "pixel_scale_arcsec": 0.03,
-                "frac_masked": 0.11005,
+                "frac_masked": 0.2098,
                 "variant": "standard",
                 "output": "data/stamps/cowls-mahler/prime/COSJ095921+020638/F115W/stamp12_dataset.png"
             },
@@ -167,7 +167,7 @@
                 "stretch": "asinh",
                 "cmap": "inferno",
                 "pixel_scale_arcsec": 0.03,
-                "frac_masked": 0.118438,
+                "frac_masked": 0.206237,
                 "variant": "standard",
                 "output": "data/stamps/cowls-mahler/prime/COSJ095921+020638/F150W/stamp12_dataset.png"
             },
@@ -177,7 +177,7 @@
                 "stretch": "asinh",
                 "cmap": "inferno",
                 "pixel_scale_arcsec": 0.06,
-                "frac_masked": 0.131625,
+                "frac_masked": 0.20065,
                 "variant": "standard",
                 "output": "data/stamps/cowls-mahler/prime/COSJ095921+020638/F277W/stamp12_dataset.png"
             },
@@ -187,7 +187,7 @@
                 "stretch": "asinh",
                 "cmap": "inferno",
                 "pixel_scale_arcsec": 0.06,
-                "frac_masked": 0.1707,
+                "frac_masked": 0.224475,
                 "variant": "standard",
                 "output": "data/stamps/cowls-mahler/prime/COSJ095921+020638/F444W/stamp12_dataset.png"
             }

@@ -10,7 +10,7 @@ picture. Update it when a step is done.
 |---|---|---|---|---|---|---|---|
 | `b1938` | B1938+666 | F115W, F277W | injected STPSF | both bands | A, B | – | yes (`mask_radius` not settled) |
 | `templates` | SPT0418-47, SPT2147-50 | 6 + 4 bands | injected STPSF | all 10 bands | both lenses (SPT0418-47 two sets, SPT2147-50 one) | – | no |
-| `cowls-mahler` | 17 (3 `multi_galaxy`, 12 `limited`, 2 `complex`; `prime` empty) | 4 bands each, re-cut on measured lens centres | injected STPSF, rebuilt on those centres | all 68 bands | 16 lenses (COSJ095920+015851 deliberately none); COSJ100018+022138 in two sets | the 3 `multi_galaxy` lenses | no |
+| `cowls-mahler` | 17 (1 `prime`, 3 `multi_galaxy`, 10 `limited`, 3 `complex`) | 4 bands each, re-cut on measured lens centres | injected STPSF, rebuilt on those centres | all 68 bands | 16 lenses (COSJ095920+015851 deliberately none); COSJ100018+022138 in two sets | the 3 `multi_galaxy` lenses | no |
 
 (Samples renamed 2026-11-06: `spt` → `templates`, `cowls_spectacular` → `cowls-mahler`; the
 COWLS prime/multi_galaxy categories split into prime/multi_galaxy/limited/complex the same day.)
@@ -19,8 +19,8 @@ COWLS prime/multi_galaxy categories split into prime/multi_galaxy/limited/comple
   Its charge diffusion is calibrated on 243 stars; the field-star ePSF is kept as a check
   (AGENTS.md *PSF*).
 - **Only spectroscopic redshifts count as confirmed.** Photometric ones are labelled wherever
-  they appear. COWLS: 11 spectroscopic and 5 photometric lens redshifts, 3 spectroscopic source
-  redshifts.
+  they appear. COWLS: 14 spectroscopic and 3 photometric lens redshifts, 6 spectroscopic source
+  redshifts (2026-11-07 literature completion; AGENTS.md *Lens samples*).
 - **GUIs:** North up, East left, with one image look. Positions snap within 1 px and `z` undoes
   (AGENTS.md *Masks, arc masks, positions, QC*).
 - **Every lens has a primary band chosen by eye** (`best_band_visual`; B1938+666 F115W, both SPT

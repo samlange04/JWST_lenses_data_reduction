@@ -291,12 +291,107 @@ own copy must keep them equal).
 are the COWLS IDs, `cowls_letter` the paper's A–Q. `ra`/`dec` are the COSMOS-Web catalogue
 positions OF THE LENS GALAXY (Shuntov+24), so unlike an APT coordinate they need no
 `deflector_ra`. `theta_e` is COWLS I's PyAutoLens value, for orientation. Redshifts carry
-their source in `redshift_*_kind` (DESI spec, COSMOS-Web photo-z, van der Wel+13);
-COSJ100119+014849 has no lens redshift and only COSJ100018+022138, COSJ100024+015334 and
-COSJ100024+021749 have source redshifts, so the rest export `null`. Spectroscopic: 11 lens
-redshifts and all 3 source redshifts, so both are spectroscopic only for COSJ100018+022138 and
-COSJ100024+021749. The other 5 lens redshifts are photometric (COSJ095917+015424,
-COSJ095955+021900, COSJ100013+023424, COSJ100024+015334, COSJ100025+015245). Depth at the
+their source in `redshift_*_kind` (DESI spec, COSMOS-Web photo-z, van der Wel+13, and the
+2026-11-07 literature additions below). Every lens has a lens redshift; six lenses have
+source redshifts (COSJ095921+020638, COSJ095955+021900, COSJ100018+022138,
+COSJ100024+015334, COSJ100024+021749, COSJ100028+021928), so the rest export `null`.
+Spectroscopic: 14 lens redshifts and all 6 source redshifts, so both are spectroscopic for
+COSJ095921+020638, COSJ095955+021900, COSJ100018+022138, COSJ100024+021749 and
+COSJ100028+021928. The other 3 lens redshifts are
+photometric (COSJ095917+015424, COSJ100024+015334, COSJ100025+015245); COSJ100013+023424's
+zCOSMOS-bright spec-z (0.8912) is flag 2, low confidence. COSJ100028+021928's source
+redshift is the one positional association in the sample (see below), not a spectrum of the
+arc.
+
+**Redshifts completed from the literature, 2026-11-07** (NED cone searches at the measured
+deflector positions and at the marked image positions, then the papers; filed in the papers
+wiki under `kashino2019fmos6`, `adame2024desiedr`, `anguita2009cosmos5921`,
+`casey2017dsfgmosfire`):
+- **COSJ100119+014849 (P): lens z = 1.669 spec** (FMOS-COSMOS, Kashino+19: 1.668831 on the
+  lens galaxy). COWLS II Table 1 has no redshift for this lens.
+- **COSJ095955+021900 (G) = the SARCS 080 group: lens z = 0.9336 spec** (DESI EDR 0.933647
+  on the deflector galaxy; zCOSMOS 0.9338, IMACS 0.93432 and the group catalogues agree),
+  replacing COWLS II's 0.577 photo-z, which was wrong. **Source z = 1.369 spec** (DESI EDR
+  1.36907 on the galaxy at the southern marked image, 3" S of the deflector; the eastern
+  image has only a 1.22 photo-z).
+- **COSJ095921+020638 (D) = COSMOS 5921+0638 = SL2S J095921+020638**, a known quadruply
+  lensed low-luminosity AGN plus complete Einstein ring (Anguita+09). **Lens z = 0.551 spec**
+  (Anguita+09 VLT/FORS1 0.551 ± 0.001; zCOSMOS 0.5518; DEIMOS-10k), replacing COWLS II's
+  0.469 labelled "DESI" — 0.469 is the Darvish+17 photo-z (0.4694); NED has no DESI redshift
+  for this object. **Source z = 3.35 spec** (Sonnenfeld+13 SL2S IV, XSHOOTER on the arc, and
+  Gavazzi+14); Anguita+09's own source redshift was 3.14 ± 0.05 from a single candidate
+  Lyα line, and Andika+25 repeats 3.14 — the two spec-z claims conflict and 3.35 is the
+  SL2S-consistent value, so say which is used.
+- **Candidates, NOT adopted** (positional cross-matches on the marked images, photometric
+  redshifts, or both; N's candidate of the morning session was later investigated and ADOPTED
+  — see the next block):
+  - COSJ100013+023424 (I): the eastern arc coincides with the ALMA source
+    AS2COS.0093.2 / A3COSMOS 1264264 — a dusty star-forming galaxy — with conflicting
+    photometric redshifts 3.4 (Miettinen+17) and 7.201 (Liu+19).
+  - COSJ100119+014849 (P): the western marked image matches COSMOS 0876696 at photo-z 1.46,
+    which is in FRONT of the 1.669 lens, so that catalogue entry cannot be the source's
+    redshift (a blend).
+  - COSJ095953+023319 (F): Herschel source HSG J095954+023321 (photo-z ~1.83, Casey+12)
+    0.7" from image 0.
+- **Open conflict, kept as recorded: COSJ100121+022740 (Q)** lens z = 0.371 (COWLS II,
+  DESI) against 0.37406 spectroscopic from DEIMOS-10k (Hasinger+18) — 900 km/s apart.
+
+**The N and I candidates investigated, 2026-11-07** (same day, later session; scratch scripts
+`diagnostics/redshift_n_i_{phot,crops,zooms}.py`):
+- **N (COSJ100028+021928): the z = 1.516 MOSFIRE redshift is on the SCUBA-2 position, and our
+  stamps show a red object there.** The candidate is Casey+17's 450.25, a L_IR ≈ 4e12 Lsun
+  DSFG with Hα + [NII] + [SII] (a robust multi-line z; Casey+17 has no lensing note). Its
+  position is Casey+13's SCUBA-2 prior position (compilation's corrected coordinates
+  150.1187, 2.3241: 0.96" from the marked western image, 0.30" from the SMM name position).
+  On the stamps, the SMM position holds NO distinct object (morphology test, same session):
+  after subtracting a sigma-clipped local plane, there is no positive compact excess within
+  0.3" in any band, the r=0.2" aperture there is NEGATIVE (−30σ/−17σ in F277W/F444W), and a
+  radial spoke from the lens through that direction falls smoothly (0.82 MJy/sr at 0.7–1.0"
+  [the img0/arc structure], 0.22, 0.06, 0.026, 0.015 out to 2.4") with no bump at the SMM
+  radius (1.62"). An earlier aperture-versus-annulus "+30 nJy (6σ) red object" claim was an
+  artefact: on a steep smooth gradient the annulus sits downhill, so any wing point reads a
+  positive excess. The only compact object in the area is the marked img0 knot 0.67" away,
+  detected in ALL bands (bright; F115W 400 nJy, red F115W−F444W = +1.3 mag; at z = 1.516
+  Hβ + [OIII] fall in F115W, Hα at F150W's red edge). The eastern marked image is bluer
+  (crude aperture photometry near the lens; not decisive). No archival ALMA continuum covers N
+  (A3COSMOS empty within 8"), so the submm → counterpart link rests on Casey+13's radio/mid-IR
+  prior (whose own z_phot for 450.25 was 0.61 ≈ the lens) plus the 0.7"-wide MOSFIRE slit,
+  which covers both the SMM position and the marked knot. ADOPTED 2026-11-07 as the source
+  redshift, with these caveats in `redshift_source_kind`: it is a redshift OF THE SMG measured
+  near the western image, not a spectrum of the arc — the association is positional and the
+  marked knot's own redshift is unmeasured.
+  The COSMOS spec-z compilation independently carries it (450.25, MOSFIRE, flag 4).
+- **I (COSJ100013+023424): the eastern arc IS the ALMA SMG, and JWST favours z ≈ 3.4 over
+  7.2, but both stay photometric.** A3COSMOS gives 4.84 ± 0.40 mJy at 872 µm (0.22" beam) ON
+  the arc (0.8" S of the marked peak, which the ~1" N-S arc covers), plus 1.2 mm detections.
+  The arc is dark in F115W and F150W (< 2σ) and bright in F277W/F444W (33σ/53σ at the marked
+  peak); COWLS II Fig. 3 uses this lens as its "HST-dark source" example. At z = 3.4 the
+  Balmer/4000 Å break falls at 1.76 µm, exactly between F150W and F277W, and Hα at 2.89 µm
+  lands in F277W; at z = 7.2 the Lyman break (0.997 µm) leaves rest-UV in F115W/F150W unless
+  the dust is extreme. Not among AS2COSPEC's 18 CO redshifts (Chen+22), and the COSMOS spec-z
+  compilation has nothing at the arc. A second A3COSMOS 872 µm detection (0.83 ± 0.23 mJy)
+  sits 0.38" W of the lens centre, 0.25" from the marked WSW counter-image — one beam, so
+  ambiguous between the counter-image and the lens itself.
+- **The COSMOS Spectroscopic Redshift Compilation DR1.1** (Khostovan+26, ApJS 282, 6;
+  github.com/cosmosastro/speczcompilation; 262k unique objects) was swept at all 17 deflectors
+  and every marked image. It confirms every recorded COWLS redshift (incl. G's source 1.3691 at
+  the southern image, J's 3.4248 at both image sets, K's source 5.1043 NOEMA) and adds:
+  - **I's lens: z = 0.8912 zCOSMOS-bright (Lilly+07), flag 2 (low confidence, ~80%)**, 0.07"
+    from the measured centre, agreeing with the photo-z 0.89. ADOPTED 2026-11-07 as spec with
+    the flag 2 noted in `redshift_lens_kind`.
+  - **Q's lens: z = 0.3741 hCOSMOS (MMT/Hectospec, Damjanov+18), flag 4** — agrees with
+    DEIMOS-10k's 0.37406. ADOPTED 2026-11-07, replacing COWLS II's 0.371 "DESI, Dey+19", which
+    cannot be traced: COWLS II cites Dey+19 (AJ 157, 168) for its DESI redshifts, but that
+    paper is the DESI Legacy Imaging Surveys overview and carries no spectroscopy, and no DESI
+    release (EDR/DR1/DR2, via NED and this compilation) has a spectrum of this galaxy. Two
+    independent public spectra (MMT, Keck) both give 0.374.
+  - **A's lens: NEW conflict** — FORS2 (Comparat+15) z = 1.1572, flag 4, 0.18" from the lens,
+    against the recorded 1.053 (Dey+19). The compilation's photo-z (1.062) leans to 1.053.
+    Unresolved; the recorded value kept.
+  - No new source redshift for any other lens (B, E, F, H, M, O arcs have no compilation match
+    at the marked images).
+
+Depth at the
 lens is set by where it falls in the COSMOS-Web dither pattern, not by the tile: COSJ100028+021928's SW
 stamp rests on ONE exposure, so Image3's outlier detection has nothing to compare and its
 cosmic rays are caught by `jump` alone — look at it before trusting faint SW structure.
@@ -592,12 +687,14 @@ mosaics' absolute astrometry (relative alignment only).
 **Lens categories (`cowls-mahler`; four since 2026-11-06, replacing the prime/multi_galaxy split of 2026-11-02).** A sample may list `lens_categories` in
 `lens_samples.json`, and each of its lenses then carries `category` (+ `category_note`). Its
 stamps live one level deeper, in `data/stamps/<sample>/<category>/<lens>/`.
-- COWLS: `prime` holds the sample's best lenses, none chosen yet. `multi_galaxy`
+- COWLS: `prime` holds the sample's best lenses (COSJ095921+020638 since 2026-11-07, the first
+  choice: a known quad with both redshifts spectroscopic). `multi_galaxy`
   means more than one galaxy's mass has to be modelled: a second lens, or a perturber near the arcs.
-  `limited` is the rest with no spectroscopic redshift for the lens, the source or both (12
+  `limited` is the rest with no spectroscopic redshift for the lens, the source or both (10
   lenses); `complex` is the rest, whose lens AND source redshifts are both spectroscopic
-  (COSJ100018+022138, COSJ100024+021749). Every lens's neighbours are still masked as
-  contaminants, whatever its category.
+  (COSJ100018+022138, COSJ100024+021749, COSJ100028+021928 since 2026-11-07 — its source
+  redshift is the sample's one positional association, see *Lens samples*). Every lens's
+  neighbours are still masked as contaminants, whatever its category.
 - `multi_galaxy` lenses (2026-11-02):
   - COSJ100119+014849: the round galaxy 1.7" SE is a second lens, 0.56" from the ring.
   - COSJ095955+021900: a group-scale lens (θ_E 2.11"). An elongated galaxy 3.9" SE, about 1.3"
@@ -989,8 +1086,8 @@ always answers `stamp<S>` for the lens's modelling size). The semantics are unch
   spans fewer than 5 PSF widths (SW resolves θ_E down to 0.33", F444W only to 0.83").
 
   **Why not redshift.** The lens light peaks near rest 1.6 µm, but the arc's colour is the
-  source's: 14 of 17 COWLS sources have no redshift, and COSJ100119+014849 has no lens redshift
-  (and 5 of the 16 lens redshifts are only photometric). Measured, the
+  source's: 12 of 17 COWLS sources have no redshift, and 4 of the 17 lens redshifts are only
+  photometric. Measured, the
   bands do not follow z_l: COSJ100012+022015, COSJ100121+022740 and COSJ100024+021749 all sit at
   z_l ≈ 0.37, yet COSJ100024+021749 is best in F150W and the other two
   in F277W.
