@@ -13,8 +13,9 @@ a guide. It missed B1938+666 (F115W's 0.03" pixels beat F277W's S/N on a 0.45" r
 COSJ100018+022138 (F150W), and had nothing to say on two lenses with faint arcs. This makes the
 choice the reviewer's.
 
-For each lens it opens the band overview (make_band_overview.build_figure: every band, full
-stamp, zoom, isophote-subtracted zoom), with each band's measured arc S/N and score under its
+For each lens it opens the band overview (make_band_overview.build_figure: every band as S/N on
+ONE stretch shared by all bands, so the bands can be compared by eye; full stamp, zoom,
+isophote-subtracted zoom), with each band's measured arc S/N and score under its
 name and the current choice outlined.
   * click a band's column, or press 1-N (bands in wavelength order), to select it;
   * Enter accepts the selection: it is written to info/samples/lens_samples.json as the

@@ -1135,8 +1135,14 @@ always answers `stamp<S>` for the lens's modelling size). The semantics are unch
   stamp, a zoom on the lens, and the zoom with the lens light removed by an ISOPHOTE model
   (`isophote_model.py`, as the positions GUI; smoothed, red-blue, red = light the model lacks,
   masked pixels blank). Its colour range is set outside the central 0.2", whose cusp the inner
-  isophotes cannot follow. The other panels have their own stretch in the repo's one look
-  (`display_look.py`, the dataset subplots' inferno + 99% asinh), North up, East left.
+  isophotes cannot follow. **The panels show S/N (data / noise), every band on ONE shared stretch
+  (2026-11-07, `display_look.shared_norm`/`normalised_with`: the combined PercentileInterval(99) +
+  asinh)** — a per-panel stretch made a faint band look as bright as a deep one, hiding exactly the
+  arc-S/N and deblending differences the best-band choice (`choose_best_band.py`) is made from.
+  The residual row keeps a per-band symmetric sigma limit (a shared one let the deepest band wash
+  out the rest). Each S/N row has one colourbar, each residual panel its own; each column's title
+  carries the measured arc S/N and score from `lens_primary_band.json`, as the
+  `choose_best_band.py` GUI shows. North up, East left.
   Overlaid: the contaminant mask outline, the extra-galaxy centres and θ_E; the primary band is
   starred. Image positions are NOT drawn (2026-11-02): each band's `*_positions.png` shows them.
   - The zooms, the θ_E circle and the isophote model are centred on the lens's measured
@@ -1186,8 +1192,10 @@ always answers `stamp<S>` for the lens's modelling size). The semantics are unch
   `AsinhStretch(0.1)`.
   - The mask GUIs pass `display_look.SCRIBBLER` as the Scribbler's `cmap`: an object with
     `norm_from(array=)` + `cmap_name`, which the Scribbler applies per panel.
-  - The positions / extra-galaxy GUIs and their PNGs, the arc-mask QC PNG and the band overview's
-    as-observed rows all use `display_look.normalised`, as does the dataset subplot itself.
+  - The positions / extra-galaxy GUIs and their PNGs and the arc-mask QC PNG all use
+    `display_look.normalised`, as does the dataset subplot itself. The band overview instead shows
+    S/N panels sharing ONE stretch across a lens's bands (`shared_norm` + `normalised_with`;
+    2026-11-07, see the band-overview bullet).
   - Signed residuals (the isophote-subtracted panels) stay red-blue.
   - Before this, the Scribbler showed its median/MAD `arcsinh_stretch` on autoarray's colormap,
     the positions GUI a percentile asinh on `jet`, and the overview gray.

@@ -8,21 +8,27 @@ One figure per lens with every band's stamp side by side: data/stamps/<sample>/[
 The per-band QC (stamp<S>_dataset.png) shows one band's data, noise, PSF and mask; this shows all
 of a lens's bands at once, so the lens and its arcs can be compared across wavelength. Columns are
 the bands in wavelength order. Rows:
-  1. the full stamp as observed, with the band's contaminant mask outlined (red) where drawn;
-  2. a zoom on the lens (+-max(2.5 theta_E, 1.5")), as observed;
+  1. the full stamp as S/N (data / noise), with the band's contaminant mask outlined (red) where drawn;
+  2. a zoom on the lens (+-max(2.5 theta_E, 1.5")), as S/N;
   3. the same zoom with the lens light removed by an ISOPHOTE model (isophote_model.py: elliptical
      isophotes free in ellipticity and PA, centre fixed on the lens, masked pixels left out;
-     the positions GUI's panel), smoothed and on a red-blue map (red = light the model lacks,
-     masked pixels blank), with the Einstein radius (dashed). Image positions are NOT drawn
-     (2026-11-02): they have their own per-band QC overlays (make_positions.py, *_positions.png).
+     the positions GUI's panel), divided by the noise, smoothed and on a red-blue map (red = light
+     the model lacks, masked pixels blank), with the Einstein radius (dashed). Image positions are
+     NOT drawn (2026-11-02): they have their own per-band QC overlays (make_positions.py,
+     *_positions.png).
      A radial median, used until 2026-11-01, leaves a quadrupole on every elliptical lens.
+Every band shares ONE stretch on the S/N rows (2026-11-07): their limits come from all bands'
+pixels combined (PercentileInterval(99) + AsinhStretch, display_look.shared_norm). A per-panel
+stretch made a faint band look as bright as a deep one, which hid exactly the arc-S/N and
+deblending differences the best-band choice (choose_best_band.py) is made from. The residual row
+keeps a per-band symmetric sigma limit (a shared one let the deepest band wash out the rest), and
+each column's title carries the measured arc S/N and score (choose_primary_band.py's record, as in
+the choose_best_band.py GUI). Each S/N row has one colourbar, each residual panel its own.
 The zooms, the theta_E circle and the isophote model are centred on the lens's measured
 centre (deflector_ra/dec, measure_lens_centres.py; else the catalogue position), at its exact
 sub-pixel position: the stamps are cut on it but snapped to the 0.06" LW grid, and a profile even
 half a pixel off the lens leaves a dipole. The residual offset is printed in the header.
-Every as-observed panel has its own stretch, the dataset subplots' look (display_look.py: inferno,
-PercentileInterval(99) + AsinhStretch(0.1)), as the GUIs. North is up
-and East left (the stamps' rows run South to North, columns East to West). The primary band
+North is up and East left (the stamps' rows run South to North, columns East to West). The primary band
 (lens_samples.primary_band: reviewed, or choose_primary_band.py's suggestion) is starred, and
 the header gives the lens and source redshifts (a photometric one labelled 'photo-z'), theta_E and
 the primary band's source.
@@ -38,11 +44,13 @@ import sys
 import warnings
 
 import numpy as np
+import matplotlib.cm
 import matplotlib.patheffects
 from matplotlib.figure import Figure     # no pyplot: GUIs import this module (see build_figure)
 from astropy.io import fits
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import info_json
 import isophote_model
 import lens_samples
 import positions_io
@@ -62,21 +70,23 @@ FILTER_UM = {'F070W': 0.70, 'F090W': 0.90, 'F115W': 1.15, 'F150W': 1.50, 'F200W'
 
 
 def load_band(stamp_dir, prefix):
-    """The band's sci (no-data pixels NaN), pixel scale, mask (or None), extra-galaxy centres (or [])."""
+    """The band's sci and noise (no-data pixels NaN), pixel scale, mask (or None), extra-galaxy
+    centres (or [])."""
     sci_f = stamp_paths.find_stamp(stamp_dir, prefix, 'sci')
     noise_f = stamp_paths.find_stamp(stamp_dir, prefix, 'noise')
     if sci_f is None:
         return None
     sci = fits.getdata(sci_f).astype(float)
     hdr = fits.getheader(sci_f)
-    if noise_f is not None:
-        sci = np.where(fits.getdata(noise_f) >= 1e7, np.nan, sci)
+    noise = fits.getdata(noise_f).astype(float) if noise_f is not None else None
+    if noise is not None:
+        sci = np.where(noise >= 1e7, np.nan, sci)
     scale = float(hdr['PIXSCALE'])
     mask_f = os.path.join(stamp_dir, f'{prefix}_mask.fits')
     mask = fits.getdata(mask_f).astype(bool) if os.path.exists(mask_f) else None
     eg_f = os.path.join(stamp_dir, f'{prefix}_extra_galaxies_centres.json')       # make_extra_galaxies.py
     extra = positions_io.flatten(positions_io.read_sets(eg_f)) if os.path.exists(eg_f) else []
-    return dict(sci=sci, scale=scale, mask=mask, extra=extra, hdr=hdr)
+    return dict(sci=sci, noise=noise, scale=scale, mask=mask, extra=extra, hdr=hdr)
 
 
 def build_figure(sample, lens, fig=None):
@@ -113,16 +123,30 @@ def build_figure(sample, lens, fig=None):
     e0, n0 = -(tx - (n_ - 1) / 2.0) * s0, (ty - (n_ - 1) / 2.0) * s0
 
     ncol = len(filts)
-    size = (max(3.0 * ncol, 8.0), 9.8)
+    size = (max(3.3 * ncol, 8.5), 9.8)
     if fig is None:
         fig = Figure(figsize=size)
     else:
         fig.clf()
         fig.set_size_inches(*size)
-    axes = fig.subplots(3, ncol, squeeze=False)
-    for j, f in enumerate(filts):
+    # panel columns alternate with slim colourbar columns (used by the residual row's per-panel
+    # bars), so a colourbar never shrinks a panel; the last slim column holds the S/N rows' bars
+    gs = fig.add_gridspec(3, 2 * ncol + 1,
+                          width_ratios=[w for _ in range(ncol) for w in (1.0, 0.05)] + [0.05])
+    axes = np.empty((3, ncol), dtype=object)
+    cax3 = []
+    for j in range(ncol):
+        for i in range(3):
+            axes[i, j] = fig.add_subplot(gs[i, 2 * j])
+        cax3.append(fig.add_subplot(gs[2, 2 * j + 1]))
+    # The panels show S/N (data / noise), and every band is drawn on ONE shared stretch, so a
+    # band where the arc is faint looks faint. A per-panel stretch made all bands look equally
+    # bright, hiding exactly the arc-S/N and deblending differences the best-band choice
+    # (choose_best_band.py) is made from.
+    for f in filts:
         b = bands[f]
         sci, s, mask = b['sci'], b['scale'], b['mask']
+        noise = b['noise'] if b['noise'] is not None else np.ones_like(sci)
         n = sci.shape[0]
         c = (n - 1) / 2.0
         # Rows run South -> North and columns East -> West. Every panel is in arcsec from the
@@ -134,12 +158,33 @@ def build_figure(sample, lens, fig=None):
                                                                refine_centre=False,
                                                                fit_half_arcsec=1.45 * half_zoom + 0.3,   # the zoom's corners too
                                                                step=0.2, maxit=15), SMOOTH_PX)
+        with np.errstate(divide='ignore', invalid='ignore'):
+            b['snr'] = np.where(np.isfinite(sci), sci / noise, np.nan)
+            b['sub_snr'] = sub / noise
+        b['lx'], b['ly'] = lx, ly
         zp = int(np.ceil(half_zoom / s)) + 1
-        j0, i0 = max(0, int(round(lx)) - zp), max(0, int(round(ly)) - zp)
-        j1, i1 = min(n, int(round(lx)) + zp + 1), min(n, int(round(ly)) + zp + 1)
-        for i, (img, zoom) in enumerate(((sci, False), (sci, True), (sub, True))):
+        b['zoom'] = (slice(max(0, int(round(ly)) - zp), min(n, int(round(ly)) + zp + 1)),
+                     slice(max(0, int(round(lx)) - zp), min(n, int(round(lx)) + zp + 1)))
+        # this band's symmetric limit for the residual row, from the zoom outside the core (the
+        # inner isophotes cannot follow the central cusp, and that residual would wash out the arcs)
+        yy, xx = np.mgrid[b['zoom']]
+        outer = np.hypot(xx - lx, yy - ly) * s > CORE_ARCSEC
+        a = np.abs(b['sub_snr'][b['zoom']][outer])
+        a = a[np.isfinite(a)]
+        b['vmax3'] = float(np.percentile(a, 99.5)) if a.size else 1.0
+    norm_snr = display_look.shared_norm([bands[f]['snr'] for f in filts])
+    # the measured arc S/N and score per band (choose_primary_band.py's record; the
+    # choose_best_band.py GUI shows the same numbers), for the column titles
+    pb = info_json.load(info_json.path(ws_path, 'lens_primary_band.json')).get(sample, {}).get(lens, {})
+    scores = pb.get('scores', {})
+    for j, f in enumerate(filts):
+        b = bands[f]
+        s, mask = b['scale'], b['mask']
+        n = b['sci'].shape[0]
+        c = (n - 1) / 2.0
+        for i, (img, zoom) in enumerate(((b['snr'], False), (b['snr'], True), (b['sub_snr'], True))):
             ax = axes[i, j]
-            rs, cs = (slice(i0, i1), slice(j0, j1)) if zoom else (slice(0, n), slice(0, n))
+            rs, cs = b['zoom'] if zoom else (slice(0, n), slice(0, n))
             a = img[rs, cs]
             diverging = i == 2
             ext = [-(cs.start - 0.5 - c) * s, -(cs.stop - 0.5 - c) * s, (rs.start - 0.5 - c) * s, (rs.stop - 0.5 - c) * s]
@@ -147,16 +192,11 @@ def build_figure(sample, lens, fig=None):
                 d = np.array(a, dtype=float)
                 if mask is not None:
                     d[mask[rs, cs]] = np.nan                     # blanked, as in the positions GUI
-                # the colour range from the zoom outside the core: the inner isophotes cannot
-                # follow the central cusp, and that residual would otherwise wash out the arcs
-                yy, xx = np.mgrid[rs, cs]
-                outer = np.hypot(xx - lx, yy - ly) * s > CORE_ARCSEC
-                vmax = float(np.nanpercentile(np.abs(d[outer]), 99.5)) if np.isfinite(d[outer]).any() else 1.0
-                ax.imshow(d, origin='lower', cmap='RdBu_r', vmin=-vmax, vmax=vmax, extent=ext,
-                          interpolation='nearest')
+                b['im3'] = ax.imshow(d, origin='lower', cmap='RdBu_r', vmin=-b['vmax3'], vmax=b['vmax3'],
+                                     extent=ext, interpolation='nearest')
             else:
-                ax.imshow(display_look.normalised(a), origin='lower', cmap=display_look.CMAP, vmin=0.0, vmax=1.0,
-                          extent=ext, interpolation='nearest')
+                ax.imshow(display_look.normalised_with(a, norm_snr), origin='lower', cmap=display_look.CMAP,
+                          vmin=0.0, vmax=1.0, extent=ext, interpolation='nearest')
             if mask is not None and mask[rs, cs].any():
                 edge = mask_boundary(mask[rs, cs])
                 rgba = np.zeros(edge.shape + (4,))
@@ -180,11 +220,14 @@ def build_figure(sample, lens, fig=None):
             ax.set_xticks([]); ax.set_yticks([])
             if i == 0:
                 star = ' ★' if f == primary else ''
-                ax.set_title(f'{f}{star}\n{s:.2f}"/px', fontsize=10,
+                sc = scores.get(f) or {}
+                meas = (f'arc S/N {sc.get("arc_snr")}  score {sc.get("score")}'
+                        if sc.get('arc_snr') is not None else 'arc S/N not measured')
+                ax.set_title(f'{f}{star}\n{meas}\n{s:.2f}"/px', fontsize=10,
                              color='darkred' if f == primary else 'black')
             if j == 0:
-                ax.set_ylabel(['as observed (full stamp)', 'as observed (zoom on the lens)',
-                               'isophote-subtracted (zoom, smoothed)'][i], fontsize=9)
+                ax.set_ylabel(['S/N, full stamp', 'S/N, zoom on the lens',
+                               'residual / noise (zoom, smoothed)'][i], fontsize=9)
             # 1" scale bar, bottom right
             (xa, xb), (ya, yb) = xl, yl
             wx, wy = xa - xb, yb - ya
@@ -192,6 +235,17 @@ def build_figure(sample, lens, fig=None):
             ink = 'black' if i == 2 else 'white'
             ax.plot([bx, bx - 1.0], [by, by], color=ink, lw=2)
             ax.text(bx - 0.5, by + 0.04 * wy, '1"', color=ink, ha='center', fontsize=8)
+    # colourbars: one per S/N row (the stretch is shared across the bands), one per residual
+    # panel (each band's own symmetric sigma limit)
+    sm = matplotlib.cm.ScalarMappable(cmap=display_look.CMAP, norm=norm_snr)
+    for i in (0, 1):
+        cb = fig.colorbar(sm, cax=fig.add_subplot(gs[i, 2 * ncol]))
+        cb.set_label('S/N (data / noise), one stretch for all bands', fontsize=8)
+        cb.ax.tick_params(labelsize=7)
+    for j, f in enumerate(filts):
+        cb = fig.colorbar(bands[f]['im3'], cax=cax3[j])
+        cb.set_label('residual / noise', fontsize=7)
+        cb.ax.tick_params(labelsize=6)
     # compass in the figure's top-left margin, clear of every panel: N up, E left
     from matplotlib.patches import FancyArrowPatch
     W, H = fig.get_size_inches()
@@ -208,6 +262,7 @@ def build_figure(sample, lens, fig=None):
     cat = lens_samples.category(lens, sample)
     fig.suptitle(f'{lens}  ({sample}{", " + cat if cat else ""})   z_l {zl_s}   z_s {zs_s}   θ_E {te_s}\n'
                  f'primary band: {prim}  (★)\n'
+                 f'panels are S/N (data / noise) on ONE stretch shared by every band; residual row on per-band ±sigma\n'
                  f'zooms on the measured lens centre ({1e3 * e0:+.0f} mas E, {1e3 * n0:+.0f} mas N of the stamp centre)\n'
                  f'red outline: contaminant mask   dashed: θ_E'
                  + ('   cyan x: extra-galaxy centres' if any(bands[f]['extra'] for f in filts) else ''),

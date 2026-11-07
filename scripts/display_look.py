@@ -9,6 +9,8 @@ Used by the mask GUIs (make_masks.py, make_arc_masks.py: al.Scribbler takes SCRI
 QC PNG and the band overview. Signed residual panels (the isophote-subtracted views) stay on a
 diverging red-blue map: a stretch onto inferno would hide which pixels are negative.
 
+`shared_norm`/`normalised_with` give several panels ONE common stretch (the band overview's S/N
+rows, where a per-panel stretch would hide the differences between bands).
 Light on purpose (numpy + astropy only): the band overview and the GUIs import it.
 """
 import numpy as np
@@ -44,6 +46,32 @@ def normalised(values, exclude=None, vmax=None, pct=PERCENTILE):
         hide |= np.asarray(exclude, dtype=bool)
     a[hide] = np.nan
     out = np.clip(np.ma.filled(norm(a, pct=pct, vmax=vmax)(np.nan_to_num(a)), 0.0), 0.0, 1.0)
+    out[hide] = 0.0
+    return out
+
+
+def shared_norm(arrays, pct=PERCENTILE):
+    """One ImageNormalize whose limits are the PercentileInterval(pct) of the finite pixels of
+    ALL the arrays combined, with AsinhStretch(ASINH_A) -- for panels that must be compared on a
+    single stretch (the band overview shows every band's S/N on one shared stretch)."""
+    vals = np.concatenate([np.asarray(a, dtype=float)[np.isfinite(a)] for a in arrays])
+    if vals.size == 0:
+        return ImageNormalize(vmin=0.0, vmax=1.0, stretch=AsinhStretch(ASINH_A))
+    lo, hi = PercentileInterval(pct).get_limits(vals)
+    if not hi > lo:
+        hi = lo + (abs(lo) or 1.0)
+    return ImageNormalize(vmin=lo, vmax=hi, stretch=AsinhStretch(ASINH_A))
+
+
+def normalised_with(values, norm, exclude=None):
+    """`values` mapped onto [0, 1] (clipped) with the given norm (e.g. shared_norm), for
+    imshow(..., cmap=CMAP, vmin=0, vmax=1); `exclude` and non-finite pixels go to the floor,
+    as in normalised."""
+    a = np.array(values, dtype=float)
+    hide = ~np.isfinite(a)
+    if exclude is not None:
+        hide |= np.asarray(exclude, dtype=bool)
+    out = np.clip(np.ma.filled(norm(np.nan_to_num(a)), 0.0), 0.0, 1.0)
     out[hide] = 0.0
     return out
 
